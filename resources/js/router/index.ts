@@ -18,7 +18,24 @@ declare module "vue-router" {
 const routes: Array<RouteRecordRaw> = [
     {
         path: "/",
+        redirect: "/home",
+        
+    },
+    {
+        path: "/home",
         component: () => import("@/pages/HomeView.vue"),
+    },
+    {
+        path: "/tiket",
+        component: () => import("@/pages/Foods.vue"),
+    },
+    {
+        path: "/tiket/:id",
+        component: () => import("@/pages/FoodDetail.vue"),
+    },
+    {
+        path: "/keranjang",
+        component: () => import("@/pages/Keranjang.vue"),
     },
     {
         path: "/",
