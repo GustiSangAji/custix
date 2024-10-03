@@ -71,5 +71,3 @@ class SettingController extends Controller
         }
     }
 }
-
-aa
