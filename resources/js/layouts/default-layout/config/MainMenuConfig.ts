@@ -45,12 +45,6 @@ const MainMenuConfig: Array<MenuItem> = [
                 ],
             },
             {
-                heading: "Setting",
-                route: "/dashboard/setting",
-                name: "setting",
-                keenthemesIcon: "setting-2",
-            },
-            {
                 sectionTitle: "Event",
                 route: "/dashboard/event",
                 keenthemesIcon: "cube-3",
@@ -67,6 +61,12 @@ const MainMenuConfig: Array<MenuItem> = [
                         name: "event-laporan",
                     },
                 ],
+            },
+            {
+                heading: "Setting",
+                route: "/dashboard/setting",
+                name: "setting",
+                keenthemesIcon: "setting-2",
             },
         ],
     },
