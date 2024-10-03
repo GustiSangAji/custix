@@ -18,42 +18,8 @@ declare module "vue-router" {
 const routes: Array<RouteRecordRaw> = [
     {
         path: "/",
-        redirect: "/home",
-        component: () => import("@/layouts/default-layout/DefaultLayout.vue"),
-        meta: {
-          middleware: "auth",
-        },
-        children: [
-          {
-            path: "/home",
-            name: "home",
-            component: () => import("@/views/Dashboard.vue"),
-            meta: {
-              pageTitle: "Home",
-            },
-           
-          },
-          {
-            path: "/tiket",
-            name: "tiket",
-            component: () => import("@/views/LayoutBuilder.vue"),
-            meta: {
-              pageTitle: "Sedang Tayang",
-              breadcrumbs: ["Tiket"],
-            },
-          },
-          {
-            path: "pemesanan",
-            name: "pemesanan-tiket",
-            component: () =>
-              import("@/views/tiket/pemesanan/Pemesanan.vue"),
-            meta: {
-              pageTitle: "Pemesanan Tiket",
-              breadcrumbs: ["Tiket", "Pemesanan Tiket"],
-            },
-          },
-        ],
-      },
+        component: () => import("@/pages/HomeView.vue"),
+    },
     {
         path: "/",
         redirect: "/dashboard",
@@ -105,6 +71,24 @@ const routes: Array<RouteRecordRaw> = [
                 meta: {
                     pageTitle: "Laporan Penjualan",
                     breadcrumbs: ["Event", "Laporan"],
+                },
+            },
+            {
+                path: "/dashboard/orders",
+                name: "dashboard.orders",
+                component: () => import("@/pages/dashboard/orders/Index.vue"),
+                meta: {
+                    pageTitle: "Website Orders",
+                    breadcrumbs: ["Website", "Orders"],
+                },
+            },
+            {
+                path: "/dashboard/orders/show",
+                name: "dashboard.orders.show",
+                component: () => import("@/pages/dashboard/orders/Show.vue"),
+                meta: {
+                    pageTitle: "Website Orders",
+                    breadcrumbs: ["Website", "Orders"],
                 },
             },
 

@@ -67,11 +67,11 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
     });
 
     Route::prefix('orders')->group(function (){
-        Route::get('/', [OrderController::class, 'index']);
+        Route::post('/', [OrderController::class, 'index']);
+        Route::get('/show', [OrderController::class, 'show']);
         Route::get('/{id}', [OrderController::class, 'showById']);
         Route::post('/checkout/{id}', [OrderController::class, 'checkout']);
     });
-
 });
 
 
