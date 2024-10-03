@@ -1,0 +1,117 @@
+{
+  "best-products": [
+    {
+      "id": "1",
+      "kode": "K-01",
+      "nama": "Konser Cosmyc Fest",
+      "harga": 180000,
+      "is_ready": true,
+      "gambar": "konser-cosmyc-fest.png"
+    },
+    {
+      "id": "2",
+      "kode": "K-02",
+      "nama": "Konser Mistikus cinta",
+      "harga": 250000,
+      "is_ready": true,
+      "gambar": "konser-mustikus-cinta.png"
+    },
+    {
+      "id": "3",
+      "kode": "K-03",
+      "nama": "Konser Persembahan Cinta Karawang",
+      "harga": 200000,
+      "is_ready": true,
+      "gambar": "konser-persembahan-cinta-karawang.png"
+    }
+  ],
+  "products": [
+    {
+      "id": "1",
+      "kode": "K-01",
+      "nama": "DCDC SHOTOUT DAY",
+      "harga": 250000,
+      "is_ready": true,
+      "gambar": "dcdc-shoutout-day.jpg"
+    },
+    {
+      "id": "2",
+      "kode": "K-02",
+      "nama": "KONSER COSMYC FEST",
+      "harga": 180000,
+      "is_ready": true,
+      "gambar": "konser-cosmyc-fest.png"
+    },
+    {
+      "id": "3",
+      "kode": "K-03",
+      "nama": "KONSER MUSTIKUS CINTA",
+      "harga": 250000,
+      "is_ready": true,
+      "gambar": "konser-mustikus-cinta.png"
+    },
+    {
+      "id": "4",
+      "kode": "K-04",
+      "nama": "KONSER PERSEMBAHAN CINTA KARAWANG",
+      "harga": 200000,
+      "is_ready": true,
+      "gambar": "konser-persembahan-cinta-karawang.png"
+    },
+    {
+      "id": "5",
+      "kode": "K-05",
+      "nama": "KONSER CINTA ISTIMEWA",
+      "harga": 275000,
+      "is_ready": true,
+      "gambar": "konser-cinta-istimewa.png"
+    },
+    {
+      "id": "6",
+      "kode": "K-06",
+      "nama": "MP3FEST VOL3 2025",
+      "harga": 300000,
+      "is_ready": true,
+      "gambar": "mp3fest-vol3-2025.jpg"
+    },
+    {
+      "id": "7",
+      "kode": "K-07",
+      "nama": "SWARA SEMESTA MENYAPA TULUNGAGUNG",
+      "harga": 220000,
+      "is_ready": true,
+      "gambar": "swara-semesta-menyapa-tulungagung.jpg"
+    },
+    {
+      "id": "8",
+      "kode": "K-08",
+      "nama": "KONSER MUSTIKUS CINTA",
+      "harga": 250000,
+      "is_ready": true,
+      "gambar": "konser-mustikus-cinta.png"
+    },
+    {
+      "id": "9",
+      "kode": "K-09",
+      "nama": "MP3FEST VOL3 2025",
+      "harga": 300000,
+      "is_ready": true,
+      "gambar": "mp3fest-vol3-2025.jpg"
+    }
+  ],
+  "keranjangs": [
+    {
+      "id": "2f91",
+      "jumlah_pemesanan": 1,
+      "products": {
+        "id": "2",
+        "kode": "K-02",
+        "nama": "KONSER COSMYC FEST",
+        "harga": 180000,
+        "is_ready": true,
+        "gambar": "konser-cosmyc-fest.png"
+      }
+    }
+  ],
+  "pesanans": []
+}
