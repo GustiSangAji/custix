@@ -1,11 +1,11 @@
 <?php
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TiketController;
 use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LaporanTiketController;
 
 /*
 |--------------------------------------------------------------------------
@@ -57,26 +57,6 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         });
     });
 
-
-    // Rute untuk Laporan Tiket
-    Route::middleware('can:event')->group(function () {
-        // Mendapatkan data laporan tiket (untuk menampilkan semua tiket)
-        Route::get('laporan', [LaporanTiketController::class, 'get']);
-
-        // Untuk pagination atau filtering laporan tiket
-        Route::post('laporan', [LaporanTiketController::class, 'index']);
-
-        // Menyimpan laporan tiket baru
-        Route::post('laporan/store', [LaporanTiketController::class, 'store']);
-
-        // Menggunakan resource controller tapi hanya untuk show dan destroy (dengan UUID)
-        Route::apiResource('laporan', LaporanTiketController::class)
-            ->except(['index', 'store'])// Hanya rute show dan destroy
-            ->scoped(['laporan' => 'uuid']); // Menggunakan UUID sebagai parameter
-    });
-
-
-
     // Tiket Routes
     Route::middleware('can:event')->group(function () {
         Route::get('tiket', [TiketController::class, 'get']);
@@ -86,8 +66,10 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
             ->except(['index', 'store'])->scoped(['tiket' => 'uuid']); // Menggunakan UUID sebagai parameter
     });
 
-    Route::prefix('order')->group(function (){
-
+    Route::prefix('orders')->group(function (){
+        Route::get('/', [OrderController::class, 'index']);
+        Route::get('/{id}', [OrderController::class, 'showById']);
+        Route::post('/checkout/{id}', [OrderController::class, 'checkout']);
     });
 
 });
