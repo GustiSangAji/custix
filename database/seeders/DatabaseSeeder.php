@@ -11,7 +11,8 @@ class DatabaseSeeder extends Seeder
      * Seed the application's database.
      */
     public function run(): void
-    {
+    {   
+        \App\Models\Order::factory(10)->create();
         $this->call([
             RoleSeeder::class,
             PermissionSeeder::class,
