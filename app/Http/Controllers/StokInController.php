@@ -10,18 +10,21 @@ use Illuminate\Support\Facades\Validator;
 class StokInController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Display a paginated listing of the resource.
      */
     public function index(Request $request)
     {
+        $perPage = $request->input('per', 10); // Default 10 per page
+        $search = $request->input('search');
+
         $stokIn = StokIn::with('tiket')
-            ->when($request->search, function ($query, $search) {
+            ->when($search, function ($query, $search) {
                 return $query->whereHas('tiket', function ($q) use ($search) {
                     $q->where('name', 'like', "%$search%");
                 });
             })
             ->orderBy('added_at', 'desc')
-            ->paginate(10);
+            ->paginate($perPage);
 
         return response()->json($stokIn);
     }
@@ -32,7 +35,7 @@ class StokInController extends Controller
     public function store(Request $request)
     {
         $validator = Validator::make($request->all(), [
-            'ticket_id' => 'required|exists:tiket,id',
+            'ticket_id' => 'required|exists:tikets,id',
             'description' => 'required|string|max:255',
             'added_at' => 'required|date',
             'amount' => 'required|integer|min:1',
@@ -45,15 +48,10 @@ class StokInController extends Controller
             ], 422);
         }
 
-        // Create a new StokIn record
-        $stokIn = StokIn::create([
-            'ticket_id' => $request->input('ticket_id'),
-            'description' => $request->input('description'),
-            'added_at' => $request->input('added_at'),
-            'amount' => $request->input('amount'),
-        ]);
+        // Menyimpan stok masuk
+        $stokIn = StokIn::create($request->only('ticket_id', 'description', 'added_at', 'amount'));
 
-        // Update the stock in the associated Tiket model
+        // Update stok pada Tiket
         $tiket = Tiket::find($request->input('ticket_id'));
         $tiket->quantity += $request->input('amount');
         $tiket->save();
@@ -86,7 +84,7 @@ class StokInController extends Controller
         $stokIn = StokIn::findOrFail($id);
 
         $validator = Validator::make($request->all(), [
-            'ticket_id' => 'required|exists:tiket,id',
+            'ticket_id' => 'required|exists:tikets,id',
             'description' => 'required|string|max:255',
             'added_at' => 'required|date',
             'amount' => 'required|integer|min:1',
@@ -99,19 +97,14 @@ class StokInController extends Controller
             ], 422);
         }
 
-        // Calculate the difference in stock
+        // Menghitung perubahan stok
         $previousAmount = $stokIn->amount;
         $difference = $request->input('amount') - $previousAmount;
 
-        // Update StokIn data
-        $stokIn->update([
-            'ticket_id' => $request->input('ticket_id'),
-            'description' => $request->input('description'),
-            'added_at' => $request->input('added_at'),
-            'amount' => $request->input('amount'),
-        ]);
+        // Update stok masuk
+        $stokIn->update($request->only('ticket_id', 'description', 'added_at', 'amount'));
 
-        // Update stock in the Tiket model
+        // Update stok pada Tiket
         $tiket = Tiket::find($request->input('ticket_id'));
         $tiket->quantity += $difference;
         $tiket->save();
@@ -130,12 +123,12 @@ class StokInController extends Controller
     {
         $stokIn = StokIn::findOrFail($id);
 
-        // Update the stock in the Tiket model before deleting
+        // Kurangi stok di Tiket
         $tiket = Tiket::find($stokIn->ticket_id);
         $tiket->quantity -= $stokIn->amount;
         $tiket->save();
 
-        // Delete the StokIn record
+        // Hapus stok masuk
         $stokIn->delete();
 
         return response()->json([

@@ -10,6 +10,7 @@ const paginateRef = ref<any>(null);
 const openForm = ref(false); // Kontrol visibilitas form
 const selected = ref<string>(""); // Untuk menyimpan ID stok yang dipilih
 
+// Mengambil fungsi delete dari custom hook
 const { delete: deleteStock } = useDelete({
   onSuccess: () => paginateRef.value.refetch(), // Refetch data setelah berhasil dihapus
 });
@@ -17,19 +18,22 @@ const { delete: deleteStock } = useDelete({
 // Kolom untuk tabel stok-in
 const columns = [
   columnHelper.accessor("no", {
-    header: "No", // Mengganti dari ID ke No
+    header: "No", // Menampilkan nomor urut
   }),
-  columnHelper.accessor("tiket_id", {
-    header: "ID Tiket", // Menambahkan kolom ID Tiket
+  columnHelper.accessor("ticket_id", {
+    header: "ID Tiket", // Menampilkan ID Tiket
   }),
-  columnHelper.accessor("tiket_name", {
-    header: "Produk Tiket",
+  columnHelper.accessor("ticket_name", {
+    header: "Nama Tiket", // Menampilkan nama tiket
   }),
-  columnHelper.accessor("quantity", {
-    header: "Jumlah",
+  columnHelper.accessor("description", {
+    header: "Deskripsi", // Menampilkan deskripsi
   }),
-  columnHelper.accessor("date", {
-    header: "Tanggal Penambahan Stok",
+  columnHelper.accessor("added_at", {
+    header: "Tanggal Penambahan", // Menampilkan tanggal penambahan stok
+  }),
+  columnHelper.accessor("amount", {
+    header: "Jumlah Stok", // Menampilkan jumlah stok yang ditambahkan
   }),
   columnHelper.accessor("uuid", {
     header: "Aksi",
@@ -50,11 +54,12 @@ const columns = [
   }),
 ];
 
-// Fungsi untuk refresh data di tabel
+// Fungsi untuk merefresh data di tabel
 const refresh = () => paginateRef.value.refetch();
 </script>
 
 <template>
+  <!-- Komponen Form untuk tambah/edit stok -->
   <Form
     :selected="selected"
     v-if="openForm"
@@ -63,20 +68,22 @@ const refresh = () => paginateRef.value.refetch();
 
   <div class="card">
     <div class="card-header align-items-center">
-      <h2 class="mb-0">List Stok Masuk</h2>
+      <h2 class="mb-0">Daftar Stok Masuk</h2>
+      <!-- Tombol Tambah -->
       <button
         type="button"
         class="btn btn-sm btn-primary ms-auto"
         v-if="!openForm"
         @click="openForm = true" 
       >
-        Tambah <i class="la la-plus"></i>
+        Tambah Stok <i class="la la-plus"></i>
       </button>
     </div>
     <div class="card-body">
+      <!-- Komponen paginate untuk menampilkan tabel stok -->
       <paginate
         ref="paginateRef"
-        id="table-stok-in"
+        id="table-stokin"
         url="/stokin"
         :columns="columns"
       ></paginate>

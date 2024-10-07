@@ -1,4 +1,6 @@
 <?php
+
+use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
@@ -64,11 +66,18 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 // Tambahkan ini di dalam middleware 'auth' jika perlu
 
     // Stok In Routes
-    Route::prefix('stokin')->group(function () {
-        Route::get('/', [StokInController::class, 'index']); // Mengambil semua stok-in
-        Route::post('/', [StokInController::class, 'store']); // Menyimpan stok-in baru
-        Route::put('/{id}', [StokInController::class, 'update']); // Mengupdate stok-in yang ada
-    });
+
+
+    
+        // Rute untuk stok-in
+        Route::prefix('stokin')->group(function () {
+            Route::get('/', [StokInController::class, 'index']); // List stok-in dengan paginasi
+            Route::post('/', [StokInController::class, 'store']); // Tambah stok-in
+            Route::get('/{id}', [StokInController::class, 'show']); // Menampilkan stok-in tertentu
+            Route::put('/{id}', [StokInController::class, 'update']); // Update stok-in
+            Route::delete('/{id}', [StokInController::class, 'destroy']); // Hapus stok-in
+        });
+    
 
     Route::prefix('orders')->group(function (){
         Route::post('/', [OrderController::class, 'index']);
@@ -77,3 +86,11 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         Route::post('/checkout/{id}', [OrderController::class, 'checkout']);
     });
 });
+
+Route::get('/tickets', [TicketController::class, 'index']); // Untuk semua tiket
+Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
+
+
+
+
+

@@ -34,7 +34,7 @@ const formSchema = Yup.object().shape({
 
 function getEdit() {
   block(document.getElementById("form-stok-in"));
-  ApiService.get(`/stok-in/${props.selected}`)
+  ApiService.get(`/stokin/${props.selected}`)
     .then(({ data }) => {
       if (data && data.stokIn) {
         stokIn.value = data.stokIn;
@@ -75,7 +75,7 @@ function submit() {
     })
     .catch((err: any) => {
       formRef.value.setErrors(err.response.data.errors);
-      toast.error(err.response.data.message);
+      toast.error(err.response.data.message); 
     })
     .finally(() => {
       unblock(document.getElementById("form-stok-in"));
