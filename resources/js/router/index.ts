@@ -19,7 +19,7 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: "/",
         component: () => import("@/pages/HomeView.vue"),
-      },
+    },
     {
         path: "/",
         redirect: "/dashboard",
@@ -65,15 +65,15 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
             {
-                path: "/event/laporan",
-                name: "event.laporan",
-                component: () => import("@/pages/dashboard/event/laporan/Index.vue"),
+                path: "/event/stokin",
+                name: "stok in",
+                component: () => import("@/pages/dashboard/event/stokin/Index.vue"),
                 meta: {
-                    pageTitle: "Laporan Penjualan",
-                    breadcrumbs: ["Event", "Laporan"],
+                    pageTitle: "Stock in",
+                    breadcrumbs: ["Event", "Stock-in"],
                 },
             },
-
+    
             // MASTER
             {
                 path: "/dashboard/master/users/roles",

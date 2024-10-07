@@ -1,10 +1,12 @@
 <?php
+
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TiketController;
+use App\Http\Controllers\DashboardController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -57,21 +59,25 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         });
     });
 
+    Route::get('/dashboard', [DashboardController::class, 'index']);
+
     // Tiket Routes
     Route::middleware('can:event')->group(function () {
         Route::get('tiket', [TiketController::class, 'get']);
         Route::post('tiket', [TiketController::class, 'index']);
         Route::post('tiket/store', [TiketController::class, 'store']);
         Route::apiResource('tiket', TiketController::class)
-            ->except(['index', 'store'])->scoped(['tiket' => 'uuid']); // Menggunakan UUID sebagai parameter
+            ->except(['index', 'store'])
+            ->scoped(['tiket' => 'uuid']);
+
+        // Route untuk mengupdate stok tiket
+        Route::put('tiket/{id}/stok', [TiketController::class, 'updateStok']);
     });
 
     Route::prefix('orders')->group(function (){
-        Route::get('/', [OrderController::class, 'index']);
+        Route::post('/', [OrderController::class, 'index']);
+        Route::get('/show', [OrderController::class, 'show']);
         Route::get('/{id}', [OrderController::class, 'showById']);
         Route::post('/checkout/{id}', [OrderController::class, 'checkout']);
     });
-
 });
-
-

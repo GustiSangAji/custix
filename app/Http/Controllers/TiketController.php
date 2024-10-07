@@ -63,40 +63,53 @@ class TiketController extends Controller
         ]);
     }
 
-
     /**
      * Display the specified resource.
      */
     public function show(Tiket $tiket)
-{
-    return response()->json(['success' => true, 'tiket' => $tiket]);
-}
-
-
-
+    {
+        return response()->json(['success' => true, 'tiket' => $tiket]);
+    }
 
     /**
      * Update the specified resource in storage.
      */
     public function update(UpdateTiketRequest $request, Tiket $tiket)
-{
-    $validatedData = $request->validated();
+    {
+        $validatedData = $request->validated();
 
-    // Jika ada file gambar, simpan dan perbarui path gambar
-    if ($request->hasFile('image')) {
-        $validatedData['image'] = $request->file('image')->store('tikets', 'public');
+        // Jika ada file gambar, simpan dan perbarui path gambar
+        if ($request->hasFile('image')) {
+            $validatedData['image'] = $request->file('image')->store('tikets', 'public');
+        }
+
+        // Update data tiket
+        $tiket->update($validatedData);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tiket berhasil diupdate',
+            'tiket' => $tiket
+        ]);
     }
 
-    // Update data tiket
-    $tiket->update($validatedData);
+    /**
+     * Update the stock of the specified resource.
+     */
+    public function updateStok(Request $request, $id)
+    {
+        $request->validate([
+            'quantity' => 'required|integer|min:0',  // Validasi input quantity
+        ]);
 
-    return response()->json([
-        'success' => true,
-        'message' => 'Tiket berhasil diupdate',
-        'tiket' => $tiket
-    ]);
-}
+        $tiket = Tiket::findOrFail($id); // Mencari tiket berdasarkan ID
 
+        // Update jumlah stok
+        $tiket->quantity = $request->input('quantity');
+        $tiket->save(); // Simpan perubahan ke database
+
+        return response()->json(['success' => true, 'message' => 'Stok tiket berhasil diperbarui']);
+    }
 
     /**
      * Remove the specified resource from storage.
@@ -114,4 +127,3 @@ class TiketController extends Controller
         ]);
     }
 }
-

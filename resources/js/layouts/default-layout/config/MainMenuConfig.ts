@@ -45,6 +45,12 @@ const MainMenuConfig: Array<MenuItem> = [
                 ],
             },
             {
+                heading: "Orders",
+                route: "/dashboard/orders",
+                name: "orders",
+                keenthemesIcon: "setting-2",
+            },
+            {
                 sectionTitle: "Event",
                 route: "/dashboard/event",
                 keenthemesIcon: "cube-3",
@@ -56,10 +62,11 @@ const MainMenuConfig: Array<MenuItem> = [
                         name: "event-tiket",
                     },
                     {
-                        heading: "Laporan",
-                        route: "/event/laporan",
-                        name: "event-laporan",
+                        heading: "Stock-in",
+                        route: "/event/stokin",
+                        name: "event-stokin",
                     },
+                  
                 ],
             },
             {

@@ -160,15 +160,19 @@ export default defineComponent({
     widgetClasses: String,
   },
   setup() {
+    // Data dashboard yang akan diambil dari API
     const pelanggan = ref(0);
     const pendapatan = ref(0);
     const tiket = ref(0);
     const pesanan = ref(0);
     const produkTerjual = ref(0);
+    
+    // Ref untuk Chart dan pengaturan chart
     const chartRef = ref<typeof VueApexCharts | null>(null);
     const chart = ref<ApexOptions>({});
     const store = useThemeStore();
-
+    
+    // Data untuk grafik (series)
     const series = [
       {
         name: "Laba Bersih",
@@ -189,28 +193,22 @@ export default defineComponent({
       },
     ];
 
-    const themeMode = computed(() => store.mode);
-
-    // Fungsi untuk format angka ke dalam Rupiah
-    const formatRupiah = (value: number) =>
-      new Intl.NumberFormat("id-ID", {
-        style: "currency",
-        currency: "IDR",
-      }).format(value);
-
+    // Mengambil data dari API Laravel
     const fetchData = async () => {
       try {
+        // Ambil data dari API
         const response = await axios.get("/api/dashboard");
         pelanggan.value = response.data.pelanggan;
         pendapatan.value = response.data.pendapatan;
         tiket.value = response.data.tiket;
-        pesanan.value = response.data.pesanan; // Total Pesanan
-        produkTerjual.value = response.data.produkTerjual; // Total Produk Terjual
+        pesanan.value = response.data.pesanan;
+        produkTerjual.value = response.data.produkTerjual;
       } catch (error) {
         console.error("Error fetching data:", error);
       }
     };
 
+    // Opsi untuk chart menggunakan ApexChart
     const chartOptions = (): ApexOptions => {
       const labelColor = getCSSVariableValue("--bs-gray-500");
       const borderColor = getCSSVariableValue("--bs-gray-200");
@@ -286,16 +284,26 @@ export default defineComponent({
       };
     };
 
+    // Memantau perubahan tema
+    const themeMode = computed(() => store.mode);
     watch(themeMode, () => {
       if (chartRef.value) {
         chartRef.value.updateOptions(chartOptions());
       }
     });
 
+    // Ambil data dari API saat komponen di-mount
     onBeforeMount(() => {
       fetchData();
       chart.value = chartOptions();
     });
+
+    // Fungsi untuk format angka ke dalam Rupiah
+    const formatRupiah = (value: number) =>
+      new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      }).format(value);
 
     return {
       pelanggan,
@@ -312,11 +320,12 @@ export default defineComponent({
 });
 </script>
 
+
 <style scoped lang="scss">
 .widget-hover {
   transition: box-shadow 0.2s ease-in-out;
   &:hover {
-    box-shadow: 0px 0px 15px rgba(61, 52, 52, 0.2) !important;
+    box-shadow: 0px 0px 15px rgba(27, 7, 212, 0.2) !important;
   }
 
 }

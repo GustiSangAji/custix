@@ -20,8 +20,8 @@ class PermissionSeeder extends Seeder
         app()[\Spatie\Permission\PermissionRegistrar::class]->forgetCachedPermissions();
 
         $menuMaster = ['master', 'master-user', 'master-role'];
-        $menuWebsite = ['website', 'setting',];
-        $menuevent = ['event', 'event-tiket', 'event-laporan'];
+        $menuWebsite = ['website', 'setting', 'orders'];
+        $menuevent = ['event', 'event-tiket', 'event-stokin'];
 
         $permissionsByRole = [
             'admin' => ['dashboard',  ...$menuevent, ...$menuMaster, ...$menuWebsite],
