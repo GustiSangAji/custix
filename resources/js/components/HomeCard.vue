@@ -1,146 +1,19 @@
 <template>
-  <div class="container mt-5">
-    <div class="row">
-      <!-- Card 1 -->
-      <div class="col-md-6 mb-4">
-        <div class="card shadow-sm rounded overflow-hidden">
-          <!-- Image -->
-          <img
-            src="/media/tiket/midea-run-to-party.png"
-            class="card-img-top"
-            alt="Konser Cinta Istimewa"
-          />
-          <!-- Card Body -->
-          <div class="card-body p-4">
-            <!-- Title -->
-            <h5 class="card-title fw-bold text-uppercase mb-3">
-              KONSER CINTA ISTIMEWA
-            </h5>
-            <!-- Event Date and Location -->
-            <p class="card-text fs-6 mb-3 text-muted">
-              <i class="bi bi-calendar me-2"></i> 12 Desember 2024 &nbsp;
-              <i class="bi bi-geo-alt me-2"></i> Bandung, GILA LALALA ENTERTAINMENT
-            </p>
-            <!-- Price and Button -->
-            <div class="d-flex justify-content-between align-items-center">
-              <!-- Price -->
-              <div class="bg-dark text-light px-3 py-2">
-                Mulai Dari Rp. 150,000
-              </div>
-              <!-- Button -->
-              <a href="#" class="btn btn-danger px-4 py-2 fw-bold">
-                Beli Tiket
-              </a>
-            </div>
-          </div>
+  <div class="card shadow-sm rounded overflow-hidden">
+    <img :src="imageUrl" class="card-img-top" :alt="ticket.name" />
+    <div class="card-body p-4">
+      <h5 class="card-title fw-bold text-uppercase mb-3">{{ ticket.name }}</h5>
+      <p class="card-text fs-6 mb-3 text-muted">
+        <i class="bi bi-calendar me-2"></i> {{ formatDate(ticket.datetime) }} &nbsp;
+        <i class="bi bi-geo-alt me-2"></i> {{ ticket.place }}
+      </p>
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="bg-dark text-light px-3 py-2 rounded">
+          Mulai Dari Rp. {{ ticket.price }}
         </div>
-      </div>
-
-      <!-- Card 2 -->
-      <div class="col-md-6 mb-4">
-        <div class="card shadow-sm rounded overflow-hidden">
-          <!-- Image -->
-          <img
-            src="/media/tiket/midea-run-to-party.png"
-            class="card-img-top"
-            alt="Konser Cinta Istimewa"
-          />
-          <!-- Card Body -->
-          <div class="card-body p-4">
-            <!-- Title -->
-            <h5 class="card-title fw-bold text-uppercase mb-3">
-              KONSER CINTA ISTIMEWA
-            </h5>
-            <!-- Event Date and Location -->
-            <p class="card-text fs-6 mb-3 text-muted">
-              <i class="bi bi-calendar me-2"></i> 12 Desember 2024 &nbsp;
-              <i class="bi bi-geo-alt me-2"></i> Bandung, GILA LALALA ENTERTAINMENT
-            </p>
-            <!-- Price and Button -->
-            <div class="d-flex justify-content-between align-items-center">
-              <!-- Price -->
-              <div class="bg-dark text-light px-3 py-2">
-                Mulai Dari Rp. 150,000
-              </div>
-              <!-- Button -->
-              <a href="#" class="btn btn-danger px-4 py-2 fw-bold">
-                Beli Tiket
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <div class="row">
-      <!-- Card 3 -->
-      <div class="col-md-6 mb-4">
-        <div class="card shadow-sm rounded overflow-hidden">
-          <!-- Image -->
-          <img
-            src="/media/tiket/midea-run-to-party.png"
-            class="card-img-top"
-            alt="Konser Cinta Istimewa"
-          />
-          <!-- Card Body -->
-          <div class="card-body p-4">
-            <!-- Title -->
-            <h5 class="card-title fw-bold text-uppercase mb-3">
-              KONSER CINTA ISTIMEWA
-            </h5>
-            <!-- Event Date and Location -->
-            <p class="card-text fs-6 mb-3 text-muted">
-              <i class="bi bi-calendar me-2"></i> 12 Desember 2024 &nbsp;
-              <i class="bi bi-geo-alt me-2"></i> Bandung, GILA LALALA ENTERTAINMENT
-            </p>
-            <!-- Price and Button -->
-            <div class="d-flex justify-content-between align-items-center">
-              <!-- Price -->
-              <div class="bg-dark text-light px-3 py-2">
-                Mulai Dari Rp. 150,000
-              </div>
-              <!-- Button -->
-              <a href="#" class="btn btn-danger px-4 py-2 fw-bold">
-                Beli Tiket
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 4 -->
-      <div class="col-md-6 mb-4">
-        <div class="card shadow-sm rounded overflow-hidden">
-          <!-- Image -->
-          <img
-            src="/media/tiket/midea-run-to-party.png"
-            class="card-img-top"
-            alt="Konser Cinta Istimewa"
-          />
-          <!-- Card Body -->
-          <div class="card-body p-4">
-            <!-- Title -->
-            <h5 class="card-title fw-bold text-uppercase mb-3">
-              KONSER CINTA ISTIMEWA
-            </h5>
-            <!-- Event Date and Location -->
-            <p class="card-text fs-6 mb-3 text-muted">
-              <i class="bi bi-calendar me-2"></i> 12 Desember 2024 &nbsp;
-              <i class="bi bi-geo-alt me-2"></i> Bandung, GILA LALALA ENTERTAINMENT
-            </p>
-            <!-- Price and Button -->
-            <div class="d-flex justify-content-between align-items-center">
-              <!-- Price -->
-              <div class="bg-dark text-light px-3 py-2">
-                Mulai Dari Rp. 150,000
-              </div>
-              <!-- Button -->
-              <a href="#" class="btn btn-danger px-4 py-2 fw-bold">
-                Beli Tiket
-              </a>
-            </div>
-          </div>
-        </div>
+        <router-link :to="'/pesan/' + ticket.id" class="btn btn-danger px-4 py-2 fw-bold">
+          Beli Tiket
+        </router-link>
       </div>
     </div>
   </div>
@@ -149,5 +22,23 @@
 <script>
 export default {
   name: "HomeCard",
+  props: {
+    ticket: Object,
+  },
+  computed: {
+    imageUrl() {
+        const imagePath = this.ticket.image && this.ticket.image.length > 0 ? this.ticket.image[0].file : ''; // Pastikan Anda mengakses file
+        console.log("Image path:", imagePath);
+        return imagePath ? `/storage/tikets/${imagePath}` : ''; // Periksa dan bangun URL dengan benar
+    },
+},
+
+
+  methods: {
+    formatDate(date) {
+      const options = { year: "numeric", month: "long", day: "numeric" };
+      return new Date(date).toLocaleDateString("id-ID", options);
+    },
+  },
 };
 </script>

@@ -1,4 +1,6 @@
 <?php
+
+use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
@@ -73,5 +75,10 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         Route::post('/checkout/{id}', [OrderController::class, 'checkout']);
     });
 });
+
+Route::get('/tickets', [TicketController::class, 'index']); // Untuk semua tiket
+Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
+
+
 
 
