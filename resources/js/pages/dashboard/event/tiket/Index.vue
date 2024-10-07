@@ -18,7 +18,7 @@
 
     // Kolom-kolom untuk tabel tiket
     const columns = [
-        columnHelper.accessor("no", {
+        columnHelper.accessor("id", {
             header: "#",
         }),
         columnHelper.accessor("name", {

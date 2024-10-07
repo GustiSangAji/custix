@@ -11,7 +11,8 @@ class TicketController extends Controller
     public function index()
     {
         // Mengambil semua tiket yang tersedia
-        $tickets = Tiket::where('status', 'available')->get();
+        $tickets = Tiket::where('status', 'available')
+        ->get(['id', 'name', 'place', 'datetime', 'quantity', 'price', 'image']);
         return response()->json($tickets);
     }
 
