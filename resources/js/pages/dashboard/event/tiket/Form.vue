@@ -18,6 +18,7 @@ const props = defineProps({
 const emit = defineEmits(["close", "refresh"]);
 
 const ticket = ref({
+    id_tiket: '',
     name: '',
     place: '',
     datetime: '',
@@ -26,10 +27,12 @@ const ticket = ref({
     price: 0,
     image: null,
 });
+
 const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
 const formRef = ref();
 
 const formSchema = Yup.object().shape({
+    id_tiket: Yup.string().required("ID Tiket harus diisi"),  // Validasi untuk id_tiket
     name: Yup.string().required("Nama harus diisi"),
     place: Yup.string().required("Tempat harus diisi"),
     status: Yup.string().required("Status harus diisi"),
@@ -58,6 +61,7 @@ function getEdit() {
 
 function submit() {
     const formData = new FormData();
+    formData.append("id_tiket", ticket.value.id_tiket);
     formData.append("name", ticket.value.name);
     formData.append("place", ticket.value.place);
     formData.append("datetime", ticket.value.datetime);
@@ -109,6 +113,7 @@ watch(
         } else {
             // Reset form untuk mode tambah
             ticket.value = {
+                id_tiket: '',
                 name: '',
                 place: '',
                 datetime: '',
@@ -145,6 +150,24 @@ watch(
         </div>
         <div class="card-body">
             <div class="row">
+                <!-- Input untuk ID Tiket -->
+                <div class="col-md-6">
+                    <div class="fv-row mb-7">
+                        <label class="form-label fw-bold fs-6 required">ID Tiket</label>
+                        <Field
+                            class="form-control form-control-lg form-control-solid"
+                            type="text"
+                            name="id_tiket"
+                            v-model="ticket.id_tiket"
+                            placeholder="Masukkan ID Tiket"
+                        />
+                        <div class="fv-help-block">
+                            <ErrorMessage name="id_tiket" />
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Input untuk Nama Tiket -->
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6 required">Nama Tiket</label>
@@ -160,6 +183,8 @@ watch(
                         </div>
                     </div>
                 </div>
+
+                <!-- Input untuk Tempat -->
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6 required">Tempat</label>
@@ -175,6 +200,8 @@ watch(
                         </div>
                     </div>
                 </div>
+
+                <!-- Input untuk Tanggal & Waktu -->
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6 required">Tanggal & Waktu</label>
@@ -188,6 +215,8 @@ watch(
                         </div>
                     </div>
                 </div>
+
+                <!-- Input untuk Status -->
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6 required">Status</label>
@@ -205,6 +234,8 @@ watch(
                         </div>
                     </div>
                 </div>
+
+                <!-- Input untuk Jumlah Tiket -->
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6 required">Jumlah Tiket</label>
@@ -220,6 +251,8 @@ watch(
                         </div>
                     </div>
                 </div>
+
+                <!-- Input untuk Harga Tiket -->
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6 required">Harga Tiket</label>
@@ -235,6 +268,8 @@ watch(
                         </div>
                     </div>
                 </div>
+
+                <!-- Input untuk Gambar Tiket -->
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
                         <label class="form-label fw-bold fs-6">Gambar Tiket</label>

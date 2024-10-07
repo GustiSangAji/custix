@@ -21,6 +21,9 @@ const columns = [
     columnHelper.accessor("no", {
         header: "#",
     }),
+    columnHelper.accessor("id_tiket", {
+        header: "ID Tiket",
+    }),
     columnHelper.accessor("name", {
         header: "Nama Tiket",
     }),
@@ -39,20 +42,18 @@ const columns = [
     }),
     columnHelper.accessor("price", {
         header: "Harga",
-        cell: (cell) => formatRupiah (cell.getValue()),
+        cell: (cell) => formatRupiah(cell.getValue()),
     }),
     columnHelper.accessor("image", {
         header: "Gambar",
         cell: (cell) => {
-    const imagePath = cell.getValue();
-    console.log(imagePath); // Cek nilai di konsol
-    return h("img", { 
-        src: `/storage/${imagePath}`, // Pastikan Anda menggunakan path yang benar
-        alt: "Gambar", 
-        style: { maxWidth: "100px", maxHeight: "100px" } 
-    });
-},
-
+            const imagePath = cell.getValue();
+            return h("img", { 
+                src: `/storage/${imagePath}`, 
+                alt: "Gambar", 
+                style: { maxWidth: "100px", maxHeight: "100px" } 
+            });
+        },
     }),
     columnHelper.accessor("uuid", {
         header: "Aksi",
@@ -72,6 +73,7 @@ const columns = [
             ]),
     }),
 ];
+
 
 // Fungsi untuk refresh data di tabel
 const refresh = () => paginateRef.value.refetch();

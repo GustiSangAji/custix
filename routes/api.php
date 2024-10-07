@@ -1,5 +1,4 @@
 <?php
-
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
@@ -7,23 +6,13 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TiketController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\StokInController; // Import StokInController
 use Illuminate\Support\Facades\Route;
-
-/*
-|--------------------------------------------------------------------------
-| API Routes
-|--------------------------------------------------------------------------
-|
-| Here is where you can register API routes for your application. These
-| routes are loaded by the RouteServiceProvider and all of them will
-| be assigned to the "api" middleware group. Make something great!
-|
-*/
 
 // Authentication Route
 Route::middleware(['json'])->prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
-    Route::post('register', [AuthController::class, 'register']); // Menambahkan route untuk register
+    Route::post('register', [AuthController::class, 'register']);
     Route::post('register/get/email/otp', [AuthController::class, 'registerGetEmailOtp']);
     Route::post('register/check/email/otp', [AuthController::class, 'registerCheckEmailOtp']);
     Route::delete('logout', [AuthController::class, 'logout']);
@@ -70,8 +59,15 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
             ->except(['index', 'store'])
             ->scoped(['tiket' => 'uuid']);
 
-        // Route untuk mengupdate stok tiket
-        Route::put('tiket/{id}/stok', [TiketController::class, 'updateStok']);
+
+    });
+// Tambahkan ini di dalam middleware 'auth' jika perlu
+
+    // Stok In Routes
+    Route::prefix('stokin')->group(function () {
+        Route::get('/', [StokInController::class, 'index']); // Mengambil semua stok-in
+        Route::post('/', [StokInController::class, 'store']); // Menyimpan stok-in baru
+        Route::put('/{id}', [StokInController::class, 'update']); // Mengupdate stok-in yang ada
     });
 
     Route::prefix('orders')->group(function (){

@@ -327,6 +327,5 @@ export default defineComponent({
   &:hover {
     box-shadow: 0px 0px 15px rgba(61, 52, 52, 0.2) !important;
 }
-
 }
 </style>

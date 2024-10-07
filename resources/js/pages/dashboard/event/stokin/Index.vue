@@ -77,7 +77,7 @@ const refresh = () => paginateRef.value.refetch();
       <paginate
         ref="paginateRef"
         id="table-stok-in"
-        url="/stok-in"
+        url="/stokin"
         :columns="columns"
       ></paginate>
     </div>

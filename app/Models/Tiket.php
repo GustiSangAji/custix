@@ -12,6 +12,7 @@ class Tiket extends Model
 
     protected $fillable = [
         'uuid',
+        'id_tiket',
         'name',
         'place',
         'datetime',

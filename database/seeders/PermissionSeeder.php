@@ -21,15 +21,15 @@ class PermissionSeeder extends Seeder
 
         $menuMaster = ['master', 'master-user', 'master-role'];
         $menuWebsite = ['website', 'setting', 'orders'];
-        $menuevent = ['event', 'event-tiket', 'event-stokin'];
+        $menuEvent = ['event', 'event-tiket', 'event-stokin'];
 
         $permissionsByRole = [
-            'admin' => ['dashboard',  ...$menuevent, ...$menuMaster, ...$menuWebsite],
+            'admin' => ['dashboard', ...$menuEvent, ...$menuMaster, ...$menuWebsite],
         ];
 
         $insertPermissions = fn ($role) => collect($permissionsByRole[$role])
             ->map(function ($name) {
-                $check = Permission::whereName($name)->first();
+                $check = Permission::where('name', $name)->first();
 
                 if (!$check) {
                     return Permission::create([
@@ -46,16 +46,22 @@ class PermissionSeeder extends Seeder
             'admin' => $insertPermissions('admin')
         ];
 
-        foreach ($permissionIdsByRole as $role => $permissionIds) {
-            $role = Role::whereName($role)->first();
+        foreach ($permissionIdsByRole as $roleName => $permissionIds) {
+            $role = Role::where('name', $roleName)->first();
 
-            DB::table('role_has_permissions')
-                ->insert(
-                    collect($permissionIds)->map(fn ($id) => [
-                        'role_id' => $role->id,
-                        'permission_id' => $id
-                    ])->toArray()
-                );
+            // Cek apakah role ditemukan
+            if ($role) {
+                DB::table('role_has_permissions')
+                    ->insert(
+                        collect($permissionIds)->map(fn ($id) => [
+                            'role_id' => $role->id,
+                            'permission_id' => $id,
+                        ])->toArray()
+                    );
+            } else {
+                // Role tidak ditemukan, Anda bisa menambahkan logika di sini
+                echo "Role $roleName not found.\n";
+            }
         }
     }
 }
