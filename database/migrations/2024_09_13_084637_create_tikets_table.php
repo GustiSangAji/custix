@@ -15,7 +15,8 @@ class CreateTiketsTable extends Migration
     {
         Schema::create('tikets', function (Blueprint $table) {
             $table->id(); // Kolom ID
-            $table->uuid('uuid')->unique(); // Menambahkan kolom UUID
+            $table->uuid('uuid');
+            $table->string('id_tiket'); // Menambahkan kolom UUID
             $table->string('name'); // Kolom Nama
             $table->string('place'); // Kolom Tempat
             $table->datetime('datetime'); // Kolom Waktu

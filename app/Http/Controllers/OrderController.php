@@ -14,13 +14,17 @@ class OrderController extends Controller
      */
     public function index(Request $request)
     {
+        $orders = Order::when($request->status, function (Builder $query, string $status) {
+            $query->where('payment_status', $status); // Pastikan query menggunakan kolom yang benar
+        })->get();
+
+        // Debug output untuk memastikan payment_status ada di data
         return response()->json([
             'success' => true,
-            'data' => Order::when($request->status, function (Builder $query, string $status) {
-                $query->where('status', $status);
-            })->get()
+            'data' => $orders
         ]);
     }
+
 
     /**
      * Store a newly created resource in storage.

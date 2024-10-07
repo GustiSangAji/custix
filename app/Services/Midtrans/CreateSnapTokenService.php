@@ -24,7 +24,7 @@ class CreateSnapTokenService extends Midtrans
             ],
             'item_details' => [
                 [
-                    'id' => 1,
+                    'id' => '',
                     'price' => '150000',
                     'quantity' => 1,
                     'name' => 'Flashdisk Toshiba 32GB',
