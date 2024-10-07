@@ -325,8 +325,8 @@ export default defineComponent({
 .widget-hover {
   transition: box-shadow 0.2s ease-in-out;
   &:hover {
-    box-shadow: 0px 0px 15px rgba(27, 7, 212, 0.2) !important;
-  }
+    box-shadow: 0px 0px 15px rgba(61, 52, 52, 0.2) !important;
+}
 
 }
 </style>
