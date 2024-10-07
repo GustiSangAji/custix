@@ -1,4 +1,6 @@
 <?php
+
+use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
@@ -59,7 +61,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
     // Tiket Routes
     Route::middleware('can:event')->group(function () {
-        Route::get('tiket', [TiketController::class, 'get']);
+   
         Route::post('tiket', [TiketController::class, 'index']);
         Route::post('tiket/store', [TiketController::class, 'store']);
         Route::apiResource('tiket', TiketController::class)
@@ -73,5 +75,11 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         Route::post('/checkout/{id}', [OrderController::class, 'checkout']);
     });
 });
+
+Route::get('/tickets', [TicketController::class, 'index']); // Untuk semua tiket
+Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
+Route::get('tiket', [TiketController::class, 'get']);
+
+
 
 

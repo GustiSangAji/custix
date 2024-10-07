@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { block, unblock } from "@/libs/utils";
-import { onMounted, ref, watch } from "vue";
+import { onMounted, ref, watch, computed, onBeforeUnmount } from "vue";
 import * as Yup from "yup";
 import axios from "@/libs/axios";
 import { toast } from "vue3-toastify";
@@ -31,6 +31,18 @@ const ticket = ref({
 const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
 const formRef = ref();
 
+const imagePreview = computed(() => {
+    return ticket.value.image && ticket.value.image.length > 0
+        ? URL.createObjectURL(ticket.value.image[0].file)
+        : null;
+});
+
+onBeforeUnmount(() => {
+    if (imagePreview.value) {
+        URL.revokeObjectURL(imagePreview.value);
+    }
+});
+
 const formSchema = Yup.object().shape({
     id_tiket: Yup.string().required("ID Tiket harus diisi"),  // Validasi untuk id_tiket
     name: Yup.string().required("Nama harus diisi"),
@@ -45,9 +57,7 @@ function getEdit() {
     ApiService.get(`/tiket/${props.selected}`)
         .then(({ data }) => {
             if (data && data.tiket) {
-                ticket.value = data.tiket; // Pastikan response berisi data.tiket
-            } else {
-                console.error("Response data format is incorrect", data);
+                ticket.value = data.tiket;
             }
         })
         .catch((err) => {
@@ -57,7 +67,6 @@ function getEdit() {
             unblock(document.getElementById("form-ticket"));
         });
 }
-
 
 function submit() {
     const formData = new FormData();
@@ -70,7 +79,7 @@ function submit() {
     formData.append("price", ticket.value.price.toString());
 
     if (ticket.value?.image && Array.isArray(ticket.value.image)) {
-        formData.append("image", ticket.value.image[0].file); // Pastikan ini sesuai dengan struktur file
+        formData.append("image", ticket.value.image[0].file);
     }
 
     if (props.selected) {
@@ -111,7 +120,6 @@ watch(
         if (newVal) {
             getEdit();
         } else {
-            // Reset form untuk mode tambah
             ticket.value = {
                 id_tiket: '',
                 name: '',
@@ -127,6 +135,7 @@ watch(
     }
 );
 </script>
+
 
 
 <template>
@@ -272,24 +281,26 @@ watch(
                 <!-- Input untuk Gambar Tiket -->
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
-                        <label class="form-label fw-bold fs-6">Gambar Tiket</label>
-                        <file-upload
-                            :files="ticket.image" 
-                            :accepted-file-types="fileTypes" 
-                            required
-                            v-on:updatefiles="(file) => (ticket.image = file)" 
-                        ></file-upload>
-                        <div class="fv-help-block">
-                            <ErrorMessage name="image" />
-                        </div>
-                        <img
-                            v-if="ticket.image && ticket.image.length > 0"
-                            :src="ticket.image[0].url"
-                            alt="Gambar Tiket"
-                            class="img-thumbnail"
-                            style="max-width: 200px; max-height: 200px;"
-                        />
-                    </div>
+      <label class="form-label fw-bold fs-6">Gambar Tiket</label>
+      <file-upload
+        :files="ticket.image" 
+        :accepted-file-types="fileTypes" 
+        required
+        v-on:updatefiles="(file) => (ticket.image = file)" 
+      ></file-upload>
+      <div class="fv-help-block">
+        <ErrorMessage name="image" />
+      </div>
+      
+      <!-- Pratinjau gambar yang di-upload -->
+      <img
+        v-if="ticket.image && ticket.image.length > 0"
+        :src="imagePreview"
+        alt="Gambar Tiket"
+        class="img-thumbnail"
+        style="max-width: 200px; max-height: 200px;"
+      />
+    </div>
                 </div>
             </div>
         </div>

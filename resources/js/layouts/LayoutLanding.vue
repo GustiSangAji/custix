@@ -1,6 +1,6 @@
 <template>
   <div class="layout-landing">
-    <Navbar /> <!-- Navbar di bagian atas -->
+    <Navbar />
     <main>
       <!-- Tempat konten seperti Carousel dan komponen lainnya -->
       <slot></slot>
