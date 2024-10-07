@@ -16,6 +16,15 @@ class TicketController extends Controller
         return response()->json($tickets);
     }
 
+    public function limited()
+    {
+        // Mengambil hanya dua tiket pertama yang tersedia untuk halaman utama
+        $tickets = Tiket::where('status', 'available')
+            ->limit(2)
+            ->get(['id', 'name', 'place', 'datetime', 'quantity', 'price', 'image']);
+        return response()->json($tickets);
+    }
+
     public function show($id)
     {
         // Mengambil detail tiket berdasarkan ID

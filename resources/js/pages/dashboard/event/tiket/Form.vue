@@ -246,26 +246,18 @@ watch(
                 </div>
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
-      <label class="form-label fw-bold fs-6">Gambar Tiket</label>
-      <file-upload
-        :files="ticket.image" 
-        :accepted-file-types="fileTypes" 
-        required
-        v-on:updatefiles="(file) => (ticket.image = file)" 
-      ></file-upload>
-      <div class="fv-help-block">
-        <ErrorMessage name="image" />
-      </div>
-      
-      <!-- Pratinjau gambar yang di-upload -->
-      <img
-        v-if="ticket.image && ticket.image.length > 0"
-        :src="imagePreview"
-        alt="Gambar Tiket"
-        class="img-thumbnail"
-        style="max-width: 200px; max-height: 200px;"
-      />
-    </div>
+                    <label class="form-label fw-bold fs-6">Gambar Tiket</label>
+                    <file-upload
+                        :files="ticket.image" 
+                        :accepted-file-types="fileTypes" 
+                        required
+                        v-on:updatefiles="(file) => (ticket.image = file)" 
+                    ></file-upload>
+                    <div class="fv-help-block">
+                        <ErrorMessage name="image" />
+                    </div>
+                    
+                    </div>
                 </div>
             </div>
         </div>

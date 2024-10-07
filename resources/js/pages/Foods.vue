@@ -36,7 +36,7 @@
           v-for="product in filteredProducts"
           :key="product.id"
         >
-          <CartProduct :product="product" />
+          <TicketProduct :product="product" />
         </div>
       </div>
     </div>
@@ -45,39 +45,37 @@
 
 <script>
 import Navbar from "@/components/Navbar.vue";
-import CartProduct from "@/components/CartProduct.vue";
+import TicketProduct from "@/components/TicketProduct.vue";
 import axios from "axios";
 
 export default {
-  name: "HomeView",
+  name: "TicketView",
   components: {
     Navbar,
-    CartProduct,
+    TicketProduct,
   },
   data() {
     return {
-      products: [], // Menyimpan semua produk
+      products: [], // Menyimpan semua produk tiket
       cari: '',     // Nilai input pencarian
     };
   },
   computed: {
     filteredProducts() {
-      // Saring produk berdasarkan input pencarian (case-insensitive)
       return this.products.filter(product =>
-        product.nama.toLowerCase().includes(this.cari.toLowerCase())
+        product.name.toLowerCase().includes(this.cari.toLowerCase())
       );
-    }
-  },
-  methods: {
-    setProducts(data) {
-      this.products = data;
     }
   },
   mounted() {
     axios
-      .get("http://localhost:3000/products")
-      .then((response) => this.setProducts(response.data))
-      .catch((error) => console.log(error));
+      .get("http://localhost:8000/api/tickets")  // Panggil API untuk tiket
+      .then((response) => {
+        this.products = response.data;  // Simpan data dari API ke 'products'
+      })
+      .catch((error) => {
+        console.log(error);
+      });
   },
 };
 </script>

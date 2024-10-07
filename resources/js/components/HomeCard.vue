@@ -8,7 +8,7 @@
         <i class="bi bi-geo-alt me-2"></i> {{ ticket.place }}
       </p>
       <div class="d-flex justify-content-between align-items-center">
-        <div class="bg-dark text-light px-3 py-2 rounded">
+        <div class="bg-success fw-bold text-light px-3 py-2 rounded">
           Mulai Dari Rp. {{ ticket.price }}
         </div>
         <router-link :to="'/pesan/' + ticket.id" class="btn btn-danger px-4 py-2 fw-bold">
@@ -39,8 +39,6 @@ export default {
     return '';
   }
 }
-
-
 },
 
 
