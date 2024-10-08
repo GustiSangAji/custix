@@ -38,8 +38,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/Keranjang.vue"),
     },
     {
-        path: "/",
-        redirect: "/dashboard",
+        path: "/dashboard",
         component: () => import("@/layouts/default-layout/DefaultLayout.vue"),
         meta: {
             middleware: "auth",

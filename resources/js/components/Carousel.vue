@@ -37,13 +37,18 @@
 </template>
 
 <script>
+import { nextTick, onMounted } from 'vue';
+import { initializeComponents } from "@/core/plugins/keenthemes"; // Sesuaikan path jika perlu
+
 export default {
   name: "Carousel",
   mounted() {
-    // Menginisialisasi carousel setelah komponen di-mount
-    const carousel = new bootstrap.Carousel(document.querySelector('#kt_carousel_1_carousel'), {
-      interval: 8000,
-      ride: 'carousel'
+    onMounted(() => {
+      nextTick(() => {
+        initializeComponents(); // Panggil fungsi ini untuk inisialisasi komponen Bootstrap, termasuk Carousel
+        // Kamu bisa menambahkan log jika ingin memastikan fungsi ini bekerja
+        console.log("Bootstrap components initialized");
+      });
     });
   }
 };
@@ -51,5 +56,5 @@ export default {
 
 <!-- Custom CSS -->
 <style scoped>
-
+/* Tambahkan custom styling di sini jika diperlukan */
 </style>
