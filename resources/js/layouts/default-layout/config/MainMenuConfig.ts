@@ -53,18 +53,13 @@ const MainMenuConfig: Array<MenuItem> = [
             {
                 sectionTitle: "Event",
                 route: "/dashboard/event",
-                keenthemesIcon: "cube-3",
+                keenthemesIcon: "cube -3",
                 name: "event",
                 sub: [
                     {
                         heading: "Tiket",
                         route: "/event/tiket",
                         name: "event-tiket",
-                    },
-                    {
-                        heading: "Stock-in",
-                        route: "/event/stokin",
-                        name: "event-stokin",
                     },
                   
                 ],

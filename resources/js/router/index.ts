@@ -80,15 +80,6 @@ const routes: Array<RouteRecordRaw> = [
                     breadcrumbs: ["Event", "Tiket"],
                 },
             },
-            {
-                path: "/event/stokin",
-                name: "stok in",
-                component: () => import("@/pages/dashboard/event/stokin/Index.vue"),
-                meta: {
-                    pageTitle: "Stock in",
-                    breadcrumbs: ["Event", "Stock-in"],
-                },
-            },
     
             // MASTER
             {

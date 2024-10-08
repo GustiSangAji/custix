@@ -1,6 +1,5 @@
 <?php
 
-use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\UserController;
@@ -8,13 +7,23 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TiketController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\StokInController; // Import StokInController
 use Illuminate\Support\Facades\Route;
+
+/*
+|--------------------------------------------------------------------------
+| API Routes
+|--------------------------------------------------------------------------
+|
+| Here is where you can register API routes for your application. These
+| routes are loaded by the RouteServiceProvider and all of them will
+| be assigned to the "api" middleware group. Make something great!
+|
+*/
 
 // Authentication Route
 Route::middleware(['json'])->prefix('auth')->group(function () {
     Route::post('login', [AuthController::class, 'login']);
-    Route::post('register', [AuthController::class, 'register']);
+    Route::post('register', [AuthController::class, 'register']); // Menambahkan route untuk register
     Route::post('register/get/email/otp', [AuthController::class, 'registerGetEmailOtp']);
     Route::post('register/check/email/otp', [AuthController::class, 'registerCheckEmailOtp']);
     Route::delete('logout', [AuthController::class, 'logout']);
@@ -61,23 +70,9 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
             ->except(['index', 'store'])
             ->scoped(['tiket' => 'uuid']);
 
-
+        // Route untuk mengupdate stok tiket
+        Route::put('tiket/{id}/stok', [TiketController::class, 'updateStok']);
     });
-// Tambahkan ini di dalam middleware 'auth' jika perlu
-
-    // Stok In Routes
-
-
-    
-        // Rute untuk stok-in
-        Route::prefix('stokin')->group(function () {
-            Route::get('/', [StokInController::class, 'index']); // List stok-in dengan paginasi
-            Route::post('/', [StokInController::class, 'store']); // Tambah stok-in
-            Route::get('/{id}', [StokInController::class, 'show']); // Menampilkan stok-in tertentu
-            Route::put('/{id}', [StokInController::class, 'update']); // Update stok-in
-            Route::delete('/{id}', [StokInController::class, 'destroy']); // Hapus stok-in
-        });
-    
 
     Route::prefix('orders')->group(function (){
         Route::post('/', [OrderController::class, 'index']);
@@ -87,10 +82,5 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
     });
 });
 
-Route::get('/tickets', [TicketController::class, 'index']); // Untuk semua tiket
-Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
-
-
-
-
-
+Route::get('/tickets', [TicketController::class, 'index']);
+Route::get('/tickets/{id}', [TicketController::class, 'show']);
