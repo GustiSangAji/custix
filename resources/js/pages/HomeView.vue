@@ -34,7 +34,7 @@ export default {
   },
   mounted() {
     axios
-      .get("http://localhost:8000/api/tickets")
+      .get("http://localhost:8000/api/tickets/limited")
       .then((response) => {
         this.tickets = response.data;
       })
