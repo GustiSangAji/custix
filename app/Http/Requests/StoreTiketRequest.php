@@ -22,6 +22,7 @@ class StoreTiketRequest extends FormRequest
     public function rules(): array
     {
         return [
+            'kode_tiket' => 'required|string|max:7',
             'name' => 'required|string|max:255',
             'place' => 'required|string|max:255',
             'datetime' => 'required|date',

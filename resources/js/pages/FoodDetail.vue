@@ -1,5 +1,5 @@
 <template>
-  <div class="food-detail">
+  <div class="ticket-detail">
     <Navbar />
     <div class="container">
       <!--Breadcrumb-->
@@ -25,17 +25,18 @@
       <div class="row mt-2">
         <div class="col-md-6">
           <img
-            :src="'/media/tiket/' + product.gambar"
+            :src="'/storage/' + product.image"
             class="img-fluid shadow"
+            :alt="product.name"
           />
         </div>
         <div class="col-md-6">
           <h2>
-            <strong>{{ product.nama }}</strong>
+            <strong>{{ product.name }}</strong>
           </h2>
           <hr />
           <h4>
-            Harga: <strong>{{ product.harga }}</strong>
+            Harga: <strong>{{ product.price }}</strong>
           </h4>
 
           <form class="mt-4" v-on:submit.prevent>
@@ -96,13 +97,12 @@
   </div>
 </template>
 
-
 <script>
 import Navbar from "@/components/Navbar.vue";
 import axios from "axios";
 
 export default {
-  name: "FoodDetail",
+  name: "TicketDetail",
   components: {
     Navbar,
   },
@@ -154,9 +154,9 @@ export default {
     },
     pemesanan() {
       if (this.pesan.jumlah_pemesanan) {
-        this.pesan.products = this.product;
+        this.pesan.product = this.product;
         axios
-          .post("http://localhost:3000/keranjangs", this.pesan)
+          .post("http://localhost:8000/api/keranjangs", this.pesan)
           .then(() => {
             this.$router.push({ path: "/keranjang" });
             this.$toast.success("Sukses Masuk Keranjang", {
@@ -179,7 +179,7 @@ export default {
   },
   mounted() {
     axios
-      .get("http://localhost:3000/products/" + this.$route.params.id)
+      .get("http://localhost:8000/api/tickets/" + this.$route.params.id)
       .then((response) => this.setProduct(response.data))
       .catch((error) => console.log(error));
   },

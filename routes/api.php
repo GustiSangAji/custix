@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
+use App\Http\Controllers\StockinController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
@@ -74,9 +75,14 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         Route::get('/{id}', [OrderController::class, 'showById']);
         Route::post('/checkout/{id}', [OrderController::class, 'checkout']);
     });
+
+    Route::prefix('stockin')->group(function (){
+        Route::post('/', [StockinController::class, 'index']);
+    });
 });
 
 Route::get('/tickets', [TicketController::class, 'index']); // Untuk semua tiket
+<<<<<<< HEAD
 Route::get('/tickets/limited', [TicketController::class, 'limited']); // Untuk tiket terbatas di halaman utama
 Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
 
@@ -84,3 +90,6 @@ Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail 
 
 
 
+=======
+Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
+>>>>>>> d29c0a665fcfacf943e2888c296a77900491d6c5

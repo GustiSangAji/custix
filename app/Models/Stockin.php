@@ -6,29 +6,22 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Support\Str;
 
-class Tiket extends Model
+class stockin extends Model
 {
-    use HasFactory;
-
     protected $fillable = [
         'uuid',
         'kode_tiket',
-        'name',
-        'place',
+        'deskripsi',
         'datetime',
-        'status',
-        'quantity',
-        'price',
-        'image',
+        'jumlah',
     ];
 
-    // Menambahkan UUID saat membuat model
     protected static function boot()
     {
         parent::boot();
 
-        static::creating(function ($tiket) {
-            $tiket->uuid = Str::uuid();
+        static::creating(function ($stockin) {
+            $stockin->uuid = Str::uuid();
         });
     }
 }

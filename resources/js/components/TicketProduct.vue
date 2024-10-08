@@ -12,7 +12,7 @@
         <i class="bi bi-calendar-event"></i> {{ formattedDate }}<br />
         <i class="bi bi-geo-alt"></i> {{ product.place }}
       </p>
-      <a class="btn btn-danger w-100 fw-bold">BELI TIKET</a>
+      <router-link :to="'/tiket/'+product.id" class="btn btn-danger w-100 fw-bold">BELI TIKET</router-link>
     </div>
   </div>
 </template>

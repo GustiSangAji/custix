@@ -21,7 +21,7 @@ class PermissionSeeder extends Seeder
 
         $menuMaster = ['master', 'master-user', 'master-role'];
         $menuWebsite = ['website', 'setting', 'orders'];
-        $menuevent = ['event', 'event-tiket', 'event-laporan'];
+        $menuevent = ['event', 'event-tiket', 'event-stockin'];
 
         $permissionsByRole = [
             'admin' => ['dashboard',  ...$menuevent, ...$menuMaster, ...$menuWebsite],

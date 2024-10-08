@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             SettingSeeder::class,
             TiketSeeder::class,
+            OrderSeeder::class,
+            StockinSeeder::class,
         ]);
     }
 }
