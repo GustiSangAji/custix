@@ -12,7 +12,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run(): void
     {   
-        \App\Models\Order::factory(10)->create();
         $this->call([
             RoleSeeder::class,
             PermissionSeeder::class,
