@@ -12,7 +12,7 @@ class TicketController extends Controller
     {
         // Mengambil semua tiket yang tersedia
         $tickets = Tiket::where('status', 'available')
-        ->get(['id', 'name', 'place', 'datetime', 'quantity', 'price', 'image']);
+        ->get(['id','kode_tiket', 'name', 'place', 'datetime', 'quantity', 'price', 'image']);
         return response()->json($tickets);
     }
 
@@ -21,7 +21,7 @@ class TicketController extends Controller
         // Mengambil hanya dua tiket pertama yang tersedia untuk halaman utama
         $tickets = Tiket::where('status', 'available')
             ->limit(2)
-            ->get(['id', 'name', 'place', 'datetime', 'quantity', 'price', 'image']);
+            ->get(['id', 'name', 'kode_tiket', 'place', 'datetime', 'quantity', 'price', 'image']);
         return response()->json($tickets);
     }
 

@@ -15,7 +15,7 @@ return new class extends Migration
             $table->string('kode_tiket');
             $table->integer('jumlah');
             $table->text('deskripsi');
-            $table->datetime('event_datetime'); // Tanggal event
+            $table->datetime('datetime'); // Tanggal event
             $table->timestamps();
         });
 

@@ -265,15 +265,6 @@ watch(
       <div class="fv-help-block">
         <ErrorMessage name="image" />
       </div>
-      
-      <!-- Pratinjau gambar yang di-upload -->
-      <img
-        v-if="ticket.image && ticket.image.length > 0"
-        :src="imagePreview"
-        alt="Gambar Tiket"
-        class="img-thumbnail"
-        style="max-width: 200px; max-height: 200px;"
-      />
     </div>
                 </div>
             </div>

@@ -1,6 +1,6 @@
 <template>
   <div class="card shadow-sm rounded overflow-hidden">
-    <img :src="imageUrl" class="card-img-top" :alt="ticket.name" />
+    <img :src="imageUrl" class="card-img-top" :alt="ticket.name" v-if="imageUrl" />
     <div class="card-body p-4">
       <h5 class="card-title fw-bold text-uppercase mb-3">{{ ticket.name }}</h5>
       <p class="card-text fs-6 mb-3 text-muted">
@@ -11,7 +11,7 @@
         <div class="bg-success fw-bold text-light px-3 py-2 rounded">
           Mulai Dari Rp. {{ ticket.price }}
         </div>
-        <router-link :to="'/tiket/'+ticket.id" class="btn btn-danger px-4 py-2 fw-bold">
+        <router-link :to="'/tiket/' + ticket.id" class="btn btn-danger px-4 py-2 fw-bold">
           Beli Tiket
         </router-link>
       </div>
@@ -23,25 +23,19 @@
 export default {
   name: "HomeCard",
   props: {
-    ticket: Object,
-    type: Object,
-    required: true,
+    ticket: {
+      type: Object,
+      required: true,
+    },
   },
   computed: {
     imageUrl() {
-  console.log("Ticket object:", this.ticket); // Periksa keseluruhan objek ticket
-  if (this.ticket.image && typeof this.ticket.image === 'string') {
-    const imagePath = this.ticket.image; // Langsung gunakan string image
-    console.log("Image file:", imagePath);
-    return `/storage/${imagePath}`; // Pastikan format path sesuai
-  } else {
-    console.log("No image found");
-    return '';
-  }
-}
-},
-
-
+      if (this.ticket.image && typeof this.ticket.image === 'string') {
+        return `/storage/${this.ticket.image}`; // Pastikan format path sesuai
+      }
+      return ''; // Mengembalikan string kosong jika tidak ada gambar
+    },
+  },
   methods: {
     formatDate(date) {
       const options = { year: "numeric", month: "long", day: "numeric" };
