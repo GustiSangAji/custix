@@ -1,47 +1,130 @@
 <template>
   <div class="ticket-detail">
     <Navbar />
-    <div class="container">
-      <!--Breadcrumb-->
-      <div class="row mt-4">
-        <div class="col">
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item">
-                <router-link to="/home" class="text-dark">Home</router-link>
-              </li>
-              <li class="breadcrumb-item">
-                <router-link to="/tiket" class="text-dark">Ticket</router-link>
-              </li>
-              <li class="breadcrumb-item active" aria-current="page">
-                Ticket Order
-              </li>
-            </ol>
-          </nav>
-        </div>
+    <div class="container mt-4">
+      <!-- Image Section -->
+      <div class="shadow-lg rounded mb-4">
+        <img
+          src="/media/carousel/closing-ceremony.png"
+          class="img-fluid rounded shadow-lg"
+          alt="Closing Ceremony"
+        />
+      </div>  
+
+      <!-- Title Section -->
+      <div class="mt-10 text-center">
+        <h1 class="fs-1 mb-4">{{product.name}}</h1>
+        <p class="d-flex align-items-center justify-content-center mb-6">
+          <i class="bi bi-calendar-event me-2"></i>{{ formatDate(product.datetime) }}
+          <span class="mx-3">|</span>
+          <i class="bi bi-geo-alt me-2"></i>{{ product.place }}
+        </p>
+        <hr />
       </div>
 
-      <!-- Content -->
-      <div class="row mt-2">
-        <div class="col-md-6">
-          <img
-            :src="'/storage/' + product.image"
-            class="img-fluid shadow"
-            :alt="product.name"
-          />
-        </div>
-        <div class="col-md-6">
-          <h2>
-            <strong>{{ product.name }}</strong>
-          </h2>
-          <hr />
-          <h4>
-            Harga: <strong>{{ product.price }}</strong>
-          </h4>
+      <!-- Content Section -->
+      <div class="row mt-4">
+        <!-- Event Details Section -->
+        <div class="col-md-8">  
+          <!-- Event description -->
+          <div class="card border-0 p-4 fs-4 shadow-sm rounded mb-4">
+            <p>✮ Hello Arte-Folks ✮</p>
+            <p>
+              Are You Ready?! Don't miss out on the
+              <strong>Epic CLOSING CEREMONY</strong> by Artefac UNS. ARTEFAC
+              merupakan rangkaian acara tahunan yang diselenggarakan oleh Fakultas
+              Ekonomi dan Bisnis Universitas Sebelas Maret dengan menampilkan
+              berbagai kompetisi <strong>ART</strong> (monolog),
+              <strong>SPORT</strong> (basket dan futsal), dan
+              <strong>Closing Ceremony</strong> yang paling dinanti setiap
+              tahunnya! Get ready for an unforgettable night with stellar
+              performances by:
+            </p>
+            <ul>
+              <li>Dewa 19 Ft Ello (Marcello Tahitoe)</li>
+              <li>Coldiac</li>
+              <li>Juicy Luicy</li>
+              <li>And many more exciting guest stars will be announced ♫</li>
+            </ul>
+            <p>
+              <strong>Date:</strong> {{ formatDate(product.datetime) }}<br />
+              <strong>Location:</strong> {{product.place}} ♬
+            </p>
+            <p>
+              Hurry and snag your tickets fast!!! Let's all gather and enjoy the
+              music together. Hope to see you there! See you! ♬
+            </p>
+            <p>
+              Further information can be found on our Instagram:
+              <strong>@artefacuns</strong> and <strong>@custiket.id</strong>
+            </p>
+          </div>
 
-          <form class="mt-4" v-on:submit.prevent>
+          <!-- Line Up Section -->
+          <div class="mt-4">
+            <h2 class="fs-3">Line Up</h2>
+            <div class="card border-0 p-4 shadow-sm rounded mt-3 fs-4">
+              <ul>
+                <li>Dewa 19 ft Ello</li>
+                <li>Juicy Luicy</li>
+                <li>Coldiac</li>
+              </ul>
+            </div>
+          </div>
+
+          <!-- Ticket Information Section -->
+          <div class="mt-4">
+            <h2 class="fs-3">Tentang Tiket</h2>
+            <div class="card border-0 p-4 shadow-sm rounded mt-3 fs-4">
+              <h4>Tentang Tiket Festival</h4>
+              <ul>
+                <li>
+                  Tiket Festival adalah kategori berdiri, dengan pengalaman menonton
+                  terbaik, dimana kamu bisa berdiri dekat sekali dengan panggung dan
+                  tentunya idola kamu.
+                </li>
+                <li>Untuk usia minimum penonton Festival 5 Tahun</li>
+                <li>
+                  Periode Presale 1 akan dimulai pada 8 Juli 2024 dengan harga spesial
+                </li>
+                <li>
+                  Tiket yang sudah dibeli tidak dapat dikembalikan kecuali acara
+                  dibatalkan oleh penyelenggara (No Refund, No Upgrade / Downgrade)
+                </li>
+              </ul>
+              <h4 class="mt-4">Tentang Tiket Festival EARLY ENTRY</h4>
+              <p>Syarat & Ketentuan</p>
+              <ul>
+                <li>
+                  Pemilik tiket Early Entry WAJIB sudah masuk venue maksimal pukul
+                  16.30 WIB
+                </li>
+                <li>
+                  Apabila melebihi pukul 16.30 WIB, maka tiket akan hangus (dan harus
+                  membeli tiket lagi jika ingin tetap menonton konser)
+                </li>
+                <li>Penukaran tiket membawa ID Card Asli (tidak dapat diwakilkan)</li>
+              </ul>
+              <p>*Harga belum termasuk pajak dan biaya admin</p>
+            </div>
+          </div>
+        </div>
+
+        <!-- Image and Form Section -->
+        <div class="col-md-4">
+          <!-- Product Image -->
+          <div class="card border-0 shadow-sm rounded mb-4">
+            <img
+              :alt="product.name"
+              :src="'/storage/' + product.image"
+              class="img-fluid rounded shadow-sm"
+            />
+          </div>
+
+          <!-- Order Form -->
+          <form class="mt-4 p-3 shadow-sm rounded" v-on:submit.prevent>
             <div class="form-group d-flex align-items-center">
-              <!-- Tombol untuk mengurangi jumlah -->
+              <!-- Button to Decrease Quantity -->
               <button
                 type="button"
                 class="btn btn-outline-danger"
@@ -50,7 +133,7 @@
                 -
               </button>
 
-              <!-- Input untuk jumlah pesanan, tanpa arrow -->
+              <!-- Input for Order Quantity, Without Arrows -->
               <input
                 type="number"
                 class="form-control text-center mx-2 no-arrows"
@@ -61,7 +144,7 @@
                 aria-label="Jumlah Pesan"
               />
 
-              <!-- Tombol untuk menambah jumlah -->
+              <!-- Button to Increase Quantity -->
               <button
                 type="button"
                 class="btn btn-outline-danger"
@@ -71,23 +154,12 @@
               </button>
             </div>
 
+            <!-- Submit Button -->
             <button
               type="submit"
-              class="btn btn-success d-flex align-items-center"
+              class="btn btn-success d-flex align-items-center mt-4 w-100"
               @click="pemesanan"
             >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-cart me-2"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M0 1.5A.5.5 0 0 1 .5 1H2a.5.5 0 0 1 .485.379L2.89 3H14.5a.5.5 0 0 1 .491.592l-1.5 8A.5.5 0 0 1 13 12H4a.5.5 0 0 1-.491-.408L2.01 3.607 1.61 2H.5a.5.5 0 0 1-.5-.5M3.102 4l1.313 7h8.17l1.313-7zM5 12a2 2 0 1 0 0 4 2 2 0 0 0 0-4m7 0a2 2 0 1 0 0 4 2 2 0 0 0 0-4m-7 1a1 1 0 1 1 0 2 1 1 0 0 1 0-2m7 0a1 1 0 1 1 0 2 1 1 0 0 1 0-2"
-                />
-              </svg>
               Pesan
             </button>
           </form>
@@ -117,6 +189,10 @@ export default {
   methods: {
     setProduct(data) {
       this.product = data;
+    },
+    formatDate(date) {
+      const options = { year: "numeric", month: "long", day: "numeric" };
+      return new Date(date).toLocaleDateString("id-ID", options);
     },
     tambahJumlah() {
       if (
