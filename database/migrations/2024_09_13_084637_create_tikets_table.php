@@ -16,7 +16,7 @@ class CreateTiketsTable extends Migration
         Schema::create('tikets', function (Blueprint $table) {
             $table->id();
             $table->uuid('uuid')->unique(); // ID Unik untuk tiket
-            $table->string('id_tiket');
+            $table->string('kode_tiket')->nullable();
             $table->string('name'); // Nama event
             $table->string('place'); // Lokasi event
             $table->datetime('datetime'); // Tanggal event

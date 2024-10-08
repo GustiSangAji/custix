@@ -62,9 +62,9 @@ const MainMenuConfig: Array<MenuItem> = [
                         name: "event-tiket",
                     },
                     {
-                        heading: "Laporan",
-                        route: "/event/laporan",
-                        name: "event-laporan",
+                        heading: "Stock-in",
+                        route: "/event/stockin",
+                        name: "event-stockin",
                     },
                 ],
             },

@@ -15,7 +15,7 @@ class TiketSeeder extends Seeder
     {
         // Data contoh untuk tiket
         Tiket::create([
-            'id_tiket' => 'JKT-03', // Menambahkan UUID
+            'kode_tiket' => 'JKT-03', // Menambahkan UUID
             'name' => 'Konser Musik A',
             'place' => 'Stadium A',
             'datetime' => '2024-10-01 19:00:00',
@@ -26,7 +26,7 @@ class TiketSeeder extends Seeder
         ]);
 
         Tiket::create([
-            'id_tiket' => 'JKT-02', // Menambahkan UUID
+            'kode_tiket' => 'JKT-02', // Menambahkan UUID
             'name' => 'GUYON WATON',
             'place' => 'Stadion Bung Amba',
             'datetime' => '2024-10-01 19:00:00',
@@ -36,7 +36,7 @@ class TiketSeeder extends Seeder
             'image' => '/storage/tikets/konser-musik-a.jpg',
         ]);
         Tiket::create([
-            'id_tiket' => 'JKT-01', // Menambahkan UUID
+            'kode_tiket' => 'JKT-01', // Menambahkan UUID
             'name' => 'Konser Jekate 48',
             'place' => 'Stadion amba tukam',
             'datetime' => '2024-10-01 19:00:00',

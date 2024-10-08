@@ -24,13 +24,23 @@ export default {
   name: "HomeCard",
   props: {
     ticket: Object,
+    type: Object,
+    required: true,
   },
   computed: {
     imageUrl() {
-        const imagePath = this.ticket.image && this.ticket.image.length > 0 ? this.ticket.image[0].file : ''; // Pastikan Anda mengakses file
-        console.log("Image path:", imagePath);
-        return imagePath ? `/storage/tikets/${imagePath}` : ''; // Periksa dan bangun URL dengan benar
-    },
+  console.log("Ticket object:", this.ticket); // Periksa keseluruhan objek ticket
+  if (this.ticket.image && typeof this.ticket.image === 'string') {
+    const imagePath = this.ticket.image; // Langsung gunakan string image
+    console.log("Image file:", imagePath);
+    return `/storage/${imagePath}`; // Pastikan format path sesuai
+  } else {
+    console.log("No image found");
+    return '';
+  }
+}
+
+
 },
 
 

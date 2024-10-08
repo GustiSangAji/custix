@@ -81,12 +81,12 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
             {
-                path: "/event/laporan",
-                name: "event.laporan",
-                component: () => import("@/pages/dashboard/event/laporan/Index.vue"),
+                path: "/event/stockin",
+                name: "event.stockin",
+                component: () => import("@/pages/dashboard/event/stockin/Index.vue"),
                 meta: {
-                    pageTitle: "Laporan Penjualan",
-                    breadcrumbs: ["Event", "Laporan"],
+                    pageTitle: "Penambahan Stock",
+                    breadcrumbs: ["Event", "Stock"],
                 },
             },
             {
