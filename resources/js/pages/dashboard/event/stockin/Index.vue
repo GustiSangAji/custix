@@ -15,7 +15,6 @@ const openDetailModal = ref(false);  // Kontrol modal detail
 const { delete: deleteStockIn } = useDelete({
     onSuccess: () => paginateRef.value.refetch(), // Refetch data setelah berhasil dihapus
 });
-
 // Definisi kolom untuk tabel stock-in
 const columns = [
     columnHelper.accessor("id", {
@@ -38,8 +37,7 @@ const columns = [
         header: "Aksi",
         cell: (cell) =>
             h("div", { class: "d-flex gap-2" }, [
-                // Tombol untuk membuka modal detail
-                h("button", {
+                h("buttonn",{
                     class: "btn btn-sm btn-icon btn-primary",
                     onClick: () => {
                         selectedStockIn.value = cell.row.original;  // Set data stok yang dipilih
