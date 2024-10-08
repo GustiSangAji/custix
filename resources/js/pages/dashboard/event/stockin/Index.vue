@@ -2,73 +2,50 @@
 import { ref, watch, h } from "vue";
 import { createColumnHelper } from "@tanstack/vue-table";
 import { useDelete } from "@/libs/hooks";
-import Form from "./Form.vue"; // Komponen Form Tiket
-import type { Tiket } from "@/types";
-import { formatRupiah } from "@/libs/rupiah";
+import Form from "./Form.vue"; // Komponen Form StockIn
+import type { StockIn } from "@/types"; // Pastikan tipe StockIn sudah didefinisikan
 
-
-const columnHelper = createColumnHelper<Tiket>();
+const columnHelper = createColumnHelper<StockIn>();
 const paginateRef = ref<any>(null);
-const selected = ref<string>("");  // Untuk menyimpan UUID tiket yang dipilih
+const selected = ref<string>("");  // Untuk menyimpan ID stock-in yang dipilih
 const openForm = ref(false);  // Kontrol visibilitas form
 
-const { delete: deleteTicket } = useDelete({
+const { delete: deleteStockIn } = useDelete({
     onSuccess: () => paginateRef.value.refetch(), // Refetch data setelah berhasil dihapus
 });
 
-// Kolom-kolom untuk tabel tiket
+// Kolom-kolom untuk tabel stockin
 const columns = [
-    columnHelper.accessor("no", {
-        header: "#",
+    columnHelper.accessor("id", {
+            header: "#",
     }),
     columnHelper.accessor("kode_tiket", {
         header: "Kode Tiket",
     }),
-    columnHelper.accessor("name", {
-        header: "Nama Tiket",
-    }),
-    columnHelper.accessor("place", {
-        header: "Tempat",
-    }),
-    columnHelper.accessor("datetime", {
-        header: "Tanggal & Waktu",
-    }),
-    columnHelper.accessor("status", {
-        header: "Status",
-        cell: (cell) => h("span", cell.getValue() === "available" ? "Tersedia" : "Tidak Tersedia"),
-    }),
-    columnHelper.accessor("quantity", {
+    columnHelper.accessor("jumlah", {
         header: "Jumlah",
     }),
-    columnHelper.accessor("price", {
-        header: "Harga",
-        cell: (cell) => formatRupiah(cell.getValue()),
+    columnHelper.accessor("deskripsi", {
+        header: "Deskripsi",
     }),
-    columnHelper.accessor("image", {
-        header: "Gambar",
-        cell: (cell) => {
-            const imagePath = cell.getValue();
-            return h("img", { 
-                src: `/storage/${imagePath}`, // Pastikan Anda menggunakan path yang benar
-                alt: "Gambar", 
-                style: { maxWidth: "100px", maxHeight: "100px" } 
-            });
-        },
+    columnHelper.accessor("datetime", {
+        header: "Tanggal Penambahan",
+        cell: (cell) => new Date(cell.getValue()).toLocaleString(), // Format tanggal
     }),
-    columnHelper.accessor("uuid", {
+    columnHelper.accessor("id", {
         header: "Aksi",
         cell: (cell) =>
             h("div", { class: "d-flex gap-2" }, [
                 h("button", {
                     class: "btn btn-sm btn-icon btn-info",
                     onClick: () => {
-                        selected.value = cell.getValue();  // Set UUID tiket yang dipilih
+                        selected.value = cell.getValue();  // Set ID stock-in yang dipilih
                         openForm.value = true;  // Buka form
                     },
                 }, h("i", { class: "la la-pencil fs-2" })),
                 h("button", {
                     class: "btn btn-sm btn-icon btn-danger",
-                    onClick: () => deleteTicket(`/tiket/${cell.getValue()}`),
+                    onClick: () => deleteStockIn(`/stockin/${cell.getValue()}`),
                 }, h("i", { class: "la la-trash fs-2" }))
             ]),
     }),
@@ -80,7 +57,7 @@ const refresh = () => paginateRef.value.refetch();
 // Watch perubahan openForm dan reset selected ketika form ditutup
 watch(openForm, (newVal) => {
     if (!newVal) {
-        selected.value = "";  // Reset UUID saat form ditutup
+        selected.value = "";  // Reset ID saat form ditutup
     }
     window.scrollTo(0, 0);  // Scroll ke atas ketika form dibuka
 });
@@ -96,7 +73,7 @@ watch(openForm, (newVal) => {
 
     <div class="card">
         <div class="card-header align-items-center">
-            <h2 class="mb-0">List Tiket</h2>
+            <h2 class="mb-0">List Stok Masuk</h2>
             <button
                 type="button"
                 class="btn btn-sm btn-primary ms-auto"
@@ -109,8 +86,8 @@ watch(openForm, (newVal) => {
         <div class="card-body">
             <paginate
                 ref="paginateRef"
-                id="table-tiket"
-                url="/tiket"
+                id="table-stockin"
+                url="/stockin"
                 :columns="columns"
             ></paginate>
         </div>

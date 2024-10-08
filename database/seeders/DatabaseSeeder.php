@@ -19,6 +19,7 @@ class DatabaseSeeder extends Seeder
             SettingSeeder::class,
             TiketSeeder::class,
             OrderSeeder::class,
+            StockinSeeder::class,
         ]);
     }
 }

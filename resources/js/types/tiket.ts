@@ -1,6 +1,6 @@
 export type Tiket = {
     id: BigInteger;
-    id_tiket: string;
+    kode_tiket: string;
     name: string;
     place: string;
     datetime: string;
