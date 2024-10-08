@@ -82,14 +82,5 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 });
 
 Route::get('/tickets', [TicketController::class, 'index']); // Untuk semua tiket
-<<<<<<< HEAD
 Route::get('/tickets/limited', [TicketController::class, 'limited']); // Untuk tiket terbatas di halaman utama
 Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
-
-
-
-
-
-=======
-Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
->>>>>>> d29c0a665fcfacf943e2888c296a77900491d6c5
