@@ -73,7 +73,7 @@
             <button
               type="submit"
               class="btn btn-success d-flex align-items-center"
-              @click="pemesanan"
+              @click="detailTransaksi"
             >
               <svg
                 xmlns="http://www.w3.org/2000/svg"
@@ -175,6 +175,10 @@ export default {
           dismissible: true,
         });
       }
+    },
+    detailTransaksi() {
+      // Navigasi ke halaman baru dengan path `/tiket/:id/orders`
+      this.$router.push(`/tiket/${this.product.id}/orders`);
     },
   },
   mounted() {

@@ -38,6 +38,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/Keranjang.vue"),
     },
     {
+        path: "/tiket/:id/orders",
+        component: () => import("@/pages/Orders.vue"),
+    },
+    {
         path: "/dashboard",
         component: () => import("@/layouts/default-layout/DefaultLayout.vue"),
         meta: {
