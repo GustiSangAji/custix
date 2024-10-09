@@ -145,7 +145,7 @@
           <div class="card border-0 shadow-sm p-4 rounded mb-4">
             <h6>Tanggal Event</h6>
             <div class="d-flex align-items-center mb-2">
-              <span class="badge bg-primary p-2 me-2">Sab 18 Jan</span>
+              <span class="badge bg-primary p-2 me-2">{{ formatShortDate(product.datetime) }}</span>
               <span>Masa berlaku: 18 Jan 2025</span>
             </div>
           </div>
@@ -186,9 +186,9 @@
 
           <!-- Total Price -->
           <div class="card border-0 shadow-sm p-4 rounded mb-4">
-            <h6>Total ({{ ticketQuantity }} pax):</h6>
+            <h6>Total ({{ this.pesan.jumlah_pemesanan }} pax):</h6>
             <p class="fs-5">
-              IDR {{ formatPrice(ticketQuantity * product.price) }}
+              IDR {{ formatPrice(this.pesan.jumlah_pemesanan * product.price) }}
             </p>
             <button
               type="submit"
@@ -241,6 +241,10 @@ export default {
       const options = { year: "numeric", month: "long", day: "numeric" };
       return new Date(date).toLocaleDateString("id-ID", options);
     },
+    formatShortDate(dateString) {
+      const options = { weekday: 'short', year: 'numeric', month: 'short', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString('id-ID', options); // Format date to "Sab 2 Jan"
+    },
     tambahJumlah() {
       if (
         this.pesan.jumlah_pemesanan === null ||
@@ -248,7 +252,7 @@ export default {
       ) {
         // Jika input kosong, atur ke 1 sebagai default
         this.pesan.jumlah_pemesanan = 1;
-      } else if (this.pesan.jumlah_pemesanan < 100) {
+      } else if (this.pesan.jumlah_pemesanan < 3) {
         // Batas maksimal misalnya 100
         this.pesan.jumlah_pemesanan++;
       }
