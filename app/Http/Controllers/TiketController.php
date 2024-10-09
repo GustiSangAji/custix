@@ -48,20 +48,24 @@ class TiketController extends Controller
      */
     public function store(StoreTiketRequest $request)
     {
-        $validatedData = $request->validated();
+    $validatedData = $request->validated();
 
-        // Jika ada file gambar, simpan
-        if ($request->hasFile('image')) {
-            $validatedData['image'] = $request->file('image')->store('tikets', 'public');
-        }
-
-        $tiket = Tiket::create($validatedData);
-
-        return response()->json([
-            'success' => true,
-            'tiket' => $tiket
-        ]);
+    // Simpan gambar jika ada
+    if ($request->hasFile('image')) {
+        $validatedData['image'] = $request->file('image')->store('tikets', 'public');
     }
+
+    // Buat tiket baru
+    $tiket = Tiket::create($validatedData);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Tiket berhasil ditambahkan',
+        'tiket' => $tiket, // Mengembalikan objek tiket yang baru dibuat
+    ], 201);
+    
+    }
+
 
     /**
      * Display the specified resource.
