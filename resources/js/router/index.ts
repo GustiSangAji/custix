@@ -38,6 +38,12 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/Keranjang.vue"),
     },
     {
+        path: "/waiting-room",
+        name: "waiting-room",
+        component: () => import("@/pages/WaitingRoom.vue"),
+    },
+    
+    {
         path: "/dashboard",
         component: () => import("@/layouts/default-layout/DefaultLayout.vue"),
         meta: {

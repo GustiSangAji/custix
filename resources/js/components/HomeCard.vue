@@ -11,7 +11,7 @@
         <div class="bg-success fw-bold text-light px-3 py-2 rounded">
           Mulai Dari Rp. {{ ticket.price }}
         </div>
-        <router-link :to="'/tiket/' + ticket.id" class="btn btn-danger px-4 py-2 fw-bold">
+        <router-link :to="'/waiting-room/'" class="btn btn-danger px-4 py-2 fw-bold">
           Beli Tiket
         </router-link>
       </div>
