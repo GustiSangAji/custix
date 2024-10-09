@@ -29,7 +29,7 @@ class StoreTiketRequest extends FormRequest
             'status' => 'required|in:available,unavailable',
             'quantity' => 'required|integer|min:1',
             'price' => 'required|numeric|min:0',
-            'image' => 'nullable|image',
+            'image' => 'nullable|image|max:2048',
         ];
     }
 }

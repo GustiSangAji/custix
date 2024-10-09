@@ -29,7 +29,7 @@ class UpdateTiketRequest extends FormRequest
             'status' => ['required', Rule::in(['available', 'unavailable'])],
             'quantity' => 'required|numeric|min:1',
             'price' => 'required|numeric|min:0',
-            'image' => 'nullable|image',
+            'image' => 'nullable|image|max:2048', // Maksimal 2MB
         ];
     }
 }

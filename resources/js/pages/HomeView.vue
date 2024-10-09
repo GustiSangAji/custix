@@ -4,9 +4,12 @@
       <Carousel />
       <BestConcert />
       <div class="row mt-6">
-        <div class="col-md-6 mb-4 " v-for="ticket in tickets" :key="ticket.id">
+        <div class="col-md-6 mb-4" v-for="ticket in tickets" :key="ticket.id">
           <HomeCard :ticket="ticket" />
         </div>
+      </div>
+      <div v-if="tickets.length === 0" class="text-center mt-5">
+        <p>Tidak ada tiket yang tersedia saat ini.</p>
       </div>
     </div>
   </LayoutLanding>
@@ -33,14 +36,19 @@ export default {
     };
   },
   mounted() {
-    axios
-      .get("http://localhost:8000/api/tickets/limited")
-      .then((response) => {
-        this.tickets = response.data;
-      })
-      .catch((error) => {
-        console.log(error);
-      });
+    this.fetchTickets();
+  },
+  methods: {
+    fetchTickets() {
+      axios
+        .get("http://localhost:8000/api/tickets/limited")
+        .then((response) => {
+          this.tickets = response.data;
+        })
+        .catch((error) => {
+          console.error("Error fetching tickets:", error);
+        });
+    },
   },
 };
 </script>

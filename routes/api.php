@@ -1,6 +1,6 @@
 <?php
 
-use App\Http\Controllers\api\TicketController;
+use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StockinController;
