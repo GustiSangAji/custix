@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\Api\TicketController;
+use App\Http\Controllers\CartController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StockinController;
@@ -99,3 +100,4 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 Route::get('/tickets', [TicketController::class, 'index']); // Untuk semua tiket
 Route::get('/tickets/limited', [TicketController::class, 'limited']); // Untuk tiket terbatas di halaman utama
 Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
+Route::post('/keranjangs', [CartController::class, 'store']);
