@@ -215,8 +215,6 @@ export default {
   },
   data() {
     return {
-      ticketQuantity: 1,
-      ticketPrice: 1694252, // IDR per ticket
       product: {},
       pesan: {
         jumlah_pemesanan: 1, // Jumlah awal
@@ -229,10 +227,6 @@ export default {
         style: "currency",
         currency: "IDR",
       });
-    },
-    placeOrder() {
-      // Handle order placement logic
-      alert(`Order placed for ${this.ticketQuantity} tickets`);
     },
     setProduct(data) {
       this.product = data;

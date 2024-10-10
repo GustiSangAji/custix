@@ -8,6 +8,15 @@ use App\Models\Tiket; // Model tiket
 
 class CartController extends Controller
 {
+        public function index()
+    {
+        // Ambil semua item di keranjang untuk pengguna yang sedang login
+        $carts = Cart::where('user_id', auth()->id())->with('ticket')->get();
+        \Log::info($carts); // Log untuk melihat hasil query
+
+        return response()->json($carts);
+    }
+
     public function store(Request $request)
     {
         // Validasi input
