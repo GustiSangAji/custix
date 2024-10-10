@@ -18,10 +18,11 @@ const props = defineProps({
 const emit = defineEmits(["close", "refresh"]);
 
 const ticket = ref({
-    kode_tiket: '', // Menambahkan kode_tiket
+    kode_tiket: '', 
     name: '',
     place: '',
     datetime: '',
+    expiry_date: '',
     status: 'available',
     quantity: 0,
     price: 0,
@@ -31,12 +32,13 @@ const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
 const formRef = ref();
 
 const formSchema = Yup.object().shape({
-    kode_tiket: Yup.string().required("ID Tiket harus diisi"), // Tambahkan validasi untuk kode_tiket
+    kode_tiket: Yup.string().required("ID Tiket harus diisi"), 
     name: Yup.string().required("Nama harus diisi"),
     place: Yup.string().required("Tempat harus diisi"),
     status: Yup.string().required("Status harus diisi"),
     quantity: Yup.number().required("Jumlah harus diisi").min(1, "Minimal 1 tiket"),
     price: Yup.number().required("Harga harus diisi").min(0, "Harga minimal 0"),
+    expiry_date: Yup.date().nullable(),
 });
 
 function getEdit() {
@@ -45,6 +47,7 @@ function getEdit() {
         .then(({ data }) => {
             if (data && data.tiket) {
                 ticket.value = data.tiket; // Pastikan response berisi data.tiket
+                ticket.value.expiry_date = data.tiket.expiry_date;
             } else {
                 console.error("Response data format is incorrect", data);
             }
@@ -60,10 +63,11 @@ function getEdit() {
 
 function submit() {
     const formData = new FormData();
-    formData.append("kode_tiket", ticket.value.kode_tiket); // Tambahkan kode_tiket
+    formData.append("kode_tiket", ticket.value.kode_tiket);
     formData.append("name", ticket.value.name);
     formData.append("place", ticket.value.place);
     formData.append("datetime", ticket.value.datetime);
+    formData.append("expiry_date", ticket.value.expiry_date);
     formData.append("status", ticket.value.status);
     formData.append("quantity", ticket.value.quantity.toString());
     formData.append("price", ticket.value.price.toString());
@@ -116,6 +120,7 @@ watch(
                 name: '',
                 place: '',
                 datetime: '',
+                expiry_date: '',
                 status: 'available',
                 quantity: 0,
                 price: 0,
@@ -203,6 +208,19 @@ watch(
                         />
                         <div class="fv-help-block">
                             <ErrorMessage name="datetime" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="fv-row mb-7">
+                        <label class="form-label fw-bold fs-6 required">Masa Berlaku</label>
+                        <Flatpickr
+                            class="form-control form-control-lg form-control-solid"
+                            v-model="ticket.expiry_date"
+                            :config="{ dateFormat: 'Y-m-d' }"
+                        />
+                        <div class="fv-help-block">
+                            <ErrorMessage name="expiry_date" />
                         </div>
                     </div>
                 </div>

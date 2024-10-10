@@ -146,7 +146,7 @@
             <h6>Tanggal Event</h6>
             <div class="d-flex align-items-center mb-2">
               <span class="badge bg-primary p-2 me-2">{{ formatShortDate(product.datetime) }}</span>
-              <span>Masa berlaku: 18 Jan 2025</span>
+              <span>Periode Event: {{ formatShortDate(product.expiry_date) }}</span>
             </div>
           </div>
 
