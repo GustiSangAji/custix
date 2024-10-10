@@ -1,43 +1,36 @@
 <template>
-    <div class="order-detail">
+    <div class="orders">
       <Navbar />
       <div class="container mt-4">
-        <!-- Order Summary Card -->
-        <div class="card shadow-lg rounded p-4 mb-4">
-          <h2 class="text-center mb-4">Detail Transaksi</h2>
-          <div class="row">
-            <!-- Product Image -->
-            <div class="col-md-4 text-center">
-              <img
-                :alt="order.product.name"
-                :src="'/storage/' + order.product.image"
-                class="img-fluid rounded shadow-sm"
-              />
+        <!-- Alert success order created -->
+        <div v-if="orderCreated" class="alert alert-success" role="alert">
+          <strong>Order berhasil dibuat!</strong> Order ID: {{ order.order_id }}
+        </div>
+  
+        <!-- Order Details -->
+        <div class="card shadow-sm p-4">
+          <h2 class="text-center mb-4">Detail Pemesanan</h2>
+  
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <p><strong>Nama Event:</strong> {{ product.name }}</p>
             </div>
-  
-            <!-- Transaction Details -->
-            <div class="col-md-8">
-              <h3>{{ order.product.name }}</h3>
-              <p><i class="bi bi-calendar-event me-2"></i> {{ formatDate(order.product.datetime) }}</p>
-              <p><i class="bi bi-geo-alt me-2"></i> {{ order.product.place }}</p>
-  
-              <hr />
-  
-              <!-- Order Information -->
-              <h4 class="mt-4">Informasi Pemesanan</h4>
-              <p>
-                <strong>Jumlah Tiket:</strong> {{ order.jumlah_pemesanan }}<br />
-                <strong>Harga per Tiket:</strong> Rp {{ formatCurrency(order.product.price) }}<br />
-                <strong>Total Harga:</strong> Rp {{ formatCurrency(order.total_price) }}<br />
-                <strong>Status Pembayaran:</strong> {{ order.payment_status ? "Sudah Dibayar" : "Belum Dibayar" }}
-              </p>
-  
-              <!-- Payment Button -->
-              <button class="btn btn-success w-100 mt-4" v-if="!order.payment_status" @click="payOrder">
-                Bayar Sekarang
-              </button>
-              <p v-else class="text-success mt-3">Pembayaran telah berhasil!</p>
+            <div class="col-md-6">
+              <p><strong>Jumlah Tiket:</strong> {{ order.jumlah_pemesanan }}</p>
             </div>
+          </div>
+  
+          <div class="row mb-3">
+            <div class="col-md-6">
+              <p><strong>Total Harga:</strong> IDR {{ formatPrice(order.total_price) }}</p>
+            </div>
+            <div class="col-md-6">
+              <p><strong>Status Pembayaran:</strong> {{ paymentStatus(order.payment_status) }}</p>
+            </div>
+          </div>
+  
+          <div class="text-center">
+            <router-link to="/" class="btn btn-primary">Kembali ke Beranda</router-link>
           </div>
         </div>
       </div>
@@ -49,64 +42,69 @@
   import axios from "axios";
   
   export default {
-    name: "OrderDetail",
+    name: "Orders",
     components: {
       Navbar,
     },
     data() {
       return {
-        order: {
-          product: {},
-          jumlah_pemesanan: 1,
-          total_price: 0,
-          payment_status: false,
-        },
+        order: {},
+        product: {},
+        orderCreated: false,
       };
     },
     methods: {
-      setOrder(data) {
-        this.order = data;
-      },
-      formatDate(date) {
-        const options = { year: "numeric", month: "long", day: "numeric" };
-        return new Date(date).toLocaleDateString("id-ID", options);
-      },
-      formatCurrency(amount) {
-        return amount.toLocaleString("id-ID", {
+      formatPrice(value) {
+        return value.toLocaleString("id-ID", {
           style: "currency",
           currency: "IDR",
-        }).replace('IDR', '').trim(); // Menghapus IDR agar sesuai format Rupiah lokal
+        });
       },
-      payOrder() {
-        // Logika pembayaran bisa dimasukkan di sini, seperti memanggil API Midtrans atau gateway lainnya
+      paymentStatus(status) {
+        switch (status) {
+          case "1":
+            return "Menunggu Pembayaran";
+          case "2":
+            return "Sudah Dibayar";
+          case "3":
+            return "Kadaluarsa";
+          default:
+            return "Tidak Diketahui";
+        }
+      },
+      fetchOrderDetails() {
+        const orderId = this.$route.query.id; // Mengambil ID order dari query params
+  
         axios
-          .post("http://localhost:8000/api/payments", { order_id: this.order.id })
+          .get(`http://localhost:8000/api/orders/${orderId}`)
           .then((response) => {
-            this.order.payment_status = true;
-            this.$toast.success("Pembayaran Berhasil!", {
-              type: "success",
-              position: "top-right",
-              duration: 3000,
-              dismissible: true,
-            });
+            this.order = response.data;
+            this.orderCreated = true;
+  
+            // Mengambil data produk berdasarkan ID produk dari order
+            return axios.get(`http://localhost:8000/api/tickets/${this.order.product_id}`);
+          })
+          .then((response) => {
+            this.product = response.data;
           })
           .catch((error) => {
-            this.$toast.error("Pembayaran Gagal", {
-              type: "error",
-              position: "top-right",
-              duration: 3000,
-              dismissible: true,
-            });
-            console.error(error);
+            console.error("Error fetching order details:", error);
           });
       },
     },
     mounted() {
-      axios
-        .get("http://localhost:8000/api/orders/" + this.$route.params.id)
-        .then((response) => this.setOrder(response.data))
-        .catch((error) => console.log(error));
+      this.fetchOrderDetails();
     },
   };
   </script>
+  
+  <style scoped>
+  .orders {
+    padding: 20px;
+  }
+  
+  .card {
+    border-radius: 8px;
+  }
+  </style>
   

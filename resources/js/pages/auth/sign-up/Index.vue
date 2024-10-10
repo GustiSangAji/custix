@@ -314,46 +314,6 @@ export default defineComponent({
         });
     };
 
-    const sendOtpPhone = (callback: any) => {
-      blockBtn("#next-form");
-
-      axios
-        .post("/auth/register/get/phone/otp", {
-          phone: formData.value.phone,
-        })
-        .then((res) => {
-          toast.success("Kode OTP berhasil dikirim ke No. Telepon Anda");
-          unblockBtn("#next-form");
-          callback && callback();
-
-          setOtpInterval.value(30);
-          handleOtpInterval();
-        })
-        .catch((err) => {
-          toast.error(err.response.data.message);
-          unblockBtn("#next-form");
-        });
-    };
-
-    const checkOtpPhone = (callback: any) => {
-      blockBtn("#next-form");
-
-      axios
-        .post("/auth/register/check/phone/otp", {
-          phone: formData.value.phone,
-          otp: formData.value.otp_phone,
-        })
-        .then((res) => {
-          toast.success("No. Telepon berhasil diverifikasi");
-          unblockBtn("#next-form");
-          callback && callback();
-        })
-        .catch((err) => {
-          toast.error(err.response.data.message);
-          unblockBtn("#next-form");
-        });
-    };
-
     const handleStep = handleSubmit((values) => {
       resetForm({
         values: {

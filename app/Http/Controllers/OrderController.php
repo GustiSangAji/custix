@@ -4,68 +4,87 @@ namespace App\Http\Controllers;
 
 use App\Models\Order;
 use Illuminate\Http\Request;
-use Illuminate\Database\Eloquent\Builder;
-use App\Services\Midtrans\CreateSnapTokenService;
 
 class OrderController extends Controller
 {
     /**
-     * Display a listing of the resource.
+     * Get all orders (optional if needed).
      */
-    public function index(Request $request)
+    public function index()
     {
-        $orders = Order::when($request->status, function (Builder $query, string $status) {
-            $query->where('payment_status', $status); // Pastikan query menggunakan kolom yang benar
-        })->get();
-
-        // Debug output untuk memastikan payment_status ada di data
-        return response()->json([
-            'success' => true,
-            'data' => $orders
-        ]);
+        $orders = Order::all();
+        return response()->json($orders, 200);
     }
 
-
     /**
-     * Store a newly created resource in storage.
+     * Store a new order.
      */
     public function store(Request $request)
     {
-        //
+        // Validasi input
+        $validatedData = $request->validate([
+            'product_id' => 'required|string',
+            'jumlah_pemesanan' => 'required|integer|min:1',
+            'total_price' => 'required|numeric|min:0',
+        ]);
+
+        // Membuat order baru
+        $order = new Order();
+        $order->order_id = 'ORD-' . strtoupper(uniqid()); // Order ID unik
+        $order->product_id = $validatedData['product_id'];
+        $order->jumlah_pemesanan = $validatedData['jumlah_pemesanan'];
+        $order->total_price = $validatedData['total_price'];
+        $order->payment_status = '1'; // Status default: menunggu pembayaran
+        $order->save();
+
+        // Mengirim respon dengan order ID
+        return response()->json([
+            'id' => $order->id,
+            'order_id' => $order->order_id,
+            'message' => 'Order berhasil dibuat!',
+        ], 201);
     }
 
     /**
-     * Display the specified resource.
+     * Show specific order.
      */
-    public function show(Order $order)
+    public function show($id)
     {
-        $snapToken = $order->snap_token;
-        if (is_null($snapToken)) {
-            // If snap token is still NULL, generate snap token and save it to database
-
-            $midtrans = new CreateSnapTokenService($order);
-            $snapToken = $midtrans->getSnapToken();
-
-            $order->snap_token = $snapToken;
-            $order->save();
-        }
-
-        return response()->json(['order' => $order, 'snap_token' => $snapToken]); // Return as JSON
+        $order = Order::findOrFail($id);
+        return response()->json($order, 200);
     }
 
     /**
-     * Update the specified resource in storage.
+     * Update specific order.
      */
-    public function update(Request $request, Order $order)
+    public function update(Request $request, $id)
     {
+        // Validasi input
+        $validatedData = $request->validate([
+            'payment_status' => 'required|in:1,2,3', // Mengupdate status pembayaran
+        ]);
 
+        // Mengambil data order
+        $order = Order::findOrFail($id);
+        $order->payment_status = $validatedData['payment_status'];
+        $order->save();
+
+        return response()->json([
+            'message' => 'Status pembayaran berhasil diupdate!',
+            'order' => $order,
+        ], 200);
     }
 
     /**
-     * Remove the specified resource from storage.
+     * Delete specific order (optional if needed).
      */
-    public function destroy(Order $order)
+    public function destroy($id)
     {
+        $order = Order::findOrFail($id);
+        $order->delete();
 
+        return response()->json([
+            'message' => 'Order berhasil dihapus!',
+        ], 200);
     }
 }

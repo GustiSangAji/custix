@@ -17,8 +17,8 @@ class DatabaseSeeder extends Seeder
             PermissionSeeder::class,
             UserSeeder::class,
             SettingSeeder::class,
-            TiketSeeder::class,
-            OrderSeeder::class,
+            //TiketSeeder::class,
+            //OrderSeeder::class,
             StockinSeeder::class,
         ]);
     }

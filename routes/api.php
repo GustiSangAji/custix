@@ -77,13 +77,13 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         Route::put('tiket/{id}/stok', [TiketController::class, 'updateStok']);
     });
 
-    Route::prefix('orders')->group(function (){
-        Route::post('/', [OrderController::class, 'index']);
-        Route::get('/show', [OrderController::class, 'show']);
-        Route::get('/{id}', [OrderController::class, 'showById']);
-        Route::post('/checkout/{id}', [OrderController::class, 'checkout']);
+    Route::prefix('orders')->group(function () {
+        Route::get('/', [OrderController::class, 'index']); // Untuk mengambil semua order
+        Route::post('/', [OrderController::class, 'store']); // Untuk membuat order baru
+        Route::get('/{id}', [OrderController::class, 'show']); // Untuk melihat detail order berdasarkan ID
+        Route::put('/{id}', [OrderController::class, 'update']); // Untuk mengupdate status pembayaran
+        Route::delete('/{id}', [OrderController::class, 'destroy']); // Untuk menghapus order
     });
-
 
 
     // Stockin Routes
@@ -94,9 +94,9 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         Route::put('/{stockin}', [StockinController::class, 'update']);
         Route::delete('/{stockin}', [StockinController::class, 'destroy']);
     });
-    
-    });
-    
+
+});
+
 Route::get('/tickets', [TicketController::class, 'index']); // Untuk semua tiket
 Route::get('/tickets/limited', [TicketController::class, 'limited']); // Untuk tiket terbatas di halaman utama
 Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
