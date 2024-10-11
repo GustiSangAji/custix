@@ -1,20 +1,108 @@
 <template>
+  <Navbar />
   <div v-if="orderDetail && ticketDetail">
-    <h1>Detail Pembayaran</h1>
-    <p>Pesanan ID: {{ orderDetail.id }}</p>
-    <p>Jumlah Pemesanan: {{ orderDetail.jumlah_pemesanan }}</p>
-    <p>Total Harga: {{ formatPrice(orderDetail.total_harga) }}</p>
-    <p>Tanggal Pemesanan: {{ formatDate(orderDetail.created_at) }}</p>
-    <p>Status: {{ orderDetail.status }}</p>
-    
-    <div class="ticket-details">
-      <h3>Detail Tiket</h3>
-      <img :src="ticketDetail.image" alt="Event Image" class="img-thumbnail" style="width: 100px; height: auto;"/>
-      <p><strong>Nama Tiket: {{ ticketDetail.name }}</strong></p>
-      <p><strong>Kode Tiket: {{ ticketDetail.kode_tiket }}</strong></p>
-      <p><strong>Tanggal Event: {{ formatDate(ticketDetail.datetime) }}</strong></p>
-      <p><strong>Lokasi: {{ ticketDetail.place }}</strong></p>
+  <div class="container mt-10">
+    <div class="row">
+      <!-- Form Pemesanan -->
+      <div class="col-md-8">
+        <h5 class="card-title">Detail Pemesanan</h5>
+        <p class="card-text">
+          Isi formulir ini dengan benar karena e-tiket akan dikirim ke alamat
+          email sesuai data pemesan.
+        </p>
+        <div class="card">
+          <div class="card-body">
+            <form>
+              <!-- Nama Lengkap -->
+              <div class="mb-3">
+                <label for="nama" class="form-label">Nama Lengkap</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nama"
+                  placeholder="Nama Lengkap"
+                  value="Dian Rizky Pratama"
+                />
+              </div>
+
+              <!-- Nomor Ponsel -->
+              <div class="mb-3">
+                <label for="nomorPonsel" class="form-label">Nomor Ponsel</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nomorPonsel"
+                  placeholder="+62"
+                  value="+62 89501215795"
+                />
+              </div>
+
+              <!-- Alamat Email -->
+              <div class="mb-3">
+                <label for="email" class="form-label">Alamat Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  placeholder="you@example.com"
+                  value="rizdian229@gmail.com"
+                />
+              </div>
+
+            </form>
+          </div>
+        </div>
+      </div>
+
+      <!-- Detail Tiket -->
+      <div class="col-md-4">
+        <div class="card shadow-sm mt-4">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-6">
+              <img
+                :src="'/storage/' + ticketDetail.image" 
+                alt="Event Image"
+                class="rounded me-2"
+                style="width: 50px"
+              />
+              <div class="flex-grow-1">
+                <h5 class="card-title mb-0">{{ ticketDetail.name }}</h5>
+              </div>
+              <a href="#" class="text-primary">Detail</a>
+            </div>
+            <p class="card-text">
+              <strong>Tiket: {{ ticketDetail.kode_tiket }}</strong>
+              <br />
+              1 Tiket - Id Pesanan {{ orderDetail.id }}<br />
+              <span class="text-muted">
+                Tanggal Dipilih: {{ formatDate(orderDetail.created_at) }}
+              </span>
+            </p>
+
+            <ul class="list-unstyled">
+              <li class="mb-3"><i class="bi bi-x-circle-fill"></i> Tidak bisa refund</li>
+              <li class="mb-3"><i class="bi bi-check-circle-fill"></i> Konfirmasi Instan</li>
+              <li class="mb-3">
+                <i class="bi bi-ticket-fill"></i> Kursi tersedia saat penukaran
+                tiket
+              </li>
+              <li class="mb-3">
+                <i class="bi bi-calendar-check-fill"></i> Berlaku di tanggal
+                terpilih
+              </li>
+            </ul>
+
+            <hr />
+
+            <div class="d-flex justify-content-between align-items-center">
+              <h6>Total Pembayaran</h6>
+              <p class="fw-bold">{{ formatPrice(orderDetail.total_harga) }}</p>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
+  </div>
   </div>
   <div v-else>
     <p>Memuat detail pembayaran...</p>
@@ -24,9 +112,13 @@
 
 <script>
 import axios from 'axios';
+import Navbar from "@/components/Navbar.vue";
 
 export default {
   name: 'PaymentDetail',
+  components: {
+    Navbar,
+  },
   data() {
   return {
     orderId: this.$route.params.orderId,
