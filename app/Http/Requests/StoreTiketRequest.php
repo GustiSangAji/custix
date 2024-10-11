@@ -26,10 +26,19 @@ class StoreTiketRequest extends FormRequest
             'name' => 'required|string|max:255',
             'place' => 'required|string|max:255',
             'datetime' => 'required|date',
+            'expiry_date' => 'required|date|after_or_equal:datetime', 
             'status' => 'required|in:available,unavailable',
             'quantity' => 'required|integer|min:1',
             'price' => 'required|numeric|min:0',
             'image' => 'nullable|image|max:2048',
         ];
     }
+
+    public function messages()
+    {
+        return [
+            'expiry_date.after_or_equal' => 'Masa berlaku harus sama dengan atau setelah tanggal event.',
+        ];
+    }
+
 }

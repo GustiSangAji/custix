@@ -1,101 +1,114 @@
 <template>
-  <div class="keranjang">
-    <Navbar :updateKeranjang="keranjangs"/>
-    <div class="container">
-      <div class="row mt-4">
-        <div class="col">
-          <nav aria-label="breadcrumb">
-            <ol class="breadcrumb">
-              <li class="breadcrumb-item">
-                <router-link to="/" class="text-dark">Home</router-link>
-              </li>
-              <li class="breadcrumb-item">
-                <router-link to="/foods" class="text-dark">Ticket</router-link>
-              </li>
-              <li class="breadcrumb-item active" aria-current="page">
-                Keranjang
-              </li>
-            </ol>
-          </nav>
+  <Navbar />
+  <div class="container mt-10">
+    <div class="row">
+      <!-- Form Pemesanan -->
+      <div class="col-md-8">
+        <h5 class="card-title">Detail Pemesanan</h5>
+        <p class="card-text">
+          Isi formulir ini dengan benar karena e-tiket akan dikirim ke alamat
+          email sesuai data pemesan.
+        </p>
+        <div class="card">
+          <div class="card-body">
+            <form>
+              <!-- Nama Lengkap -->
+              <div class="mb-3">
+                <label for="nama" class="form-label">Nama Lengkap</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nama"
+                  placeholder="Nama Lengkap"
+                  value="Dian Rizky Pratama"
+                />
+              </div>
+
+              <!-- Nomor Ponsel -->
+              <div class="mb-3">
+                <label for="nomorPonsel" class="form-label">Nomor Ponsel</label>
+                <input
+                  type="text"
+                  class="form-control"
+                  id="nomorPonsel"
+                  placeholder="+62"
+                  value="+62 89501215795"
+                />
+              </div>
+
+              <!-- Alamat Email -->
+              <div class="mb-3">
+                <label for="email" class="form-label">Alamat Email</label>
+                <input
+                  type="email"
+                  class="form-control"
+                  id="email"
+                  placeholder="you@example.com"
+                  value="rizdian229@gmail.com"
+                />
+              </div>
+
+              <!-- Kewarganegaraan -->
+              <div class="mb-3">
+                <label for="kewarganegaraan" class="form-label"
+                  >Kewarganegaraan</label
+                >
+                <select class="form-select" id="kewarganegaraan">
+                  <option selected>Pilih kewarganegaraan</option>
+                  <option value="1">Indonesia</option>
+                  <option value="2">Lainnya</option>
+                </select>
+                <div class="text-danger">Isi kewarganegaraan dulu, ya.</div>
+              </div>
+            </form>
+          </div>
         </div>
       </div>
-      <div class="row">
-        <div class="col">
-          <h2>Keranjang <strong>saya</strong></h2>
-          <div class="table-responsive mt-3"  v-if="keranjangs.length > 0">
-            <table class="table">
-              <thead>
-                <tr>
-                  <th scope="col">#</th>
-                  <th scope="col">Foto</th>
-                  <th scope="col">Tiket</th>
-                  <th scope="col">Jumlah</th>
-                  <th scope="col">Harga</th>
-                  <th scope="col">Total Harga</th>
-                  <th scope="col">Hapus</th>
-                </tr>
-              </thead>
-              <tbody>
-                <tr
-                  v-for="(keranjang, index) in keranjangs"
-                  :key="keranjang.id"
-                >
-                  <th>{{ index + 1 }}</th>
-                  <td>
-                    <img
-                      :src="'/media/tiket/' + keranjang.products.gambar"
-                      class="img-fluid shadow"
-                      width="250"
-                    />
-                  </td>
-                  <td>
-                    <strong>{{ keranjang.products.nama }}</strong>
-                  </td>
-                  <td>{{ keranjang.jumlah_pemesanan }}</td>
-                  <td align="right">Rp. {{ keranjang.products.harga }}</td>
-                  <td align="right">
-                    <strong
-                      >Rp.
-                      {{
-                        keranjang.products.harga * keranjang.jumlah_pemesanan
-                      }}</strong
-                    >
-                  </td>
-                  <td align="center" class="text-danger">
-                    <svg
-                      xmlns="http://www.w3.org/2000/svg"
-                      width="16"
-                      height="16"
-                      fill="currentColor"
-                      class="bi bi-trash"
-                      viewBox="0 0 16 16"
-                      @click="hapusKeranjang(keranjang.id)"
-                    >
-                      <path
-                        d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0z"
-                      />
-                      <path
-                        d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1zM4.118 4 4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4zM2.5 3h11V2h-11z"
-                      />
-                    </svg>
-                  </td>
-                </tr>
 
-                <tr>
-                  <td colspan="6" align="right">
-                    <strong>Total Harga :</strong>
-                  </td>
-                  <td align="right">
-                    <strong>Rp. {{ totalHarga }}</strong>
-                  </td>
-                  <td></td>
-                </tr>
-              </tbody>
-            </table>
-          </div>
-           <!-- Pesan jika keranjang kosong -->
-          <div v-else class="mt-4">
-            <h4>Keranjang kosong</h4>
+      <!-- Detail Tiket -->
+      <div class="col-md-4" v-for="(item, index) in keranjang" :key="index">
+        <div class="card shadow-sm mt-4">
+          <div class="card-body">
+            <div class="d-flex align-items-center mb-3">
+              <img
+                :src="item.image_url"
+                alt="Event Image"
+                class="img-thumbnail me-2"
+                style="width: 50px"
+              />
+              <div class="flex-grow-1">
+                <h5 class="card-title mb-0">{{ item.event_name }}</h5>
+              </div>
+              <a href="#" class="text-primary">Detail</a>
+            </div>
+            <p class="card-text">
+              <strong>{{ item.ticket_type }}</strong
+              ><br />
+              {{ item.jumlah_pemesanan }} Tiket • Pax {{ item.pax }}<br />
+              <span class="text-muted"
+                >Tanggal Dipilih: {{ item.selected_date }}</span
+              >
+            </p>
+
+            <ul class="list-unstyled">
+              <li><i class="bi bi-x-circle-fill"></i> Tidak bisa refund</li>
+              <li><i class="bi bi-check-circle-fill"></i> Konfirmasi Instan</li>
+              <li>
+                <i class="bi bi-ticket-fill"></i> Kursi tersedia saat penukaran
+                tiket
+              </li>
+              <li>
+                <i class="bi bi-calendar-check-fill"></i> Berlaku di tanggal
+                terpilih
+              </li>
+            </ul>
+
+            <hr />
+
+            <div class="d-flex justify-content-between align-items-center">
+              <h6>Total Pembayaran</h6>
+              <p class="fw-bold">IDR {{ item.total_harga }}</p>
+            </div>
           </div>
         </div>
       </div>
@@ -114,44 +127,24 @@ export default {
   },
   data() {
     return {
-      keranjangs: [],
+      keranjang: [], // Untuk menyimpan data keranjang
     };
   },
+  mounted() {
+    // Panggil API saat halaman dimuat
+    this.ambilDataKeranjang();
+  },
   methods: {
-    setKeranjangs(data) {
-      this.keranjangs = data;
-    },
-    hapusKeranjang(id) {
-      axios
-      .delete("http://localhost:3000/keranjangs/"+id)
-      .then(() => {
-        this.$toast.error("Sukses Hapus Keranjang", {
-          type: "error",
-          position: "top-right",
-          duration: 3000,
-          dismissible: true,
-        });
-        //Update Data Keranjang
-        axios
-      .get("http://localhost:3000/keranjangs")
-      .then((response) => this.setKeranjangs(response.data))
-      .catch((error) => console.log(error));
-      })
-      .catch((error) => console.log(error));
+  async ambilDataKeranjang() {
+    try {
+      const response = await axios.get("http://localhost:8000/api/keranjangs");
+      this.keranjang = response.data;
+    } catch (error) {
+      console.error("Gagal mengambil data keranjang", error);
     }
   },
-  mounted() {
-    axios
-      .get("http://localhost:3000/keranjangs")
-      .then((response) => this.setKeranjangs(response.data))
-      .catch((error) => console.log(error));
-  },
-  computed: {
-    totalHarga() {
-      return this.keranjangs.reduce(function (items, data) {
-        return items + data.products.harga * data.jumlah_pemesanan;
-      }, 0);
-    },
-  },
+},
+
+
 };
 </script>
