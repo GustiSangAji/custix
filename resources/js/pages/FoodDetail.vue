@@ -146,7 +146,7 @@
             <h6>Tanggal Event</h6>
             <div class="d-flex align-items-center mb-2">
               <span class="badge bg-primary p-2 me-2">{{ formatShortDate(product.datetime) }}</span>
-              <span>Masa berlaku: 18 Jan 2025</span>
+              <span>Periode Event: {{ formatShortDate(product.expiry_date) }}</span>
             </div>
           </div>
 
@@ -215,8 +215,6 @@ export default {
   },
   data() {
     return {
-      ticketQuantity: 1,
-      ticketPrice: 1694252, // IDR per ticket
       product: {},
       pesan: {
         jumlah_pemesanan: 1, // Jumlah awal
@@ -229,10 +227,6 @@ export default {
         style: "currency",
         currency: "IDR",
       });
-    },
-    placeOrder() {
-      // Handle order placement logic
-      alert(`Order placed for ${this.ticketQuantity} tickets`);
     },
     setProduct(data) {
       this.product = data;
@@ -280,42 +274,35 @@ export default {
       }
     },
     pemesanan() {
-      if (this.pesan.jumlah_pemesanan) {
-        // Data yang akan dikirim ke API
-        const orderData = {
-          jumlah_pemesanan: this.pesan.jumlah_pemesanan,
-          product: this.product,
-        };
-
-        axios
-          .post("http://localhost:8000/api/keranjangs", orderData)
-          .then(() => {
-            this.$router.push({ path: "/keranjang" });
-            this.$toast.success("Sukses Masuk Keranjang", {
-              type: "success",
-              position: "top-right",
-              duration: 3000,
-              dismissible: true,
-            });
-          })
-          .catch((err) => {
-            console.log(err);
-            this.$toast.error("Gagal menambahkan ke keranjang", {
-              type: "error",
-              position: "top-right",
-              duration: 3000,
-              dismissible: true,
-            });
-          });
-      } else {
-        this.$toast.error("Jumlah Pesanan Harus Diisi", {
-          type: "error",
-          position: "top-right",
-          duration: 3000,
-          dismissible: true,
-        });
-      }
+  const userId = localStorage.getItem('user_id');
+  const payload = {
+    jumlah_pemesanan: this.pesan.jumlah_pemesanan,
+    product: {
+      id: this.product.id,
+      nama_tiket: this.product.name,
+      total_harga: this.pesan.jumlah_pemesanan * this.product.price,
     },
+    user_id: userId,
+    tanggal: this.formatShortDate(this.product.datetime),
+    tiket: `#${this.product.name.replace(/\s+/g, '')}` // Identifier tiket
+  };
+
+  axios.post('/order', payload)
+    .then(response => {
+      console.log('Pemesanan berhasil:', response.data);
+      
+      // Setelah pemesanan berhasil, redirect ke halaman pembayaran
+      this.$router.push({
+        name: 'paymentDetail',
+        params: {
+          orderId: response.data.cart.id // ID pemesanan dari response
+        }
+      });
+    })
+    .catch(error => {
+      console.error('Terjadi kesalahan:', error);
+    });
+},
   },
   mounted() {
     axios

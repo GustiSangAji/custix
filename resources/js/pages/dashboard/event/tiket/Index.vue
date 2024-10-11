@@ -33,6 +33,13 @@ const columns = [
     columnHelper.accessor("datetime", {
         header: "Tanggal & Waktu",
     }),
+    columnHelper.accessor("expiry_date", { 
+    header: "Masa Berlaku",
+    cell: (cell) => {
+        const dateValue = cell.getValue();
+        return dateValue ? new Date(dateValue).toISOString().split('T')[0] : "-"; // Format YYYY-MM-DD
+    },
+    }),
     columnHelper.accessor("status", {
         header: "Status",
         cell: (cell) => h("span", cell.getValue() === "available" ? "Tersedia" : "Tidak Tersedia"),

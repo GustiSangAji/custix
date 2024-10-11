@@ -34,8 +34,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/FoodDetail.vue"),
     },
     {
-        path: "/keranjang",
-        component: () => import("@/pages/Keranjang.vue"),
+        path: '/payment/:orderId',
+        name: 'paymentDetail',
+        component: () => import('@/pages/PaymentDetail.vue'),
+        props: true,
     },
     {
         path: "/waiting-room",

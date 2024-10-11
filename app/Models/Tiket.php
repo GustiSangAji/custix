@@ -20,6 +20,7 @@ class Tiket extends Model
         'quantity',
         'price',
         'image',
+        'expiry_date',
     ];
 
     // Menambahkan UUID saat membuat model

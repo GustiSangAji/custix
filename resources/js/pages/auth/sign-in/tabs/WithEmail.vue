@@ -123,6 +123,8 @@ export default defineComponent({
             blockBtn(this.submitButton);
 
             axios.post("/auth/login", { ...this.data, type: "email" }).then(res => {
+                localStorage.setItem('user_id', res.data.user.id);
+                
                 this.store.setAuth(res.data.user, res.data.token);
                 this.router.push("/dashboard");
             }).catch(error => {

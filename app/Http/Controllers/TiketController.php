@@ -48,6 +48,7 @@ class TiketController extends Controller
      */
     public function store(StoreTiketRequest $request)
     {
+
     $validatedData = $request->validated();
 
     // Simpan gambar jika ada
@@ -61,7 +62,7 @@ class TiketController extends Controller
     return response()->json([
         'success' => true,
         'message' => 'Tiket berhasil ditambahkan',
-        'tiket' => $tiket, // Mengembalikan objek tiket yang baru dibuat
+        'tiket' => $tiket,
     ], 201);
     
     }
@@ -86,10 +87,10 @@ class TiketController extends Controller
         if ($request->hasFile('image')) {
             $validatedData['image'] = $request->file('image')->store('tikets', 'public');
         }
-
+    
         // Update data tiket
         $tiket->update($validatedData);
-
+    
         return response()->json([
             'success' => true,
             'message' => 'Tiket berhasil diupdate',
