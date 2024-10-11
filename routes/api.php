@@ -99,9 +99,12 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
 Route::get('/tickets', [TicketController::class, 'index']); // Untuk semua tiket
 Route::get('/tickets/limited', [TicketController::class, 'limited']); // Untuk tiket terbatas di halaman utama
-Route::get('/tickets/{id}', [TicketController::class, 'show']);// Untuk detail tiket
+Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
 
-Route::middleware(['auth'])->group(function() {
-    Route::post('/keranjangs', [CartController::class, 'store']);
-    Route::get('/keranjangs', [CartController::class, 'index']);
-});
+
+
+Route::post('/order', [CartController::class, 'store']);
+Route::get('/order', [CartController::class, 'index']);
+Route::get('/order/{id}', [CartController::class, 'show']);
+
+

@@ -150,27 +150,19 @@ export default defineComponent({
     submit() {
       blockBtn(this.submitButton);
 
-      axios
-        .post("/auth/login", { ...this.data, type: "email" })
-        .then((res) => {
-          this.store.setAuth(res.data.user, res.data.token);
-
-          // Gunakan redirect dari respons
-          const redirectUrl =
-            res.data.redirect ||
-            (res.data.user.role.name === "admin" ? "/dashboard" : "/home");
-          this.router.push(redirectUrl);
-        })
-        .catch((error) => {
-          toast.error(error.response.data.message);
-        })
-        .finally(() => {
-          unblockBtn(this.submitButton);
-        });
-    },
-
-    togglePassword(ev) {
-      const type = document.querySelector("[name=password]").type;
+            axios.post("/auth/login", { ...this.data, type: "email" }).then(res => {
+                localStorage.setItem('user_id', res.data.user.id);
+                
+                this.store.setAuth(res.data.user, res.data.token);
+                this.router.push("/dashboard");
+            }).catch(error => {
+                toast.error(error.response.data.message);
+            }).finally(() => {
+                unblockBtn(this.submitButton);
+            });
+        },
+        togglePassword(ev) {
+            const type = document.querySelector("[name=password]").type;
 
       if (type === "password") {
         document.querySelector("[name=password]").type = "text";
