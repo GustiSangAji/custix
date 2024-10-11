@@ -53,6 +53,7 @@ class OrderController extends Controller
         return response()->json(['order' => $order, 'snap_token' => $snapToken]); // Return as JSON
     }
 
+
     /**
      * Update the specified resource in storage.
      */

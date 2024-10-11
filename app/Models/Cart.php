@@ -14,7 +14,7 @@ class Cart extends Model
     // Relasi ke model Ticket
     public function ticket()
     {
-        return $this->belongsTo(Tiket::class);
+        return $this->belongsTo(Tiket::class, 'ticket_id');
     }
 
     // Relasi ke model User
