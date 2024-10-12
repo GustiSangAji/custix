@@ -116,7 +116,13 @@ export default defineComponent({
                 .post("/auth/login", { ...this.data, type: this.check.type })
                 .then((res) => {
                     this.store.setAuth(res.data.user, res.data.token);
-                    this.router.push("/dashboard");
+                    
+                      // Cek peran pengguna dan arahkan ke halaman yang sesuai
+                    if (res.data.user.role?.name === 'admin') {
+                        this.router.push("/dashboard"); // Arahkan admin ke dashboard
+                    } else {
+                        this.router.push("/home"); // Arahkan user biasa ke halaman home
+                    }
                 })
                 .catch((error) => {
                     toast.error(error.response.data.message);

@@ -62,7 +62,10 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         });
     });
 
-    Route::get('/dashboard', [DashboardController::class, 'index']);
+    Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+        Route::get('/dashboard', [DashboardController::class, 'index']);
+    });    
+    
 
     // Tiket Routes
     Route::middleware('can:event')->group(function () {
