@@ -1,5 +1,5 @@
 <template>
-  <Navbar />
+  <LayoutLanding>
   <div v-if="orderDetail && ticketDetail">
   <div class="container mt-10">
     <div class="row">
@@ -107,17 +107,18 @@
   <div v-else>
     <p>Memuat detail pembayaran...</p>
   </div>
+</LayoutLanding>
 </template>
 
 
 <script>
 import axios from 'axios';
-import Navbar from "@/components/Navbar.vue";
+import LayoutLanding from "@/layouts/LayoutLanding.vue";
 
 export default {
   name: 'PaymentDetail',
   components: {
-    Navbar,
+    LayoutLanding,
   },
   data() {
   return {
