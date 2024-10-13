@@ -283,35 +283,56 @@ export default {
       }
     },
     pemesanan() {
-  const userId = localStorage.getItem('user_id');
-  const payload = {
-    jumlah_pemesanan: this.pesan.jumlah_pemesanan,
-    product: {
-      id: this.product.id,
-      nama_tiket: this.product.name,
-      total_harga: this.pesan.jumlah_pemesanan * this.product.price,
-    },
-    user_id: userId,
-    tanggal: this.formatShortDate(this.product.datetime),
-    tiket: `#${this.product.name.replace(/\s+/g, '')}` // Identifier tiket
-  };
+      const userId = localStorage.getItem("userId");
 
-  axios.post('/order', payload)
-    .then(response => {
-      console.log('Pemesanan berhasil:', response.data);
-      
-      // Setelah pemesanan berhasil, redirect ke halaman pembayaran
-      this.$router.push({
-        name: 'paymentDetail',
-        params: {
-          orderId: response.data.cart.id // ID pemesanan dari response
-        }
-      });
-    })
-    .catch(error => {
-      console.error('Terjadi kesalahan:', error);
-    });
-},
+      // Cek apakah userId ada
+      if (!userId) {
+        // Menggunakan SweetAlert untuk notifikasi
+        Swal.fire({
+          title: "Anda harus login",
+          text: "Silakan login untuk memesan tiket.",
+          icon: "warning",
+          confirmButtonText: "Login",
+          cancelButtonText: "Batal",
+          showCancelButton: true,
+          reverseButtons: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.$router.push({ name: "sign-in" });
+          }
+        });
+        return; // Hentikan eksekusi lebih lanjut
+      }
+
+      const payload = {
+        jumlah_pemesanan: this.pesan.jumlah_pemesanan,
+        product: {
+          id: this.product.id,
+          nama_tiket: this.product.name,
+          total_harga: this.pesan.jumlah_pemesanan * this.product.price,
+        },
+        user_id: userId,
+        tanggal: this.formatShortDate(this.product.datetime),
+        tiket: `#${this.product.name.replace(/\s+/g, "")}`, // Identifier tiket
+      };
+
+      axios
+        .post("/order", payload)
+        .then((response) => {
+          console.log("Pemesanan berhasil:", response.data);
+
+          // Setelah pemesanan berhasil, redirect ke halaman pembayaran
+          this.$router.push({
+            name: "paymentDetail",
+            params: {
+              orderId: response.data.carts.id, // ID pemesanan dari response
+            },
+          });
+        })
+        .catch((error) => {
+          console.error("Terjadi kesalahan:", error);
+        });
+    },
   },
   mounted() {
     axios

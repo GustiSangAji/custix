@@ -5,16 +5,17 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Cart; // Model keranjang (buat model jika belum ada)
 use App\Models\Tiket; // Model tiket
+use App\Services\Midtrans\CreateSnapTokenService;
 
 class CartController extends Controller
 {
-     public function index()
-        {
-            // Ambil semua item di keranjang untuk pengguna yang sedang login
-            $carts = Cart::where('user_id', auth()->id())->with('ticket')->get();
+    public function index()
+    {
+        // Ambil semua item di keranjang untuk pengguna yang sedang login
+        $carts = Cart::where('user_id', auth()->id())->with('ticket')->get();
 
-            return response()->json($carts);
-        }
+        return response()->json($carts);
+    }
 
     public function store(Request $request)
     {
@@ -29,7 +30,7 @@ class CartController extends Controller
 
         // Ambil data tiket dari database
         $ticket = Tiket::find($request->product['id']);
-        
+
         // Cek apakah tiket tersedia
         if (!$ticket || $ticket->quantity < $request->jumlah_pemesanan) {
             return response()->json(['message' => 'Tiket tidak tersedia'], 400);
@@ -47,8 +48,19 @@ class CartController extends Controller
             'total_harga' => $request->product['total_harga'], // Ambil dari payload
         ]);
 
-        // Kembalikan respon sukses
-        return response()->json(['message' => 'Tiket berhasil ditambahkan ke keranjang', 'cart' => $cart], 201);
+        $midtrans = new CreateSnapTokenService($cart);
+        $snapToken = $midtrans->getSnapToken();
+
+        // Simpan Snap Token ke dalam database
+        $cart->snap_token = $snapToken;
+        $cart->save();
+
+        // Kembalikan response atau redirect ke halaman pembayaran dengan token Snap
+        return response()->json([
+            'message' => 'Pemesanan berhasil',
+            'order' => $cart,
+            'snap_token' => $snapToken,
+        ], 201);
     }
 
     public function show($id)
@@ -56,7 +68,6 @@ class CartController extends Controller
         $order = Cart::findOrFail($id);
         return response()->json($order);
     }
-
 
 }
 
