@@ -1,4 +1,5 @@
 <template>
+  <LayoutLanding>
   <div class="ticket-detail">
     <Navbar />
     <div class="container mt-4">
@@ -153,6 +154,7 @@
       </div>
     </div>
   </div>
+  </LayoutLanding>
 </template>
 
 <script>
