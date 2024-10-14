@@ -22,7 +22,7 @@ export interface User {
 
 export const useAuthStore = defineStore("auth", () => {
     const error = ref<null | string>(null);
-    const user = ref<User>({} as User);
+    const user = ref<User | null>(null);
     const isAuthenticated = ref(false);
 
     function setAuth(authUser: User, token = "") {
@@ -30,17 +30,25 @@ export const useAuthStore = defineStore("auth", () => {
         user.value = authUser;
         error.value = null;
 
+          // Simpan user ID ke localStorage
+        localStorage.setItem('userId', authUser.id.toString()); // Simpan ID sebagai string
+
         if (token) {
             JwtService.saveToken(token);
         }
     }
 
     function purgeAuth() {
-        isAuthenticated.value = false;
-        user.value = {} as User;
-        error.value = null;
-        JwtService.destroyToken();
+        isAuthenticated.value = false; // Menandakan pengguna sudah keluar
+        user.value = {} as User; // Mereset user menjadi objek kosong
+        error.value = null; // Menghapus error yang mungkin ada
+    
+        // Hapus user ID dari localStorage
+        localStorage.removeItem('userId');
+        
+        JwtService.destroyToken(); // Menghapus token JWT
     }
+    
 
     async function login(credentials: User) {
         return ApiService.post("auth/login", credentials)

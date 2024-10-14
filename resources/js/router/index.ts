@@ -19,10 +19,10 @@ const routes: Array<RouteRecordRaw> = [
     {
         path: "/",
         redirect: "/home",
-        
     },
     {
         path: "/home",
+        name: "home",
         component: () => import("@/pages/HomeView.vue"),
     },
     {
@@ -59,6 +59,7 @@ const routes: Array<RouteRecordRaw> = [
                 meta: {
                     pageTitle: "Dashboard",
                     breadcrumbs: ["Dashboard"],
+                    middleware: "admin",
                 },
             },
             {
@@ -151,6 +152,19 @@ const routes: Array<RouteRecordRaw> = [
                     pageTitle: "Masuk",
                     middleware: "guest",
                 },
+                beforeEnter: (to, from, next) => {
+                    const authStore = useAuthStore();
+                    if (authStore.isAuthenticated) {
+                        // Jika pengguna sudah login sebagai admin atau user
+                        if (authStore.user.role?.name === 'admin') {
+                            next({ name: 'dashboard' });
+                        } else {
+                            next({ name: 'home' }); // Arahkan ke home untuk user
+                        }
+                    } else {
+                        next();
+                    }
+                },
             },
             {
                 path: "/sign-up",
@@ -224,8 +238,7 @@ router.beforeEach(async (to, from, next) => {
 
     // current page view title
     if (to.meta.pageTitle) {
-        document.title = `${to.meta.pageTitle} - ${import.meta.env.VITE_APP_NAME
-            }`;
+        document.title = `${to.meta.pageTitle} - ${import.meta.env.VITE_APP_NAME}`;
     } else {
         document.title = import.meta.env.VITE_APP_NAME as string;
     }
@@ -236,28 +249,34 @@ router.beforeEach(async (to, from, next) => {
     // verify auth token before each page change
     if (!authStore.isAuthenticated) await authStore.verifyAuth();
 
-    // before page access check if page requires authentication
-    if (to.meta.middleware == "auth") {
-        if (authStore.isAuthenticated) {
-            if (
-                to.meta.permission &&
-                !authStore.user.permission.includes(to.meta.permission)
-            ) {
-                next({ name: "404" });
-            } else if (to.meta.checkDetail == false) {
-                next();
-            }
 
-            next();
-        } else {
-            next({ name: "sign-in" });
+
+    // Handle middleware
+    if (to.meta.middleware) {
+        if (to.meta.middleware === 'auth') {
+            if (authStore.isAuthenticated) {
+                next();
+            } else {
+                next({ name: 'sign-in' }); // Redirect to sign-in if not authenticated
+            }
+        } else if (to.meta.middleware === 'guest') {
+            if (authStore.isAuthenticated) {
+                next({ name: 'home' }); 
+            } else {
+                next(); // Allow access to guest routes
+            }
+        } else if (to.meta.middleware === 'admin') {
+            if (authStore.isAuthenticated && authStore.user.role?.name === 'admin') {
+                next();
+            } else {
+                next({ name: '404' }); // Redirect to 404 if not admin
+            }
         }
-    } else if (to.meta.middleware == "guest" && authStore.isAuthenticated) {
-        next({ name: "dashboard" });
     } else {
-        next();
+        next(); // No middleware, continue
     }
 });
+
 
 router.afterEach(() => {
     // Complete the animation of the route progress bar.

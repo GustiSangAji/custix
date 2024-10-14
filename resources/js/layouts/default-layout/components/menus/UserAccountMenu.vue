@@ -57,7 +57,7 @@ const signOut = () => {
                 icon: "success",
                 text: "Berhasil keluar",
             }).then(() => {
-                router.push({ name: "sign-in" });
+                router.push({ name: "home" });
             });
         }
     });
@@ -106,7 +106,7 @@ const currentLangugeLocale = computed(() => {
                         <span
                             class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2"
                         >
-                            {{ store.user.role.name }}
+                            {{ store.user.role ? store.user.role.name : 'Tidak ada' }}
                         </span>
                     </div>
                     <a
