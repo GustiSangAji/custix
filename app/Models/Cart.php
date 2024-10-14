@@ -9,7 +9,7 @@ class Cart extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['user_id', 'ticket_id', 'jumlah_pemesanan', 'total_harga'];
+    protected $fillable = ['phone','email','nama','user_id', 'ticket_id', 'jumlah_pemesanan', 'total_harga'];
 
     // Relasi ke model Ticket
     public function ticket()

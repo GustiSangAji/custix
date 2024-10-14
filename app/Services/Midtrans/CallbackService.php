@@ -9,7 +9,7 @@ use Midtrans\Notification;
 class CallbackService extends Midtrans
 {
     protected $notification;
-    protected $order;
+    protected $cart;
     protected $serverKey;
 
     public function __construct()

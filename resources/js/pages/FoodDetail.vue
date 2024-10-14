@@ -1,15 +1,16 @@
-  <template>
+<template>
   <LayoutLanding>
     <div class="ticket-detail">
-      <div class="container mt-8">
+      <Navbar />
+      <div class="container mt-4">
         <div class="col-md-4"></div>
 
         <!-- Image Section -->
         <div class="shadow-lg rounded mb-4">
           <img
-            src="/media/carousel/closing-ceremony.png"
+            :src="'/storage/' + product.banner"
             class="img-fluid rounded shadow-lg"
-            alt="Closing Ceremony"
+            alt="Event Banner"
           />
         </div>
 
@@ -30,52 +31,17 @@
           <!-- Event Details Section -->
           <div class="col-md-8">
             <!-- Event description -->
+            <h2 class="fs-3">Tentang {{ product.name }}</h2>
             <div class="card border-0 p-4 fs-4 shadow-sm rounded mb-4">
               <p>✮ Hello Arte-Folks ✮</p>
-              <p>
-                Are You Ready?! Don't miss out on the
-                <strong>Epic CLOSING CEREMONY</strong> by Artefac UNS. ARTEFAC
-                merupakan rangkaian acara tahunan yang diselenggarakan oleh
-                Fakultas Ekonomi dan Bisnis Universitas Sebelas Maret dengan
-                menampilkan berbagai kompetisi <strong>ART</strong> (monolog),
-                <strong>SPORT</strong> (basket dan futsal), dan
-                <strong>Closing Ceremony</strong> yang paling dinanti setiap
-                tahunnya! Get ready for an unforgettable night with stellar
-                performances by:
-              </p>
-              <ul>
-                <li>Dewa 19 Ft Ello (Marcello Tahitoe)</li>
-                <li>Coldiac</li>
-                <li>Juicy Luicy</li>
-                <li>And many more exciting guest stars will be announced ♫</li>
-              </ul>
+              <p>{{ product.description }}</p>
               <p>
                 <strong>Date:</strong> {{ formatDate(product.datetime) }}<br />
                 <strong>Location:</strong> {{ product.place }} ♬
               </p>
-              <p>
-                Hurry and snag your tickets fast!!! Let's all gather and enjoy
-                the music together. Hope to see you there! See you! ♬
-              </p>
-              <p>
-                Further information can be found on our Instagram:
-                <strong>@artefacuns</strong> and <strong>@custiket.id</strong>
-              </p>
             </div>
 
-            <!-- Line Up Section -->
-            <div class="mt-4">
-              <h2 class="fs-3">Line Up</h2>
-              <div class="card border-0 p-4 shadow-sm rounded mt-3 fs-4">
-                <ul>
-                  <li>Dewa 19 ft Ello</li>
-                  <li>Juicy Luicy</li>
-                  <li>Coldiac</li>
-                </ul>
-              </div>
-            </div>
-
-            <!-- Ticket Information Section -->
+            <!-- Tentang Tiket Section -->
             <div class="mt-4">
               <h2 class="fs-3">Tentang Tiket</h2>
               <div class="card border-0 p-4 shadow-sm rounded mt-3 fs-4">
@@ -128,19 +94,6 @@
                 :src="'/storage/' + product.image"
                 class="img-fluid rounded shadow-sm"
               />
-            </div>
-
-            <!-- Ticket Category -->
-            <div class="card border-0 shadow-sm p-4 rounded mb-4">
-              <h5>PRESALE 2 - CAT 1B</h5>
-              <p class="text-muted mb-1">
-                <i class="bi bi-x-circle me-2"></i> Tidak bisa refund
-              </p>
-              <p class="text-muted mb-1">
-                <i class="bi bi-ticket me-2"></i> Kursi tersedia saat penukaran
-                tiket • Kursi dipilih otomatis di lokasi penukaran.
-              </p>
-              <a href="#" class="text-primary">Detail</a>
             </div>
 
             <!-- Event Date -->
@@ -314,20 +267,19 @@ export default {
 
     // Mengirim permintaan pesanan
     axios
-      .post("/order", payload)
-      .then((response) => {
-        console.log("Pemesanan berhasil:", response.data);
-        // Redirect ke halaman detail pembayaran dengan orderId dari response
-        this.$router.push({
-          name: "paymentDetail",
-          params: {
-            orderId: response.data.order.id, // Pastikan id order dari response
-          },
-        });
-      })
-      .catch((error) => {
-        console.error("Terjadi kesalahan:", error);
+  .post("/order", payload)
+  .then((response) => {
+    console.log("Pemesanan Berhasil:", response.data); // Tambahkan ini
+      this.$router.push({
+        name: "paymentDetail",
+        params: {
+          orderId: response.data.cart.id,
+        },
       });
+  })
+  .catch((error) => {
+    console.error("Terjadi kesalahan:", error);
+  });
    },
   },
   mounted() {

@@ -2,11 +2,12 @@
 
 namespace App\Http\Controllers;
 
+use Brick\Math\BigInteger;
 use Illuminate\Http\Request;
 use App\Models\Cart; // Model keranjang (buat model jika belum ada)
 use App\Models\Tiket; // Model tiket
-use App\Services\Midtrans\CreateSnapTokenService;
 use Midtrans\Config;
+use App\Models\User;
 
 class CartController extends Controller
 {
@@ -49,12 +50,14 @@ class CartController extends Controller
             'total_harga' => $request->product['total_harga'], // Ambil dari payload
         ]);
 
+        return response()->json(['message' => 'Tiket berhasil ditambahkan ke keranjang', 'cart' => $cart], 201);
+
     }
 
     public function show($id)
     {
-        $order = Cart::findOrFail($id);
-        return response()->json($order);
+        $cart = Cart::findOrFail($id);
+        return response()->json($cart);
     }
 
     public function checkout($id)
@@ -76,7 +79,7 @@ class CartController extends Controller
             'transaction_details' => [
                 'order_id' => (int) $cart->id,
                 'gross_amount' => (int) $cart->total_harga,
-            ]
+            ],
         ];
 
         // Buat Snap Token
