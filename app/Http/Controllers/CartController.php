@@ -60,41 +60,57 @@ class CartController extends Controller
     }
 
     public function checkout($id)
-    {
-        $cart = Cart::find($id);
+{
+    $cart = Cart::with('user', 'ticket')->findOrFail($id);
 
-        // $orderData = [
-        //     'order_id' => $ihiy->id,
-        //     'total_price' => $ihiy->total_price,
-        // ];
-        // Set konfigurasi Midtrans
-        Config::$serverKey = env('MIDTRANS_SERVER_KEY');
-        Config::$isProduction = false; // ganti ke true jika di production
-        Config::$isSanitized = true;
-        Config::$is3ds = true;
-
-        // Data transaksi
-        $transactionDetails = [
-            'transaction_details' => [
-                'order_id' => (int) $cart->id,
-                'gross_amount' => (int) $cart->total_harga,
-            ]
-        ];
-
-        // Buat Snap Token
-        try {
-            $snapToken = \Midtrans\Snap::getSnapToken($transactionDetails);
-
-            return response()->json([
-                'id' => $cart->id,
-                'snap_token' => $snapToken,
-            ]);
-
-        } catch (\Exception $e) {
-            return response()->json([
-                'error' => $e->getMessage(),
-            ], 500);
-        }
+    if (!$cart) {
+        return response()->json(['error' => 'Keranjang tidak ditemukan'], 404);
     }
+
+    $user = $cart->user;
+    $ticket = $cart->ticket;
+
+    // Set konfigurasi Midtrans
+    Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+    Config::$isProduction = false; // ganti ke true jika di production
+    Config::$isSanitized = true;
+    Config::$is3ds = true;
+
+    // Data transaksi
+    $transactionDetails = [
+        'transaction_details' => [
+            'order_id' => 'ORDER-' . $cart->id,
+            'gross_amount' => (int) $cart->total_harga,
+        ],
+        'customer_details' => [
+            'first_name' => $user->nama,
+            'phone' => $user->phone ?? '',
+        ],
+        'item_details' => [
+            [
+                'id' => $ticket->id,
+                'price' => (int) $ticket->price,
+                'quantity' => $cart->jumlah_pemesanan,
+                'name' => $ticket->name, // Mengambil nama tiket
+            ],
+        ],
+    ];
+
+    // Buat Snap Token
+    try {
+        $snapToken = \Midtrans\Snap::getSnapToken($transactionDetails);
+
+        return response()->json([
+            'id' => $cart->id,
+            'snap_token' => $snapToken,
+        ]);
+
+    } catch (\Exception $e) {
+        return response()->json([
+            'error' => $e->getMessage(),
+        ], 500);
+    }
+}
+
 }
 
