@@ -21,7 +21,7 @@
                     class="form-control"
                     id="nama"
                     placeholder="Nama Lengkap"
-                    value="Dian Rizky Pratama"
+                    v-model="user.nama"
                   />
                 </div>
 
@@ -35,7 +35,7 @@
                     class="form-control"
                     id="nomorPonsel"
                     placeholder="+62"
-                    value="+62 89501215795"
+                    v-model="user.phone"
                   />
                 </div>
 
@@ -47,7 +47,7 @@
                     class="form-control"
                     id="email"
                     placeholder="you@example.com"
-                    value="rizdian229@gmail.com"
+                    v-model="user.email"
                   />
                 </div>
               </form>
@@ -124,11 +124,22 @@
 <script>
 import axios from 'axios';
 import LayoutLanding from "@/layouts/LayoutLanding.vue";
+import { computed } from "vue";
+import { useAuthStore } from "@/stores/auth";
 
 export default {
   name: "PaymentDetail",
   components: {
     LayoutLanding,
+  },
+  setup() {
+    const authStore = useAuthStore();
+
+    const user = computed(() => authStore.user);
+
+    return {
+      user,
+    };
   },
   data() {
     return {

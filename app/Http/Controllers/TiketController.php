@@ -48,25 +48,27 @@ class TiketController extends Controller
      */
     public function store(StoreTiketRequest $request)
     {
+        $validatedData = $request->validated();
 
-    $validatedData = $request->validated();
+        // Simpan gambar jika ada
+        if ($request->hasFile('image')) {
+            $validatedData['image'] = $request->file('image')->store('tikets', 'public');
+        }
 
-    // Simpan gambar jika ada
-    if ($request->hasFile('image')) {
-        $validatedData['image'] = $request->file('image')->store('tikets', 'public');
+        // Simpan banner jika ada
+        if ($request->hasFile('banner')) {
+            $validatedData['banner'] = $request->file('banner')->store('banners', 'public');
+        }
+
+        // Buat tiket baru
+        $tiket = Tiket::create($validatedData);
+
+        return response()->json([
+            'success' => true,
+            'message' => 'Tiket berhasil ditambahkan',
+            'tiket' => $tiket,
+        ], 201);
     }
-
-    // Buat tiket baru
-    $tiket = Tiket::create($validatedData);
-
-    return response()->json([
-        'success' => true,
-        'message' => 'Tiket berhasil ditambahkan',
-        'tiket' => $tiket,
-    ], 201);
-    
-    }
-
 
     /**
      * Display the specified resource.
@@ -85,12 +87,25 @@ class TiketController extends Controller
 
         // Jika ada file gambar, simpan dan perbarui path gambar
         if ($request->hasFile('image')) {
+            // Hapus gambar lama jika ada
+            if ($tiket->image) {
+                Storage::disk('public')->delete($tiket->image);
+            }
             $validatedData['image'] = $request->file('image')->store('tikets', 'public');
         }
-    
+
+        // Jika ada file banner, simpan dan perbarui path banner
+        if ($request->hasFile('banner')) {
+            // Hapus banner lama jika ada
+            if ($tiket->banner) {
+                Storage::disk('public')->delete($tiket->banner);
+            }
+            $validatedData['banner'] = $request->file('banner')->store('banners', 'public');
+        }
+
         // Update data tiket
         $tiket->update($validatedData);
-    
+
         return response()->json([
             'success' => true,
             'message' => 'Tiket berhasil diupdate',
@@ -121,8 +136,14 @@ class TiketController extends Controller
      */
     public function destroy(Tiket $tiket)
     {
+        // Hapus gambar jika ada
         if ($tiket->image) {
             Storage::disk('public')->delete($tiket->image);
+        }
+
+        // Hapus banner jika ada
+        if ($tiket->banner) {
+            Storage::disk('public')->delete($tiket->banner);
         }
 
         $tiket->delete();

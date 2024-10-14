@@ -6,7 +6,6 @@ import Form from "./Form.vue"; // Komponen Form Tiket
 import type { Tiket } from "@/types";
 import { formatRupiah } from "@/libs/rupiah";
 
-
 const columnHelper = createColumnHelper<Tiket>();
 const paginateRef = ref<any>(null);
 const selected = ref<string>("");  // Untuk menyimpan UUID tiket yang dipilih
@@ -34,11 +33,11 @@ const columns = [
         header: "Tanggal & Waktu",
     }),
     columnHelper.accessor("expiry_date", { 
-    header: "Masa Berlaku",
-    cell: (cell) => {
-        const dateValue = cell.getValue();
-        return dateValue ? new Date(dateValue).toISOString().split('T')[0] : "-"; // Format YYYY-MM-DD
-    },
+        header: "Masa Berlaku",
+        cell: (cell) => {
+            const dateValue = cell.getValue();
+            return dateValue ? new Date(dateValue).toISOString().split('T')[0] : "-"; // Format YYYY-MM-DD
+        },
     }),
     columnHelper.accessor("status", {
         header: "Status",
@@ -51,6 +50,7 @@ const columns = [
         header: "Harga",
         cell: (cell) => formatRupiah(cell.getValue()),
     }),
+  
     columnHelper.accessor("image", {
         header: "Gambar",
         cell: (cell) => {
@@ -58,6 +58,17 @@ const columns = [
             return h("img", { 
                 src: `/storage/${imagePath}`, // Pastikan Anda menggunakan path yang benar
                 alt: "Gambar", 
+                style: { maxWidth: "100px", maxHeight: "100px" } 
+            });
+        },
+    }),
+    columnHelper.accessor("banner", { // Kolom Banner
+        header: "Banner",
+        cell: (cell) => {
+            const bannerPath = cell.getValue();
+            return h("img", { 
+                src: `/storage/${bannerPath}`, // Pastikan Anda menggunakan path yang benar
+                alt: "Banner", 
                 style: { maxWidth: "100px", maxHeight: "100px" } 
             });
         },
