@@ -21,6 +21,8 @@ class Tiket extends Model
         'price',
         'image',
         'expiry_date',
+        'description', // Menambahkan kolom deskripsi
+        'banner', // Menambahkan kolom banner
     ];
 
     // Menambahkan UUID saat membuat model

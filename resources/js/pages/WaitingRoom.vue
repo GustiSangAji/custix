@@ -18,7 +18,7 @@
   export default {
     data() {
       return {
-        waitTime: 1000, // Waktu tunggu awal
+        waitTime: 5  // Waktu tunggu awal
       };
     },
     mounted() {
@@ -27,7 +27,7 @@
           this.waitTime--;
         } else {
           clearInterval(countdown);
-          this.$router.push({ path: '/tiket/1' });
+          this.$router.push({ path: '/tiket/4' });
         }
       }, 1000);
     },

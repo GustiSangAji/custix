@@ -7,9 +7,9 @@
       <!-- Image Section -->
       <div class="shadow-lg rounded mb-4">
         <img
-          src="/media/carousel/closing-ceremony.png"
+          :src="'/storage/' + product.banner"
           class="img-fluid rounded shadow-lg"
-          alt="Closing Ceremony"
+          alt="Event Banner"
         />
       </div>
 
@@ -17,8 +17,7 @@
       <div class="mt-10 text-center">
         <h1 class="fs-1 mb-4">{{ product.name }}</h1>
         <p class="d-flex align-items-center justify-content-center mb-6">
-          <i class="bi bi-calendar-event me-2"></i
-          >{{ formatDate(product.datetime) }}
+          <i class="bi bi-calendar-event me-2"></i>{{ formatDate(product.datetime) }}
           <span class="mx-3">|</span>
           <i class="bi bi-geo-alt me-2"></i>{{ product.place }}
         </p>
@@ -32,54 +31,19 @@
           <!-- Event description -->
           <div class="card border-0 p-4 fs-4 shadow-sm rounded mb-4">
             <p>✮ Hello Arte-Folks ✮</p>
-            <p>
-              Are You Ready?! Don't miss out on the
-              <strong>Epic CLOSING CEREMONY</strong> by Artefac UNS. ARTEFAC
-              merupakan rangkaian acara tahunan yang diselenggarakan oleh
-              Fakultas Ekonomi dan Bisnis Universitas Sebelas Maret dengan
-              menampilkan berbagai kompetisi <strong>ART</strong> (monolog),
-              <strong>SPORT</strong> (basket dan futsal), dan
-              <strong>Closing Ceremony</strong> yang paling dinanti setiap
-              tahunnya! Get ready for an unforgettable night with stellar
-              performances by:
-            </p>
-            <ul>
-              <li>Dewa 19 Ft Ello (Marcello Tahitoe)</li>
-              <li>Coldiac</li>
-              <li>Juicy Luicy</li>
-              <li>And many more exciting guest stars will be announced ♫</li>
-            </ul>
+            <p>{{ product.description }}</p>
+
             <p>
               <strong>Date:</strong> {{ formatDate(product.datetime) }}<br />
               <strong>Location:</strong> {{ product.place }} ♬
             </p>
-            <p>
-              Hurry and snag your tickets fast!!! Let's all gather and enjoy the
-              music together. Hope to see you there! See you! ♬
-            </p>
-            <p>
-              Further information can be found on our Instagram:
-              <strong>@artefacuns</strong> and <strong>@custiket.id</strong>
-            </p>
           </div>
 
-          <!-- Line Up Section -->
-          <div class="mt-4">
-            <h2 class="fs-3">Line Up</h2>
-            <div class="card border-0 p-4 shadow-sm rounded mt-3 fs-4">
-              <ul>
-                <li>Dewa 19 ft Ello</li>
-                <li>Juicy Luicy</li>
-                <li>Coldiac</li>
-              </ul>
-            </div>
-          </div>
-
-          <!-- Ticket Information Section -->
+          <!-- Tentang Tiket Section -->
           <div class="mt-4">
             <h2 class="fs-3">Tentang Tiket</h2>
             <div class="card border-0 p-4 shadow-sm rounded mt-3 fs-4">
-              <h4>Tentang Tiket Festival</h4>
+    
               <ul>
                 <li>
                   Tiket Festival adalah kategori berdiri, dengan pengalaman
@@ -126,19 +90,6 @@
               :src="'/storage/' + product.image"
               class="img-fluid rounded shadow-sm"
             />
-          </div>
-
-          <!-- Ticket Category -->
-          <div class="card border-0 shadow-sm p-4 rounded mb-4">
-            <h5>PRESALE 2 - CAT 1B</h5>
-            <p class="text-muted mb-1">
-              <i class="bi bi-x-circle me-2"></i> Tidak bisa refund
-            </p>
-            <p class="text-muted mb-1">
-              <i class="bi bi-ticket me-2"></i> Kursi tersedia saat penukaran
-              tiket • Kursi dipilih otomatis di lokasi penukaran.
-            </p>
-            <a href="#" class="text-primary">Detail</a>
           </div>
 
           <!-- Event Date -->
@@ -244,10 +195,8 @@ export default {
         this.pesan.jumlah_pemesanan === null ||
         this.pesan.jumlah_pemesanan === ""
       ) {
-        // Jika input kosong, atur ke 1 sebagai default
         this.pesan.jumlah_pemesanan = 1;
       } else if (this.pesan.jumlah_pemesanan < 3) {
-        // Batas maksimal misalnya 100
         this.pesan.jumlah_pemesanan++;
       }
     },
@@ -256,10 +205,8 @@ export default {
         this.pesan.jumlah_pemesanan === null ||
         this.pesan.jumlah_pemesanan === ""
       ) {
-        // Jika input kosong, atur ke 1 sebagai default
         this.pesan.jumlah_pemesanan = 1;
       } else if (this.pesan.jumlah_pemesanan > 1) {
-        // Batas minimal adalah 1
         this.pesan.jumlah_pemesanan--;
       }
     },
@@ -269,40 +216,37 @@ export default {
         this.pesan.jumlah_pemesanan === "" ||
         this.pesan.jumlah_pemesanan < 1
       ) {
-        // Pastikan jumlah minimal selalu 1 saat input kosong atau kurang dari 1
         this.pesan.jumlah_pemesanan = 1;
       }
     },
     pemesanan() {
-  const userId = localStorage.getItem('user_id');
-  const payload = {
-    jumlah_pemesanan: this.pesan.jumlah_pemesanan,
-    product: {
-      id: this.product.id,
-      nama_tiket: this.product.name,
-      total_harga: this.pesan.jumlah_pemesanan * this.product.price,
-    },
-    user_id: userId,
-    tanggal: this.formatShortDate(this.product.datetime),
-    tiket: `#${this.product.name.replace(/\s+/g, '')}` // Identifier tiket
-  };
+      const userId = localStorage.getItem('user_id');
+      const payload = {
+        jumlah_pemesanan: this.pesan.jumlah_pemesanan,
+        product: {
+          id: this.product.id,
+          nama_tiket: this.product.name,
+          total_harga: this.pesan.jumlah_pemesanan * this.product.price,
+        },
+        user_id: userId,
+        tanggal: this.formatShortDate(this.product.datetime),
+        tiket: `#${this.product.name.replace(/\s+/g, '')}`,
+      };
 
-  axios.post('/order', payload)
-    .then(response => {
-      console.log('Pemesanan berhasil:', response.data);
-      
-      // Setelah pemesanan berhasil, redirect ke halaman pembayaran
-      this.$router.push({
-        name: 'paymentDetail',
-        params: {
-          orderId: response.data.cart.id // ID pemesanan dari response
-        }
-      });
-    })
-    .catch(error => {
-      console.error('Terjadi kesalahan:', error);
-    });
-},
+      axios.post('/order', payload)
+        .then(response => {
+          console.log('Pemesanan berhasil:', response.data);
+          this.$router.push({
+            name: 'paymentDetail',
+            params: {
+              orderId: response.data.cart.id,
+            },
+          });
+        })
+        .catch(error => {
+          console.error('Terjadi kesalahan:', error);
+        });
+    },
   },
   mounted() {
     axios
@@ -319,14 +263,30 @@ export default {
 }
 
 .card {
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
-.btn-outline-secondary {
-  min-width: 40px;
+.shadow-lg {
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
 }
 
-.input-group {
-  max-width: 250px;
+.fs-1 {
+  font-size: 2.5rem;
+}
+
+.fs-4 {
+  font-size: 1.5rem;
+}
+
+.fs-5 {
+  font-size: 1.25rem;
+}
+
+.text-danger {
+  color: #dc3545;
+}
+
+.text-center {
+  text-align: center;
 }
 </style>

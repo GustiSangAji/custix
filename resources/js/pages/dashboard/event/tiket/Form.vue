@@ -27,6 +27,8 @@ const ticket = ref({
     quantity: 0,
     price: 0,
     image: null,
+    description: '', // Tambahkan kolom deskripsi
+    banner: null, // Tambahkan kolom banner
 });
 const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
 const formRef = ref();
@@ -60,7 +62,6 @@ function getEdit() {
         });
 }
 
-
 function submit() {
     const formData = new FormData();
     formData.append("kode_tiket", ticket.value.kode_tiket);
@@ -71,9 +72,12 @@ function submit() {
     formData.append("status", ticket.value.status);
     formData.append("quantity", ticket.value.quantity.toString());
     formData.append("price", ticket.value.price.toString());
-
+    formData.append("description", ticket.value.description); // Tambahkan deskripsi ke FormData
     if (ticket.value?.image && Array.isArray(ticket.value.image)) {
         formData.append("image", ticket.value.image[0].file); // Pastikan ini sesuai dengan struktur file
+    }
+    if (ticket.value?.banner && Array.isArray(ticket.value.banner)) {
+        formData.append("banner", ticket.value.banner[0].file); // Pastikan ini sesuai dengan struktur file
     }
 
     if (props.selected) {
@@ -125,6 +129,8 @@ watch(
                 quantity: 0,
                 price: 0,
                 image: null,
+                description: '', // Reset deskripsi
+                banner: null, // Reset banner
             };
             formRef.value.resetForm();
         }
@@ -273,17 +279,46 @@ watch(
                 </div>
                 <div class="col-md-6">
                     <div class="fv-row mb-7">
-      <label class="form-label fw-bold fs-6">Gambar Tiket</label>
-      <file-upload
-        :files="ticket.image" 
-        :accepted-file-types="fileTypes" 
-        required
-        v-on:updatefiles="(file) => (ticket.image = file)" 
-      ></file-upload>
-      <div class="fv-help-block">
-        <ErrorMessage name="image" />
-      </div>
-    </div>
+                        <label class="form-label fw-bold fs-6">Deskripsi Tiket</label>
+                        <Field
+                            class="form-control form-control-lg form-control-solid"
+                            type="text"
+                            name="description"
+                            v-model="ticket.description"
+                            placeholder="Masukkan Deskripsi Tiket"
+                        />
+                        <div class="fv-help-block">
+                            <ErrorMessage name="description" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="fv-row mb-7">
+                        <label class="form-label fw-bold fs-6">Banner Tiket</label>
+                        <file-upload
+                            :files="ticket.banner" 
+                            :accepted-file-types="fileTypes" 
+                            required
+                            v-on:updatefiles="(file) => (ticket.banner = file)" 
+                        ></file-upload>
+                        <div class="fv-help-block">
+                            <ErrorMessage name="banner" />
+                        </div>
+                    </div>
+                </div>
+                <div class="col-md-6">
+                    <div class="fv-row mb-7">
+                        <label class="form-label fw-bold fs-6">Gambar Tiket</label>
+                        <file-upload
+                            :files="ticket.image" 
+                            :accepted-file-types="fileTypes" 
+                            required
+                            v-on:updatefiles="(file) => (ticket.image = file)" 
+                        ></file-upload>
+                        <div class="fv-help-block">
+                            <ErrorMessage name="image" />
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
