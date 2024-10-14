@@ -1,6 +1,6 @@
 <template>
   <LayoutLanding>
-    <div class="container mt-4">
+    <div class="container mt-8">
       <Carousel />
       <BestConcert />
       <div class="row mt-6">

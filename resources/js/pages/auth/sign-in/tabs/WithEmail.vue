@@ -154,7 +154,7 @@ export default defineComponent({
                 
                 this.store.setAuth(res.data.user, res.data.token);
                 
-                        // Cek peran pengguna dan arahkan ke halaman yang sesuai
+               // Cek peran pengguna dan arahkan ke halaman yang sesuai
                 if (res.data.user.role?.name === 'admin') {
                     this.router.push("/dashboard"); // Arahkan admin ke dashboard
                 } else {

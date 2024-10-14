@@ -1,48 +1,52 @@
 <template>
-  <nav class="navbar navbar-expand-lg navbar-light bg-body-tertiary" :class="{ 'sticky': isSticky }">
+  <nav class="navbar navbar-expand-lg shadow-sm" :class="{'sticky-top bg-light': isSticky}">
     <div class="container">
-      <a class="navbar-brand" href="#">
-        <img src="/media/hero/custiket.png" alt="CusTicket" width="80" />
-      </a>
+      <!-- Logo -->
+      <router-link class="navbar-brand" to="/home">
+        <img src="/media/hero/custiket.png" alt="Logo" class="logo img-fluid" />
+      </router-link>
+      <!-- Navbar Toggler -->
       <button
         class="navbar-toggler"
         type="button"
         data-bs-toggle="collapse"
-        data-bs-target="#navbarSupportedContent"
-        aria-controls="navbarSupportedContent"
+        data-bs-target="#navbarNav"
+        aria-controls="navbarNav"
         aria-expanded="false"
         aria-label="Toggle navigation"
       >
         <span class="navbar-toggler-icon"></span>
       </button>
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
-        <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <router-link class="nav-link" to="/home">Home</router-link>
+      <!-- Navbar Content -->
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <!-- Center Search Bar -->
+        <form class="d-flex mx-5 search-bar">
+          <div class="input-group">
+            <input
+              type="text"
+              class="form-control"
+              placeholder="Cari di CusTix"
+              aria-label="Recipient's username"
+              aria-describedby="basic-addon2"
+            />
+            <span class="input-group-text" id="basic-addon2">
+              <i class="ki-duotone ki-magnifier fs-2">
+                <span class="path1"></span>
+                <span class="path2"></span>
+              </i>
+            </span>
+          </div>
+        </form>
+        <!-- Right Menu Items -->
+        <ul class="navbar-nav ms-auto">
+          <!-- Jika user sudah login -->
+          <li v-if="isAuthenticated">
+            <UserDropdown />
           </li>
-          <li class="nav-item">
-            <router-link class="nav-link" to="/tiket">Tiket</router-link>
-          </li>
-        </ul>
-
-        <ul class="navbar-nav ms-auto mb-2 mb-lg-0">
-          <li class="nav-item">
-            <router-link class="nav-link" to="/keranjang">
-              Keranjang
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                fill="currentColor"
-                class="bi bi-bag"
-                viewBox="0 0 16 16"
-              >
-                <path
-                  d="M8 1a2.5 2.5 0 0 1 2.5 2.5V4h-5v-.5A2.5 2.5 0 0 1 8 1m3.5 3v-.5a3.5 3.5 0 1 0-7 0V4H1v10a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V4zM2 5h12v9a1 1 0 0 1-1 1H3a1 1 0 0 1-1-1z"
-                />
-              </svg>
-              <span class="badge badge-success ms-2">{{ updateKeranjang ? updateKeranjang.length : jumlah_pesanans.length }}</span>
-            </router-link>
+          <!-- Jika user belum login -->
+          <li v-else>
+            <router-link to="/sign-in" class="btn btn-light-primary rounded me-2">Masuk</router-link>
+            <router-link to="/sign-up" class="btn btn-active-dark rounded">Daftar</router-link>
           </li>
         </ul>
       </div>
@@ -51,55 +55,65 @@
 </template>
 
 <script>
-import axios from "axios";
+import { useAuthStore } from "@/stores/auth";
+import { computed, onMounted, ref } from "vue";
+import UserDropdown from "@/components/dropdown/UserDropdown.vue"; 
 
 export default {
   name: "Navbar",
-  data() {
-    return {
-      isSticky: false,
-      jumlah_pesanans: [],
-    };
+  components: {
+    UserDropdown,
   },
-  props: ["updateKeranjang"],
-  methods: {
-    setJumlah(data) {
-      this.jumlah_pesanans = data;
-    },
-    handleScroll() {
-      this.isSticky = window.scrollY > 0;
-    },
-  },
-  mounted() {
-    axios
-      .get("http://localhost:3000/keranjangs")
-      .then((response) => this.setJumlah(response.data))
-      .catch((error) => console.log(error));
+  setup() {
+    const authStore = useAuthStore();
 
-    window.addEventListener("scroll", this.handleScroll);
-  },
-  beforeDestroy() {
-    window.removeEventListener("scroll", this.handleScroll);
+    const isAuthenticated = computed(() => authStore.isAuthenticated);
+    const isSticky = ref(false);
+
+    const handleScroll = () => {
+      isSticky.value = window.scrollY > 0; // Menentukan kapan navbar menjadi sticky
+    };
+
+    onMounted(() => {
+      window.addEventListener('scroll', handleScroll);
+    });
+
+    return {
+      isAuthenticated,
+      isSticky,
+    };
   },
 };
 </script>
 
-<style lang="scss" scoped>
+<style scoped>
 .navbar {
-  transition: background-color 0.3s ease, box-shadow 0.3s ease;
-
-  &.sticky {
-    background-color: #ffffff;
-    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-    z-index: 1000;
-  }
+  transition: background-color 0.1s ease, box-shadow 0.1s ease;
 }
-
-.nav-link {
-  transition: color 0.3s ease;
-
-  &:hover {
-    color: #28a745;
-  }
+.sticky-top {
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+}
+.logo {
+  width: 100px;
+  height: 40px;
+  object-fit: cover;
+  transition: transform 0.3s ease;
+}
+.logo:hover {
+  transform: scale(1.05);
+}
+.search-bar {
+  width: 50%;
+  transition: width 0.3s ease;
+}
+.search-bar:hover {
+  width: 55%;
+}
+.hover-fade {
+  transition: background-color 0.3s ease, color 0.3s ease;
+}
+.hover-fade:hover {
+  background-color: #f5f5f5 !important;
+  color: #333 !important;
 }
 </style>
