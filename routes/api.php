@@ -100,3 +100,4 @@ Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail 
 Route::post('/order', [CartController::class, 'store']);
 Route::get('/order', [CartController::class, 'index']);
 Route::get('/order/{id}', [CartController::class, 'show']);
+Route::post('/payment/{id}', [CartController::class, 'checkout']);
