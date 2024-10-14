@@ -27,7 +27,7 @@
           this.waitTime--;
         } else {
           clearInterval(countdown);
-          this.$router.push({ path: '/tiket/4' });
+          this.$router.push(`/tiket/${this.kode_tiket}`);
         }
       }, 1000);
     },

@@ -29,10 +29,10 @@
         <!-- Event Details Section -->
         <div class="col-md-8">
           <!-- Event description -->
+          <h2 class="fs-3">Tentang {{ product.name }}</h2>
           <div class="card border-0 p-4 fs-4 shadow-sm rounded mb-4">
             <p>✮ Hello Arte-Folks ✮</p>
             <p>{{ product.description }}</p>
-
             <p>
               <strong>Date:</strong> {{ formatDate(product.datetime) }}<br />
               <strong>Location:</strong> {{ product.place }} ♬
