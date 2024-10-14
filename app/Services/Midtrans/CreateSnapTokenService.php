@@ -6,25 +6,25 @@ use Midtrans\Snap;
 
 class CreateSnapTokenService extends Midtrans
 {
-    protected $order;
+    protected $carts;
 
-    public function __construct($order)
+    public function __construct($carts)
     {
         parent::__construct();
 
-        $this->order = $order;
+        $this->carts = $carts;
     }
 
     public function getSnapToken()
     {
         $params = [
             'transaction_details' => [
-                'order_id' => $this->order->number,
-                'gross_amount' => $this->order->total_price,
+                'order_id' => $this->carts->id,
+                'gross_amount' => $this->carts->total_price,
             ],
             'item_details' => [
                 [
-                    'id' => '',
+                    'id' => '1',
                     'price' => '150000',
                     'quantity' => 1,
                     'name' => 'Flashdisk Toshiba 32GB',
@@ -37,7 +37,7 @@ class CreateSnapTokenService extends Midtrans
                 ],
             ],
             'customer_details' => [
-                'first_name' => 'Martin Mulyo Syahidin',
+                'first_name' => 'Martin Mulyo Srimulat',
                 'email' => 'mulyosyahidin95@gmail.com',
                 'phone' => '081234567890',
             ]
