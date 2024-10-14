@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Cart; // Model keranjang (buat model jika belum ada)
 use App\Models\Tiket; // Model tiket
 use App\Services\Midtrans\CreateSnapTokenService;
+use Midtrans\Config;
 
 class CartController extends Controller
 {
@@ -48,19 +49,8 @@ class CartController extends Controller
             'total_harga' => $request->product['total_harga'], // Ambil dari payload
         ]);
 
-        $midtrans = new CreateSnapTokenService($cart);
-        $snapToken = $midtrans->getSnapToken();
+        return response()->json(['message' => 'Tiket berhasil ditambahkan ke keranjang', 'cart' => $cart], 201);
 
-        // Simpan Snap Token ke dalam database
-        $cart->snap_token = $snapToken;
-        $cart->save();
-
-        // Kembalikan response atau redirect ke halaman pembayaran dengan token Snap
-        return response()->json([
-            'message' => 'Pemesanan berhasil',
-            'order' => $cart,
-            'snap_token' => $snapToken,
-        ], 201);
     }
 
     public function show($id)
@@ -69,4 +59,42 @@ class CartController extends Controller
         return response()->json($order);
     }
 
+    public function checkout($id)
+    {
+        $cart = Cart::find($id);
+
+        // $orderData = [
+        //     'order_id' => $ihiy->id,
+        //     'total_price' => $ihiy->total_price,
+        // ];
+        // Set konfigurasi Midtrans
+        Config::$serverKey = env('MIDTRANS_SERVER_KEY');
+        Config::$isProduction = false; // ganti ke true jika di production
+        Config::$isSanitized = true;
+        Config::$is3ds = true;
+
+        // Data transaksi
+        $transactionDetails = [
+            'transaction_details' => [
+                'order_id' => (int) $cart->id,
+                'gross_amount' => (int) $cart->total_harga,
+            ]
+        ];
+
+        // Buat Snap Token
+        try {
+            $snapToken = \Midtrans\Snap::getSnapToken($transactionDetails);
+
+            return response()->json([
+                'id' => $cart->id,
+                'snap_token' => $snapToken,
+            ]);
+
+        } catch (\Exception $e) {
+            return response()->json([
+                'error' => $e->getMessage(),
+            ], 500);
+        }
+    }
 }
+

@@ -6,7 +6,8 @@
   <meta name="description" content="Metronic Vue Demo" />
   <link rel="icon" sizes="512px" href="/ocigeming.png">
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700">
-  {{-- <link rel="stylesheet" href="/splash-screen.css"> --}}
+  {{--
+  <link rel="stylesheet" href="/splash-screen.css"> --}}
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>CUSTIX</title>
 
@@ -41,6 +42,7 @@
 
     document.documentElement.setAttribute("data-bs-theme", themeMode);
   </script>
+
   <!--end::Theme mode setup on page load-->
 
   <div id="app"></div>
@@ -52,7 +54,8 @@
     <span>Loading ...</span>
   </div> --}}
   <!--end::Loading markup-->
-
+  <script src="https://app.sandbox.midtrans.com/snap/snap.js" data-client-key="{{ config('midtrans.MIDTRANS_CLIENT_KEY') }}">
+  </script>
 </body>
 
 </html>
