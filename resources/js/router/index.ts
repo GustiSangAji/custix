@@ -44,6 +44,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/Orders.vue"),
     },
     {
+        path: "/waiting-room",
+        component: () => import("@/pages/WaitingRoom.vue"),
+    },
+    {
         path: "/dashboard",
         component: () => import("@/layouts/default-layout/DefaultLayout.vue"),
         meta: {
