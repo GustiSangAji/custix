@@ -5,6 +5,7 @@ use App\Http\Controllers\CartController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StockinController;
+use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\UserController;
 use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
@@ -95,9 +96,17 @@ Route::get('/tickets', [TicketController::class, 'index']); // Untuk semua tiket
 Route::get('/tickets/limited', [TicketController::class, 'limited']); // Untuk tiket terbatas di halaman utama
 Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
 
+Route::prefix('laporan')->group(function () {
+    Route::post('/', [LaporanController::class, 'index']);  // Menampilkan daftar laporan dengan pagination
+    Route::post('/store', [LaporanController::class, 'store']);  // Menyimpan laporan baru
+    Route::get('/{laporan}', [LaporanController::class, 'show']);  // Menampilkan laporan berdasarkan ID
+    Route::put('/{laporan}', [LaporanController::class, 'update']);  // Mengupdate laporan tertentu
+    Route::delete('/{laporan}', [LaporanController::class, 'destroy']);  // Menghapus laporan tertentu
+});
 
 
 Route::post('/order', [CartController::class, 'store']);
 Route::get('/order', [CartController::class, 'index']);
 Route::get('/order/{id}', [CartController::class, 'show']);
 Route::post('/payment/{id}', [CartController::class, 'checkout']);
+Route::post('/midtrans-callback', [CartController::class, 'callback']);
