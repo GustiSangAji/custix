@@ -11,7 +11,6 @@
       <div v-if="tickets.length === 0" class="text-center mt-5">
         <p>Tidak ada tiket yang tersedia saat ini.</p>
       </div>
-      <Footer />
     </div>
   </LayoutLanding>
 </template>
@@ -21,7 +20,6 @@ import LayoutLanding from "@/layouts/LayoutLanding.vue";
 import Carousel from "@/components/Carousel.vue";
 import BestConcert from "@/components/BestConcert.vue";
 import HomeCard from "@/components/HomeCard.vue";
-import Footer from "@/layouts/default-layout/components/footer/Footer.vue";
 import axios from "axios";
 
 export default {
@@ -31,7 +29,6 @@ export default {
     Carousel,
     BestConcert,
     HomeCard,
-    Footer,
   },
   data() {
     return {

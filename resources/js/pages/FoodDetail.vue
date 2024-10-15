@@ -1,4 +1,5 @@
 <template>
+  <LayoutLanding>
   <div class="ticket-detail">
     <Navbar />
     <div class="container mt-4">
@@ -153,6 +154,7 @@
       </div>
     </div>
   </div>
+  </LayoutLanding>
 </template>
 
 <script>
@@ -256,20 +258,19 @@ export default {
 
     // Mengirim permintaan pesanan
     axios
-      .post("/order", payload)
-      .then((response) => {
-        console.log("Pemesanan berhasil:", response.data);
-        // Redirect ke halaman detail pembayaran dengan orderId dari response
-        this.$router.push({
-          name: "paymentDetail",
-          params: {
-            orderId: response.data.order.id, // Pastikan id order dari response
-          },
-        });
-      })
-      .catch((error) => {
-        console.error("Terjadi kesalahan:", error);
+  .post("/order", payload)
+  .then((response) => {
+    console.log("Pemesanan Berhasil:", response.data); // Tambahkan ini
+      this.$router.push({
+        name: "paymentDetail",
+        params: {
+          orderId: response.data.cart.id,
+        },
       });
+  })
+  .catch((error) => {
+    console.error("Terjadi kesalahan:", error);
+  });
    },
   },
   mounted() {

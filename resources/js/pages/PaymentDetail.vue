@@ -188,36 +188,43 @@ export default {
         });
     },
     pay() {
-      // Request payment data from your backend
-      axios
-        .post(`http://localhost:8000/api/payment`, { orderId: this.orderId })
-        .then((response) => {
-          const snapToken = response.data.snapToken; // Assuming the response contains the Snap token
+  // Request payment data from your backend
+  axios
+    .post(`http://localhost:8000/api/payment/${this.orderId}`, { orderId: this.orderId })
+    .then((response) => {
+      // Cek apakah snapToken ada di dalam response
+      let snapToken = response.data.snap_token; // Ubah menjadi snap_token
 
-          // Initialize Midtrans Snap
-          window.snap.pay(snapToken, {
-            onSuccess: function (result) {
-              console.log("Payment Success:", result);
-              // Handle success (e.g., redirect to success page)
-            },
-            onPending: function (result) {
-              console.log("Payment Pending:", result);
-              // Handle pending payment
-            },
-            onError: function (result) {
-              console.log("Payment Error:", result);
-              // Handle error
-            },
-            onClose: function () {
-              console.log("Payment popup closed");
-              // Handle popup close
-            },
-          });
-        })
-        .catch((error) => {
-          console.error("Error fetching payment data:", error);
-        });
-    },
+      // Tambahkan log untuk memeriksa snapToken
+      console.log("Snap Token:", snapToken); 
+
+      // Pastikan snapToken tidak undefined atau null sebelum memanggil pay
+      if (!snapToken) {
+        console.error("Snap Token is undefined or null.");
+        return; // Hentikan eksekusi jika snapToken tidak ada
+      }
+
+      // Initialize Midtrans Snap
+      window.snap.pay(snapToken, {
+        onSuccess: function (result) {
+          console.log("Payment Success:", result);
+        },
+        onPending: function (result) {
+          console.log("Payment Pending:", result);
+        },
+        onError: function (result) {
+          console.log("Payment Error:", result);
+        },
+        onClose: function () {
+          console.log("Payment popup closed");
+        },
+      });
+    })
+    .catch((error) => {
+      console.error("Error fetching payment data:", error);
+    });
+},
+
   },
 };
 </script>
