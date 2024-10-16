@@ -2,50 +2,49 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
 use Illuminate\Http\Request;
-use App\Http\Controllers\Controller;
-use App\Services\Midtrans\CallbackService;
+use App\Models\Cart;
+use Illuminate\Support\Facades\Log;
 
 class PaymentCallbackController extends Controller
 {
-    public function receive()
+    public function callback(Request $request)
     {
-        $callback = new CallbackService;
+        Log::info('Midtrans Callback Request: ', $request->all());
 
-        if ($callback->isSignatureKeyVerified()) {
-            $notification = $callback->getNotification();
-            $order = $callback->getOrder();
+        $orderId = $request->order_id;
+        $statusCode = $request->status_code;
+        $grossAmount = $request->gross_amount;
+        $serverKey = config('midtrans.MIDTRANS_SERVER_KEY');
+        $receivedSignatureKey = $request->signature_key;
 
-            if ($callback->isSuccess()) {
-                Order::where('id', $order->id)->update([
-                    'payment_status' => 2,
-                ]);
+        // Create the correct string to hash
+        $stringToHash = $orderId . $statusCode . $grossAmount . $serverKey;
+
+        // Generate the correct hash
+        $calculatedSignatureKey = hash("sha512", $stringToHash);
+
+        Log::info('String to hash: ' . $stringToHash);
+        Log::info('Calculated signature key: ' . $calculatedSignatureKey);
+        Log::info('Received signature key: ' . $receivedSignatureKey);
+
+        if ($calculatedSignatureKey === $receivedSignatureKey) {
+            if ($request->transaction_status == 'settlement') {
+                $cart = Cart::find($orderId);
+
+                if ($cart) {
+                    $cart->update(['status' => 'Paid']);
+                    Log::info('Order ' . $orderId . ' status updated to Paid');
+                } else {
+                    Log::error('Order with id ' . $orderId . ' not found');
+                }
+            } else {
+                Log::info('Transaction status is not settlement: ' . $request->transaction_status);
             }
-
-            if ($callback->isExpire()) {
-                Order::where('id', $order->id)->update([
-                    'payment_status' => 3,
-                ]);
-            }
-
-            if ($callback->isCancelled()) {
-                Order::where('id', $order->id)->update([
-                    'payment_status' => 4,
-                ]);
-            }
-
-            return response()
-                ->json([
-                    'success' => true,
-                    'message' => 'Notifikasi berhasil diproses',
-                ]);
         } else {
-            return response()
-                ->json([
-                    'error' => true,
-                    'message' => 'Signature key tidak terverifikasi',
-                ], 403);
+            Log::error('Invalid signature for order_id: ' . $orderId);
         }
+
+        return response()->json(['status' => 'ok'], 200);
     }
 }

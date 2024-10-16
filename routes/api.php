@@ -10,6 +10,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TiketController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\PaymentCallbackController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -101,3 +102,4 @@ Route::post('/order', [CartController::class, 'store']);
 Route::get('/order', [CartController::class, 'index']);
 Route::get('/order/{id}', [CartController::class, 'show']);
 Route::post('/payment/{id}', [CartController::class, 'checkout']);
+Route::post('/afterpayment', [CartController::class, 'callback']);
