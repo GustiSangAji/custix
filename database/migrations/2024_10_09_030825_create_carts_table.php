@@ -13,6 +13,7 @@ return new class extends Migration
     {
         Schema::create('carts', function (Blueprint $table) {
             $table->id();
+            $table->string('order_id')->unique();
             $table->foreignId('user_id')->constrained()->onDelete('cascade'); // ID user
             $table->foreignId('ticket_id')->constrained('tikets')->onDelete('cascade'); // ID tiket (pastikan nama tabel sesuai)
             $table->integer('jumlah_pemesanan'); // Jumlah tiket yang dipesan

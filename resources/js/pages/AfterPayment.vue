@@ -24,7 +24,8 @@
           <div class="card-body">
             <h5 class="card-title">Detail Pesanan</h5>
             <p class="card-text">
-              Tiket: {{ ticketDetail.kode_tiket }}<br />
+              Order ID: {{orderDetail.order_id}}<br />
+              Nama Tiket: {{ ticketDetail.name }}<br />
               Jumlah: {{ orderDetail.jumlah_pemesanan }}<br />
               Nama Pemesan: {{ user.nama }}<br />
               Nomor Ponsel: {{ user.phone }}<br />
