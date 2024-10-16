@@ -3,45 +3,47 @@ import {
     createWebHistory,
     type RouteRecordRaw,
 } from "vue-router";
-import { useAuthStore } from "@/stores/auth";
-import { useConfigStore } from "@/stores/config";
-import NProgress from "nprogress";
-import "nprogress/nprogress.css";
+import { useAuthStore } from "@/stores/auth"; // Store untuk autentikasi
+import { useConfigStore } from "@/stores/config"; // Store untuk konfigurasi
+import NProgress from "nprogress"; // Library untuk menampilkan progress bar
+import "nprogress/nprogress.css"; // Gaya untuk progress bar
 
+// Deklarasi module untuk menambahkan properti meta pada route
 declare module "vue-router" {
     interface RouteMeta {
-        pageTitle?: string;
-        permission?: string;
+        pageTitle?: string; // Judul halaman
+        permission?: string; // Izin akses
     }
 }
 
+// Mendefinisikan rute
 const routes: Array<RouteRecordRaw> = [
     {
         path: "/",
-        redirect: "/home",
+        redirect: "/home", // Mengalihkan root ke halaman home
     },
     {
         path: "/home",
         name: "home",
-        component: () => import("@/pages/HomeView.vue"),
+        component: () => import("@/pages/HomeView.vue"), // Halaman utama
     },
     {
         path: "/tiket",
-        component: () => import("@/pages/Foods.vue"),
+        component: () => import("@/pages/Foods.vue"), // Halaman untuk daftar tiket
     },
     {
         path: "/tiket/:id",
-        component: () => import("@/pages/FoodDetail.vue"),
+        component: () => import("@/pages/FoodDetail.vue"), // Halaman detail tiket
     },
     {
         path: '/payment/:orderId',
         name: 'paymentDetail',
-        component: () => import('@/pages/PaymentDetail.vue'),
+        component: () => import('@/pages/PaymentDetail.vue'), // Halaman detail pembayaran
         props: true,
     },
     {
         path: "/tiket/:id/orders",
-        component: () => import("@/pages/Orders.vue"),
+        component: () => import("@/pages/Orders.vue"), // Halaman untuk pemesanan tiket
     },
     {
         path: "/afterpayment/:orderId",
@@ -50,37 +52,46 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: "/dashboard",
-        component: () => import("@/layouts/default-layout/DefaultLayout.vue"),
+        component: () => import("@/layouts/default-layout/DefaultLayout.vue"), // Layout untuk dashboard
         meta: {
-            middleware: "auth",
+            middleware: "auth", // Middleware untuk autentikasi
         },
         children: [
             {
-                path: "/dashboard",
+                path: "",
                 name: "dashboard",
-                component: () => import("@/pages/dashboard/Index.vue"),
+                component: () => import("@/pages/dashboard/Index.vue"), // Halaman utama dashboard
                 meta: {
-                    pageTitle: "Dashboard",
+                    pageTitle: "Dashboard", // Judul halaman dashboard
                     breadcrumbs: ["Dashboard"],
-                    middleware: "admin",
+                    middleware: "admin", // Middleware untuk admin
                 },
             },
             {
-                path: "/dashboard/profile",
+                path: "profile",
                 name: "dashboard.profile",
-                component: () => import("@/pages/dashboard/profile/Index.vue"),
+                component: () => import("@/pages/dashboard/profile/Index.vue"), // Halaman profil
                 meta: {
                     pageTitle: "Profile",
                     breadcrumbs: ["Profile"],
                 },
             },
             {
-                path: "/dashboard/setting",
+                path: "setting",
                 name: "dashboard.setting",
-                component: () => import("@/pages/dashboard/setting/Index.vue"),
+                component: () => import("@/pages/dashboard/setting/Index.vue"), // Halaman pengaturan
                 meta: {
                     pageTitle: "Website Setting",
                     breadcrumbs: ["Website", "Setting"],
+                },
+            },
+            {
+                path: "laporan",
+                name: "dashboard.laporan",
+                component: () => import("@/pages/dashboard/laporan/Index.vue"), // Halaman laporan
+                meta: {
+                    pageTitle: "Website Laporan",
+                    breadcrumbs: ["Website", "laporan"],
                 },
             },
             {
@@ -102,7 +113,7 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
             {
-                path: "/dashboard/orders",
+                path: "orders",
                 name: "dashboard.orders",
                 component: () => import("@/pages/dashboard/orders/Index.vue"),
                 meta: {
@@ -111,7 +122,7 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
             {
-                path: "/dashboard/orders/show",
+                path: "orders/show",
                 name: "dashboard.orders.show",
                 component: () => import("@/pages/dashboard/orders/Show.vue"),
                 meta: {
@@ -122,20 +133,18 @@ const routes: Array<RouteRecordRaw> = [
 
             // MASTER
             {
-                path: "/dashboard/master/users/roles",
+                path: "master/users/roles",
                 name: "dashboard.master.users.roles",
-                component: () =>
-                    import("@/pages/dashboard/master/users/roles/Index.vue"),
+                component: () => import("@/pages/dashboard/master/users/roles/Index.vue"),
                 meta: {
                     pageTitle: "User Roles",
                     breadcrumbs: ["Master", "Users", "Roles"],
                 },
             },
             {
-                path: "/dashboard/master/users",
+                path: "master/users",
                 name: "dashboard.master.users",
-                component: () =>
-                    import("@/pages/dashboard/master/users/Index.vue"),
+                component: () => import("@/pages/dashboard/master/users/Index.vue"),
                 meta: {
                     pageTitle: "Users",
                     breadcrumbs: ["Master", "Users"],
@@ -145,50 +154,49 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: "/",
-        component: () => import("@/layouts/AuthLayout.vue"),
+        component: () => import("@/layouts/AuthLayout.vue"), // Layout untuk autentikasi
         children: [
             {
-                path: "/sign-in",
+                path: "sign-in",
                 name: "sign-in",
-                component: () => import("@/pages/auth/sign-in/Index.vue"),
+                component: () => import("@/pages/auth/sign-in/Index.vue"), // Halaman login
                 meta: {
                     pageTitle: "Masuk",
-                    middleware: "guest",
+                    middleware: "guest", // Middleware untuk tamu
                 },
                 beforeEnter: (to, from, next) => {
                     const authStore = useAuthStore();
                     if (authStore.isAuthenticated) {
                         // Jika pengguna sudah login sebagai admin atau user
                         if (authStore.user.role?.name === 'admin') {
-                            next({ name: 'dashboard' });
+                            next({ name: 'dashboard' }); // Arahkan ke dashboard
                         } else {
                             next({ name: 'home' }); // Arahkan ke home untuk user
                         }
                     } else {
-                        next();
+                        next(); // Lanjutkan ke halaman login
                     }
                 },
             },
             {
-                path: "/sign-up",
+                path: "sign-up",
                 name: "sign-up",
-                component: () => import("@/pages/auth/sign-up/Index.vue"),
+                component: () => import("@/pages/auth/sign-up/Index.vue"), // Halaman pendaftaran
                 meta: {
                     pageTitle: "Daftar",
-                    middleware: "guest",
+                    middleware: "guest", // Middleware untuk tamu
                 },
             },
         ],
     },
     {
         path: "/",
-        component: () => import("@/layouts/SystemLayout.vue"),
+        component: () => import("@/layouts/SystemLayout.vue"), // Layout untuk sistem
         children: [
             {
-                // the 404 route, when none of the above matches
                 path: "/404",
                 name: "404",
-                component: () => import("@/pages/errors/Error404.vue"),
+                component: () => import("@/pages/errors/Error404.vue"), // Halaman error 404
                 meta: {
                     pageTitle: "Error 404",
                 },
@@ -196,7 +204,7 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: "/500",
                 name: "500",
-                component: () => import("@/pages/errors/Error500.vue"),
+                component: () => import("@/pages/errors/Error500.vue"), // Halaman error 500
                 meta: {
                     pageTitle: "Error 500",
                 },
@@ -204,16 +212,17 @@ const routes: Array<RouteRecordRaw> = [
         ],
     },
     {
-        path: "/:pathMatch(.)",
-        redirect: "/404",
+        path: "/:pathMatch(.*)*", // Route catch-all
+        redirect: "/404", // Redirect ke halaman 404
     },
 ];
 
+// Membuat router
 const router = createRouter({
     history: createWebHistory(import.meta.env.BASE_URL),
     routes,
     scrollBehavior(to) {
-        // If the route has a hash, scroll to the section with the specified ID; otherwise, scroll to the top of the page.
+        // Mengatur perilaku scroll ketika berpindah rute
         if (to.hash) {
             return {
                 el: to.hash,
@@ -230,60 +239,60 @@ const router = createRouter({
     },
 });
 
+// Middleware sebelum setiap rute
 router.beforeEach(async (to, from, next) => {
     if (to.name) {
-        // Start the route progress bar.
+        // Mulai progress bar jika ada nama rute
         NProgress.start();
     }
 
     const authStore = useAuthStore();
     const configStore = useConfigStore();
 
-    // current page view title
+    // Mengatur judul halaman
     if (to.meta.pageTitle) {
         document.title = `${to.meta.pageTitle} - ${import.meta.env.VITE_APP_NAME}`;
     } else {
         document.title = import.meta.env.VITE_APP_NAME as string;
     }
 
-    // reset config to initial state
+    // Reset konfigurasi
     configStore.resetLayoutConfig();
 
-    // verify auth token before each page change
+    // Verifikasi token autentikasi sebelum berpindah rute
     if (!authStore.isAuthenticated) await authStore.verifyAuth();
-
-
 
     // Handle middleware
     if (to.meta.middleware) {
         if (to.meta.middleware === 'auth') {
             if (authStore.isAuthenticated) {
-                next();
+                next(); // Lanjutkan jika terautentikasi
             } else {
-                next({ name: 'sign-in' }); // Redirect to sign-in if not authenticated
+                next({ name: 'sign-in' }); // Redirect ke login jika tidak terautentikasi
             }
         } else if (to.meta.middleware === 'guest') {
             if (authStore.isAuthenticated) {
-                next({ name: 'home' }); 
+                next({ name: 'home' }); // Redirect ke home jika sudah terautentikasi
             } else {
-                next(); // Allow access to guest routes
+                next(); // Lanjutkan untuk tamu
             }
         } else if (to.meta.middleware === 'admin') {
             if (authStore.isAuthenticated && authStore.user.role?.name === 'admin') {
-                next();
+                next(); // Lanjutkan jika admin
             } else {
-                next({ name: '404' }); // Redirect to 404 if not admin
+                next({ name: '404' }); // Redirect ke 404 jika bukan admin
             }
         }
     } else {
-        next(); // No middleware, continue
+        next(); // Tidak ada middleware, lanjutkan
     }
 });
 
-
+// Setelah berpindah rute
 router.afterEach(() => {
-    // Complete the animation of the route progress bar.
+    // Selesaikan animasi progress bar
     NProgress.done();
 });
 
+// Ekspor router
 export default router;
