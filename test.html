@@ -1,77 +1,137 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Login Modal</title>
-  <!-- Bootstrap 5 CSS -->
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
-  <style>
-    /* Smooth transition for the button */
-    #submitBtn {
-      transition: background-color 0.4s ease, border-color 0.4s ease, color 0.4s ease;
-    }
+<html lang="id">
 
-    /* Custom style for disabled button */
-    #submitBtn:disabled {
-      background-color: #6c757d !important; /* Gray out button */
-      border-color: #6c757d !important; 
-      cursor: not-allowed;
-    }
-  </style>
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Konfirmasi Pemesanan Tiket Konser</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=San Francisco:wght@400;600&display=swap" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery-barcode/2.0.1/jquery-barcode.min.js"></script>
+    <style>
+        body {
+            background-color: #f0f0f5;
+            font-family: 'San Francisco', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            color: #333;
+        }
+
+        .ticket-confirmation {
+            max-width: 600px;
+            margin: 50px auto;
+            padding: 40px;
+            background-color: #ffffff;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .ticket-confirmation:hover {
+            transform: scale(1.02);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.2);
+        }
+
+        .concert-image {
+            width: 100%;
+            border-radius: 20px;
+            margin-bottom: 20px;
+            object-fit: cover;
+        }
+
+        .ticket-header {
+            border-bottom: 2px solid #007bff;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: #007bff;
+        }
+
+        .form-control-plaintext {
+            font-size: 1.2rem;
+            font-weight: 500;
+            color: #555;
+        }
+
+        .barcode {
+            margin-top: 30px;
+            text-align: center;
+        }
+
+        .btn-print {
+            background-color: #007bff;
+            color: #fff;
+            border-radius: 50px;
+            padding: 12px 30px;
+            font-weight: 600;
+            border: none;
+            transition: background-color 0.3s ease;
+        }
+
+        .btn-print:hover {
+            background-color: #0056b3;
+        }
+
+        .footer {
+            text-align: center;
+            margin-top: 30px;
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        @media (max-width: 768px) {
+            .ticket-confirmation {
+                padding: 20px;
+            }
+        }
+    </style>
 </head>
+
 <body>
 
-  <!-- Button to trigger the login modal -->
-  <div class="text-center mt-5">
-    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#loginModal">
-      Pesan
-    </button>
-  </div>
+    <div class="ticket-confirmation">
+        <img src="https://example.com/concert-image.jpg" alt="Concert Image" class="concert-image">
+        <div class="ticket-header">
+            <h2 class="text-center">Konfirmasi Pemesanan Tiket</h2>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Judul Acara:</label>
+            <p class="form-control-plaintext">Konser Musik XYZ</p>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Tanggal dan Waktu:</label>
+            <p class="form-control-plaintext">25 Oktober 2024, 19:00 WIB</p>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Jumlah Tiket:</label>
+            <p class="form-control-plaintext">2 Tiket</p>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Total Harga:</label>
+            <p class="form-control-plaintext">Rp 500.000</p>
+        </div>
+        <div class="mb-3">
+            <label class="form-label">Nomor Pesanan:</label>
+            <p class="form-control-plaintext">#ABC123456</p>
+        </div>
 
-  <!-- Bootstrap Modal -->
-  <div class="modal fade" id="loginModal" tabindex="-1" aria-labelledby="loginModalLabel" aria-hidden="true">
-    <div class="modal-dialog modal-sm modal-dialog-centered">
-      <div class="modal-content">
-        <div class="modal-header">
-          <h5 class="modal-title" id="loginModalLabel">Masuk</h5>
-          <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-        </div>
-        <div class="modal-body">
-          <form>
-            <div class="mb-3">
-              <label for="email" class="form-label">Nomor HP atau Email</label>
-              <input type="email" class="form-control" id="email" placeholder="email@example.com" oninput="checkInput()">
-            </div>
-            
-            <div class="mb-3">
-              <button type="submit" class="btn btn-success w-100" id="submitBtn" disabled>Selanjutnya</button>
-            </div>
-          </form>
-        </div>
-      </div>
+        <div class="barcode" id="barcode"></div>
+
+        <button class="btn btn-print btn-block" onclick="window.print()">Cetak Tiket</button>
+        <div class="footer">Terima kasih telah memesan tiket bersama kami!</div>
     </div>
-  </div>
 
-  <!-- JavaScript to handle enabling/disabling the button -->
-  <script>
-    function checkInput() {
-      var emailInput = document.getElementById("email").value;
-      var submitBtn = document.getElementById("submitBtn");
-
-      // Regex to validate the email format
-      var emailPattern = /^[a-zA-Z0-9._%+-]+@(gmail\.com|yahoo\.com|email\.com)$/;
-
-      // Enable button if input is a valid email
-      if (emailPattern.test(emailInput.trim())) {
-        submitBtn.disabled = false;
-      } else {
-        submitBtn.disabled = true;
-      }
-    }
-  </script>
-
-  <!-- Bootstrap 5 JS -->
-  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0-alpha1/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        $(document).ready(function () {
+            $("#barcode").barcode("ABC123456", "code128", {
+                barWidth: 2,
+                barHeight: 100,
+                fontSize: 20
+            });
+        });
+    </script>
 </body>
+
 </html>

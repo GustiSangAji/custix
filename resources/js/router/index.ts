@@ -46,6 +46,14 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/Orders.vue"), // Halaman untuk pemesanan tiket
     },
     {
+        path: "/tiketsaya",
+        component: () => import("@/pages/Setting.vue"), 
+    },
+    {
+        path: "/informasi-pribadi",
+        component: () => import("@/pages/setting/InformasiPribadi.vue")
+    },
+    {
         path: "/dashboard",
         component: () => import("@/layouts/default-layout/DefaultLayout.vue"), // Layout untuk dashboard
         meta: {
