@@ -1,7 +1,8 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use App\Exports\ExportLaporan;
+use Maatwebsite\Excel\Facades\Excel; // Tambahkan ini untuk mengimpor Excel
 use App\Models\Laporan;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -120,5 +121,9 @@ class LaporanController extends Controller
             'success' => true,
             'message' => 'Laporan berhasil dihapus'
         ]);
+    }
+
+    function export_excel(){
+        return Excel::download(new ExportLaporan, "Laporan.xlxs");
     }
 }
