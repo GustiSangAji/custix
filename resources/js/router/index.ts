@@ -50,8 +50,13 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/Setting.vue"), 
     },
     {
+        path: "/afterpayment/:orderId",
+        name: "afterpayment", 
+        component: () => import("@/pages/AfterPayment.vue"),
+    },
+    {
         path: "/informasi-pribadi",
-        component: () => import("@/pages/setting/InformasiPribadi.vue")
+        component: () => import("@/pages/setting/InformasiPribadi.vue"),
     },
     {
         path: "/dashboard",

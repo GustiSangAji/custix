@@ -1,6 +1,6 @@
 <template>
   <div
-          class="col-md-3 col-lg-2 bg-dark text-white vh-100 sticky-top py-3 fs-5 fw-bold"
+          class="col-md-3 col-lg-2 bg-dark text-white vh-100 py-3 fs-5 fw-bold"
         >
           <ul class="list-group list-group-flush">
             <router-link

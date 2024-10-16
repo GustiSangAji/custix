@@ -24,7 +24,7 @@ class CreateTiketsTable extends Migration
             $table->integer('quantity'); // Stok tiket yang tersedia
             $table->decimal('price', 10, 2); // Harga tiket
             $table->string('image')->nullable(); // Gambar tiket
-            $table->string('description')->nullable(); // Deskripsi tiket
+            $table->longText('description')->nullable(); // Deskripsi tiket
             $table->string('banner')->nullable(); // Banner tiket
             $table->datetime('expiry_date')->nullable(); // Kolom masa berlaku tiket
             $table->timestamps(); // Kolom created_at dan updated_at

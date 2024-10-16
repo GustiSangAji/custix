@@ -1,128 +1,128 @@
 <template>
   <LayoutLanding>
-  <div v-if="orderDetail && ticketDetail">
-    <div class="container mt-10">
-      <div class="row">
-        <!-- Form Pemesanan -->
-        <div class="col-md-8">
-          <h5 class="card-title">Detail Pemesanan</h5>
-          <p class="card-text">
-            Isi formulir ini dengan benar karena e-tiket akan dikirim ke alamat
-            email sesuai data pemesan.
-          </p>
-          <div class="card">
-            <div class="card-body">
-              <form>
-                <!-- Nama Lengkap -->
-                <div class="mb-3">
-                  <label for="nama" class="form-label">Nama Lengkap</label>
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="nama"
-                    placeholder="Nama Lengkap"
-                    v-model="user.nama"
-                  />
-                </div>
+    <div v-if="orderDetail && ticketDetail">
+      <div class="container mt-10">
+        <div class="row">
+          <!-- Form Pemesanan -->
+          <div class="col-md-8">
+            <h5 class="card-title">Detail Pemesanan</h5>
+            <p class="card-text">
+              Isi formulir ini dengan benar karena e-tiket akan dikirim ke
+              alamat email sesuai data pemesan.
+            </p>
+            <div class="card">
+              <div class="card-body">
+                <form>
+                  <!-- Nama Lengkap -->
+                  <div class="mb-3">
+                    <label for="nama" class="form-label">Nama Lengkap</label>
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="nama"
+                      placeholder="Nama Lengkap"
+                      v-model="user.nama"
+                    />
+                  </div>
 
-                <!-- Nomor Ponsel -->
-                <div class="mb-3">
-                  <label for="nomorPonsel" class="form-label"
-                    >Nomor Ponsel</label
-                  >
-                  <input
-                    type="text"
-                    class="form-control"
-                    id="nomorPonsel"
-                    placeholder="+62"
-                    v-model="user.phone"
-                  />
-                </div>
+                  <!-- Nomor Ponsel -->
+                  <div class="mb-3">
+                    <label for="nomorPonsel" class="form-label"
+                      >Nomor Ponsel</label
+                    >
+                    <input
+                      type="text"
+                      class="form-control"
+                      id="nomorPonsel"
+                      placeholder="+62"
+                      v-model="user.phone"
+                    />
+                  </div>
 
-                <!-- Alamat Email -->
-                <div class="mb-3">
-                  <label for="email" class="form-label">Alamat Email</label>
-                  <input
-                    type="email"
-                    class="form-control"
-                    id="email"
-                    placeholder="you@example.com"
-                    v-model="user.email"
-                  />
-                </div>
-              </form>
+                  <!-- Alamat Email -->
+                  <div class="mb-3">
+                    <label for="email" class="form-label">Alamat Email</label>
+                    <input
+                      type="email"
+                      class="form-control"
+                      id="email"
+                      placeholder="you@example.com"
+                      v-model="user.email"
+                    />
+                  </div>
+                </form>
+              </div>
             </div>
           </div>
-        </div>
 
-        <!-- Detail Tiket -->
-        <div class="col-md-4">
-          <div class="card shadow-sm mt-4">
-            <div class="card-body">
-              <div class="d-flex align-items-center mb-6">
-                <img
-                  :src="'/storage/' + ticketDetail.image"
-                  alt="Event Image"
-                  class="rounded me-2"
-                  style="width: 50px"
-                />
-                <div class="flex-grow-1">
-                  <h5 class="card-title mb-0">{{ ticketDetail.name }}</h5>
+          <!-- Detail Tiket -->
+          <div class="col-md-4">
+            <div class="card shadow-sm mt-4">
+              <div class="card-body">
+                <div class="d-flex align-items-center mb-6">
+                  <img
+                    :src="'/storage/' + ticketDetail.image"
+                    alt="Event Image"
+                    class="rounded me-2"
+                    style="width: 50px"
+                  />
+                  <div class="flex-grow-1">
+                    <h5 class="card-title mb-0">{{ ticketDetail.name }}</h5>
+                  </div>
+                  <a href="#" class="text-primary">Detail</a>
                 </div>
-                <a href="#" class="text-primary">Detail</a>
-              </div>
-              <p class="card-text">
-                <strong>Tiket: {{ ticketDetail.kode_tiket }}</strong>
-                <br />
-                1 Tiket - Id Pesanan {{ orderDetail.id }}<br />
-                <span class="text-muted">
-                  Tanggal Dipilih: {{ formatDate(orderDetail.created_at) }}
-                </span>
-              </p>
-
-              <ul class="list-unstyled">
-                <li class="mb-3">
-                  <i class="bi bi-x-circle-fill"></i> Tidak bisa refund
-                </li>
-                <li class="mb-3">
-                  <i class="bi bi-check-circle-fill"></i> Konfirmasi Instan
-                </li>
-                <li class="mb-3">
-                  <i class="bi bi-ticket-fill"></i> Kursi tersedia saat
-                  penukaran tiket
-                </li>
-                <li class="mb-3">
-                  <i class="bi bi-calendar-check-fill"></i> Berlaku di tanggal
-                  terpilih
-                </li>
-              </ul>
-
-              <hr />
-
-              <div class="d-flex justify-content-between align-items-center">
-                <h6>Total Pembayaran</h6>
-                <p class="fw-bold">
-                  {{ formatPrice(orderDetail.total_harga) }}
+                <p class="card-text">
+                  <strong>Tiket: {{ ticketDetail.kode_tiket }}</strong>
+                  <br />
+                  1 Tiket - Id Pesanan {{ orderDetail.id }}<br />
+                  <span class="text-muted">
+                    Tanggal Dipilih: {{ formatDate(orderDetail.created_at) }}
+                  </span>
                 </p>
+
+                <ul class="list-unstyled">
+                  <li class="mb-3">
+                    <i class="bi bi-x-circle-fill"></i> Tidak bisa refund
+                  </li>
+                  <li class="mb-3">
+                    <i class="bi bi-check-circle-fill"></i> Konfirmasi Instan
+                  </li>
+                  <li class="mb-3">
+                    <i class="bi bi-ticket-fill"></i> Kursi tersedia saat
+                    penukaran tiket
+                  </li>
+                  <li class="mb-3">
+                    <i class="bi bi-calendar-check-fill"></i> Berlaku di tanggal
+                    terpilih
+                  </li>
+                </ul>
+
+                <hr />
+
+                <div class="d-flex justify-content-between align-items-center">
+                  <h6>Total Pembayaran</h6>
+                  <p class="fw-bold">
+                    {{ formatPrice(orderDetail.total_harga) }}
+                  </p>
+                </div>
+                <button @click="pay" class="btn btn-primary mt-3">
+                  Bayar Sekarang
+                </button>
               </div>
-              <button @click="pay" class="btn btn-primary mt-3">
-                Bayar Sekarang
-              </button>
             </div>
           </div>
         </div>
       </div>
     </div>
-  </div>
-  <div v-else>
-    <p>Memuat detail pembayaran...</p>
-  </div>
-</LayoutLanding>
+    <div v-else>
+      <p>Memuat detail pembayaran...</p>
+    </div>
+  </LayoutLanding>
 </template>
 
 
 <script>
-import axios from 'axios';
+import axios from "axios";
 import LayoutLanding from "@/layouts/LayoutLanding.vue";
 import { computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
@@ -188,34 +188,44 @@ export default {
         });
     },
     pay() {
-  // Request payment data from your backend
   axios
-    .post(`http://localhost:8000/api/payment/${this.orderId}`, { orderId: this.orderId })
+    .post(`http://localhost:8000/api/payment/${this.orderId}`, {
+      orderId: this.orderId,
+    })
     .then((response) => {
-      // Cek apakah snapToken ada di dalam response
-      let snapToken = response.data.snap_token; // Ubah menjadi snap_token
+      let snapToken = response.data.snap_token;
 
-      // Tambahkan log untuk memeriksa snapToken
-      console.log("Snap Token:", snapToken); 
-
-      // Pastikan snapToken tidak undefined atau null sebelum memanggil pay
       if (!snapToken) {
         console.error("Snap Token is undefined or null.");
-        return; // Hentikan eksekusi jika snapToken tidak ada
+        return;
       }
 
-      // Initialize Midtrans Snap
       window.snap.pay(snapToken, {
-        onSuccess: function (result) {
+        onSuccess: (result) => {
           console.log("Payment Success:", result);
+          this.$router.push({
+            name: "afterpayment",
+            params: { orderId: this.orderId },
+            query: { transaction_status: result.transaction_status }, // Tambahkan status transaksi
+          });
         },
-        onPending: function (result) {
+        onPending: (result) => {
           console.log("Payment Pending:", result);
+          this.$router.push({
+            name: "afterpayment",
+            params: { orderId: this.orderId },
+            query: { transaction_status: 'pending' }, // Status pending
+          });
         },
-        onError: function (result) {
-          console.log("Payment Error:", result);
+        onError: (result) => {
+          console.log("Payment Pending:", result);
+          this.$router.push({
+            name: "afterpayment",
+            params: { orderId: this.orderId },
+            query: { transaction_status: 'unpaid' }, // Status unpaid
+          });
         },
-        onClose: function () {
+        onClose: () => {
           console.log("Payment popup closed");
         },
       });

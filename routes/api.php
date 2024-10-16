@@ -3,7 +3,6 @@
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StockinController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\UserController;
@@ -109,4 +108,4 @@ Route::post('/order', [CartController::class, 'store']);
 Route::get('/order', [CartController::class, 'index']);
 Route::get('/order/{id}', [CartController::class, 'show']);
 Route::post('/payment/{id}', [CartController::class, 'checkout']);
-Route::post('/midtrans-callback', [CartController::class, 'callback']);
+Route::post('/afterpayment', [CartController::class, 'callback']);
