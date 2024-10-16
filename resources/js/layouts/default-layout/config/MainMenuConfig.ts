@@ -69,6 +69,12 @@ const MainMenuConfig: Array<MenuItem> = [
                 ],
             },
             {
+                heading: "Laporan",
+                route: "/dashboard/laporan",
+                name: "laporan",
+                keenthemesIcon: "setting-3",
+            },
+            {
                 heading: "Setting",
                 route: "/dashboard/setting",
                 name: "setting",

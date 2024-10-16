@@ -3,36 +3,37 @@
 namespace App\Http\Middleware;
 
 use Closure;
-use Illuminate\Support\Facades\Cache;
+use Illuminate\Http\Request;
 
 class WaitingRoomMiddleware
 {
-    /**
-     * Handle an incoming request.
-     */
-    public function handle($request, Closure $next)
+    protected $maxUsers = 1; // Jumlah maksimum pengguna yang dapat masuk
+
+    public function handle(Request $request, Closure $next)
     {
-        $maxAllowedUsers = 1; // Jumlah maksimum pengguna di waiting room
-        $waitingRoomKey = 'waiting_room_users';
+        // Cek jumlah pengguna yang sudah masuk
+        $currentUsers = cache()->get('current_users', 0);
 
-        // Cek jumlah pengguna saat ini di waiting room
-        $currentUsers = Cache::get($waitingRoomKey, 0);
-
-        if ($currentUsers >= $maxAllowedUsers) {
-            return response()->json([
-                'success' => false,
-                'message' => 'Waiting room penuh. Silakan coba lagi nanti.'
-            ], 429); // HTTP status code for Too Many Requests
+        if ($currentUsers >= $this->maxUsers) {
+            // Jika sudah penuh, redirect ke waiting room
+            return redirect('/waiting-room');
         }
 
-        // Tambahkan pengguna ke waiting room
-        Cache::increment($waitingRoomKey);
+        // Tambahkan pengguna yang sedang aktif
+        cache()->increment('current_users');
 
+        // Setiap kali pengguna keluar, decrement jumlah pengguna
         $response = $next($request);
+        $response->headers->set('X-Current-User-Count', $currentUsers + 1);
 
-        // Keluarkan pengguna dari waiting room setelah request selesai
-        Cache::decrement($waitingRoomKey);
+        // Menggunakan event untuk mengurangi pengguna saat keluar
+        register_shutdown_function(function () {
+            cache()->decrement('current_users');
+        });
 
         return $response;
     }
+
+    
+
 }

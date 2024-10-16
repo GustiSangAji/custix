@@ -72,7 +72,7 @@ class Kernel extends HttpKernel
         'json' => \App\Http\Middleware\EnsureApiJson::class,
         
         // Tambahkan middleware baru untuk limit akses tiket
-        'check.ticket.access' => \App\Http\Middleware\CheckTicketAccess::class,
+        'waiting.room' => \App\Http\Middleware\WaitingRoomMiddleware::class,
     ];
     
 }
