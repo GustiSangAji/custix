@@ -44,6 +44,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
+    
 
     /**
      * The application's middleware aliases.
@@ -72,7 +73,11 @@ class Kernel extends HttpKernel
         'json' => \App\Http\Middleware\EnsureApiJson::class,
         
         // Tambahkan middleware baru untuk limit akses tiket
-        'waiting.room' => \App\Http\Middleware\WaitingRoomMiddleware::class,
+
+            // ...
+            'CheckSingleAccess' => \App\Http\Middleware\CheckSingleAccess::class,
+        
+        
     ];
     
 }

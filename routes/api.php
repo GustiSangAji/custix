@@ -3,7 +3,6 @@
 use App\Http\Controllers\Api\TicketController;
 use App\Http\Controllers\CartController;
 use App\Http\Controllers\AuthController;
-use App\Http\Controllers\OrderController;
 use App\Http\Controllers\StockinController;
 use App\Http\Controllers\LaporanController;
 use App\Http\Controllers\UserController;
@@ -11,7 +10,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TiketController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\WaitingRoomController;
+use App\Http\Controllers\Api\TicketWaitingRoomController;
 use Illuminate\Support\Facades\Route;
 
 /*
@@ -35,9 +34,6 @@ Route::middleware(['json'])->prefix('auth')->group(function () {
     Route::get('me', [AuthController::class, 'me']);
 });
 
-// Waiting Room Status
-Route::get('/waiting-room-status', [WaitingRoomController::class, 'status']);
-
 // Setting Routes
 Route::prefix('setting')->group(function () {
     Route::get('', [SettingController::class, 'index']);
@@ -48,7 +44,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
     Route::prefix('setting')->middleware('can:setting')->group(function () {
         Route::post('', [SettingController::class, 'update']);
     });
-
+    
     Route::prefix('master')->group(function () {
         Route::middleware('can:master-user')->group(function () {
             Route::get('users', [UserController::class, 'get']);
@@ -57,16 +53,16 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
             Route::apiResource('users', UserController::class)
                 ->except(['index', 'store'])->scoped(['user' => 'uuid']);
         });
-
+        
         Route::middleware('can:master-role')->group(function () {
             Route::get('roles', [RoleController::class, 'get'])->withoutMiddleware('can:master-role');
             Route::post('roles', [RoleController::class, 'index']);
             Route::post('roles/store', [RoleController::class, 'store']);
             Route::apiResource('roles', RoleController::class)
-                ->except(['index', 'store']);
+            ->except(['index', 'store']);
         });
     });
-
+    
     Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index']);
     });
@@ -77,8 +73,8 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         Route::post('tiket', [TiketController::class, 'index']);
         Route::post('tiket/store', [TiketController::class, 'store']);
         Route::apiResource('tiket', TiketController::class)
-            ->except(['index', 'store'])
-            ->scoped(['tiket' => 'uuid']);
+        ->except(['index', 'store'])
+        ->scoped(['tiket' => 'uuid']);
 
         // Route untuk mengupdate stok tiket
         Route::put('tiket/{id}/stok', [TiketController::class, 'updateStok']);
@@ -92,7 +88,6 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         Route::put('/{stockin}', [StockinController::class, 'update']);
         Route::delete('/{stockin}', [StockinController::class, 'destroy']);
     });
-
 });
 
 // Public Routes
@@ -110,8 +105,14 @@ Route::prefix('laporan')->group(function () {
 });
 
 // Order Routes
-Route::post('/order', [CartController::class, 'store']);
-Route::get('/order', [CartController::class, 'index']);
-Route::get('/order/{id}', [CartController::class, 'show']);
-Route::post('/payment/{id}', [CartController::class, 'checkout']);
-Route::post('/midtrans-callback', [CartController::class, 'callback']);
+Route::middleware('CheckSingleAccess')->group(function () {
+    Route::post('/order', [CartController::class, 'store']);
+    Route::get('/order', [CartController::class, 'index']);
+    Route::get('/order/{id}', [CartController::class, 'show']);
+    Route::post('/payment/{id}', [CartController::class, 'checkout']);
+    Route::post('/afterpayment', [CartController::class, 'callback']);
+    Route::get('/waiting-room-status', [TicketWaitingRoomController::class, 'status']);
+    Route::post('/grant-access', [TicketWaitingRoomController::class, 'grantAccess']);
+});
+
+// Waiting Room Status

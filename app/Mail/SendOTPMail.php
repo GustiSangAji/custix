@@ -34,7 +34,7 @@ class SendOTPMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            from: new Address('gustavdrk@gmail.com', 'Percobaan'), // Gunakan email terverifikasi secara langsung
+            from: new Address('custixticketing@gmail.com', 'Percobaan'), // Gunakan email terverifikasi secara langsung
             subject: 'Verifikasi Email - OTP',
         );
     }    

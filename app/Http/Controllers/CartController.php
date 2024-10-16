@@ -2,11 +2,15 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Order;
+use Brick\Math\BigInteger;
 use Illuminate\Http\Request;
 use App\Models\Cart; // Model keranjang (buat model jika belum ada)
 use App\Models\Tiket; // Model tiket
-use App\Services\Midtrans\CreateSnapTokenService;
 use Midtrans\Config;
+use Illuminate\Support\Facades\Log;
+use Midtrans\Notification;
+use App\Models\User;
 
 class CartController extends Controller
 {
@@ -55,31 +59,31 @@ class CartController extends Controller
 
     public function show($id)
     {
-        $order = Cart::findOrFail($id);
-        return response()->json($order);
+        $cart = Cart::findOrFail($id);
+        return response()->json($cart);
     }
 
     public function checkout($id)
     {
         $cart = Cart::with('user', 'ticket')->findOrFail($id);
-    
+
         if (!$cart) {
             return response()->json(['error' => 'Keranjang tidak ditemukan'], 404);
         }
-    
+
         $user = $cart->user;
         $ticket = $cart->ticket;
-    
+
         // Set konfigurasi Midtrans
         Config::$serverKey = env('MIDTRANS_SERVER_KEY');
         Config::$isProduction = false; // ganti ke true jika di production
         Config::$isSanitized = true;
         Config::$is3ds = true;
-    
+
         // Data transaksi
         $transactionDetails = [
             'transaction_details' => [
-                'order_id' => 'ORDER-' . $cart->id,
+                'order_id' => $cart->id,
                 'gross_amount' => (int) $cart->total_harga,
             ],
             'customer_details' => [
@@ -95,20 +99,53 @@ class CartController extends Controller
                 ],
             ],
         ];
-    
+
         // Buat Snap Token
         try {
             $snapToken = \Midtrans\Snap::getSnapToken($transactionDetails);
-    
+
             return response()->json([
                 'id' => $cart->id,
                 'snap_token' => $snapToken,
             ]);
-    
+
         } catch (\Exception $e) {
             return response()->json([
                 'error' => $e->getMessage(),
             ], 500);
         }
+    }
+
+
+    public function callback(Request $request)
+    {
+        $notification = $request->all();
+
+        // Anda bisa menggunakan validasi dari Midtrans jika perlu
+        // Midtrans::validSignature($notification)
+
+        // Contoh bagaimana menangani notifikasi status pembayaran
+        $transactionStatus = $notification['transaction_status'];
+        $orderId = $notification['order_id'];
+
+        // Cari pesanan berdasarkan order_id
+        $order = Cart::where('id', $orderId)->first();
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        // Perbarui status berdasarkan status transaksi dari Midtrans
+        if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
+            $order->status = 'Paid';
+        } elseif ($transactionStatus == 'pending') {
+            $order->status = 'Unpaid';
+        } elseif ($transactionStatus == 'deny' || $transactionStatus == 'expire' || $transactionStatus == 'cancel') {
+            $order->status = 'Unpaid';
+        }
+
+        $order->save();
+
+        return response()->json(['message' => 'Payment notification handled']);
     }
 }

@@ -1,41 +1,53 @@
 <template>
-  <div class="container text-center">
-    <h1>Anda berada di Waiting Room</h1>
-    <p>Silakan tunggu, Anda akan diarahkan ke halaman penjualan tiket segera setelah ada slot yang tersedia.</p>
-    <p>Posisi Anda dalam antrean: <span id="queuePosition">{{ queuePosition }}</span></p>
+  <div class="waiting-room text-center">
+    <h1>Waiting Room</h1>
+    <p v-if="accessGranted">Slot tersedia! Anda akan segera diarahkan...</p>
+    <p v-else>
+      Anda berada di antrian. Posisi Anda: {{ queuePosition }}. Tunggu hingga pengguna selesai.
+    </p>
   </div>
 </template>
 
 <script>
+import axios from 'axios';
+
 export default {
   data() {
     return {
-      queuePosition: 0,
+      accessGranted: false,
+      queuePosition: null,
     };
   },
-  mounted() {
-    this.checkWaitingRoomStatus();
-  },
   methods: {
-    checkWaitingRoomStatus() {
-      setInterval(() => {
-        fetch('/api/waiting-room-status')
-          .then(response => response.json())
-          .then(data => {
-            if (data.entered) {
-              window.location.href = '/tiket/1'; // Redirect to ticket sale page
-            } else {
-              this.queuePosition = data.position;
-            }
-          });
-      }, 5000); // Cek status antrean setiap 5 detik
-    },
+    checkStatus() {
+      axios.get('/waiting-room-status') // Pastikan URL benar
+        .then(response => {
+          this.accessGranted = response.data.accessGranted;
+          this.queuePosition = response.data.queuePosition;
+
+          if (this.accessGranted) {
+            // Arahkan ke halaman pembelian tiket jika slot tersedia
+            this.$router.push({ name: 'FoodDetail', params: { id: this.$route.params.id } });
+          }
+        })
+        .catch(error => {
+          console.error('Terjadi kesalahan saat memeriksa status:', error);
+        });
+    }
   },
+  mounted() {
+    // Cek status setiap 5 detik
+    this.checkStatus();
+    this.interval = setInterval(this.checkStatus, 5000);
+  },
+  beforeUnmount() {
+    clearInterval(this.interval);
+  }
 };
 </script>
 
 <style scoped>
-.container {
+.waiting-room {
   margin-top: 50px;
 }
 </style>
