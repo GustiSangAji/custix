@@ -222,7 +222,7 @@ export default {
           this.$router.push({
             name: "afterpayment",
             params: { orderId: this.orderId },
-            query: { transaction_status: 'unpaid' }, // Status unpaid
+            query: { transaction_status: 'Unpaid' }, // Status pending
           });
         },
         onClose: () => {

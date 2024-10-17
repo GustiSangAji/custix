@@ -1,13 +1,13 @@
 <template>
   <LayoutLanding>
-    <div class="container-fluid py-4">
+    <div class="container mt-8">
       <div class="row">
 
         <!-- Sidebar -->
         <Sidebar />
 
         <!-- Main Content -->
-         <TiketSaya />
+        <router-view /> <!-- Tempat untuk merender komponen anak -->
         
       </div>
     </div>
@@ -17,18 +17,12 @@
 <script>
 import LayoutLanding from "@/layouts/LayoutLanding.vue";
 import Sidebar from "@/components/sidebar/Sidebar.vue";
-import TiketSaya from "@/components/tiket/TiketSaya.vue";
 
 export default {
   name: "Setting",
   components: {
     LayoutLanding,
     Sidebar,
-    TiketSaya,
   },
 };
 </script>
-
-<style scoped>
-/* Tidak perlu styling tambahan */
-</style>

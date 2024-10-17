@@ -11,6 +11,7 @@ use Midtrans\Config;
 use Illuminate\Support\Facades\Log;
 use Midtrans\Notification;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class CartController extends Controller
 {
@@ -30,7 +31,6 @@ class CartController extends Controller
             'product.id' => 'required|exists:tikets,id', // Validasi ID tiket
             'product.nama_tiket' => 'required|string', // Validasi nama tiket
             'product.total_harga' => 'required|numeric|min:0', // Validasi total harga
-            'user_id' => 'required|exists:users,id', // Validasi ID pengguna
         ]);
 
         // Ambil data tiket dari database
@@ -45,16 +45,22 @@ class CartController extends Controller
         $ticket->quantity -= $request->jumlah_pemesanan;
         $ticket->save();
 
+        // Menghasilkan order_id yang unik
+        do {
+            $orderId = $ticket->kode_tiket . now()->format('YmdHis') . auth()->id(); // Tambahkan ID pengguna
+        } while (Cart::where('order_id', $orderId)->exists());
+
         // Buat entri baru di keranjang
         $cart = Cart::create([
-            'user_id' => $request->user_id, // Ambil dari request
+            'order_id' => $orderId,
+            'user_id' => auth()->id(), // Ambil dari user yang sedang login
             'ticket_id' => $request->product['id'],
             'jumlah_pemesanan' => $request->jumlah_pemesanan,
-            'total_harga' => $request->product['total_harga'], // Ambil dari payload
+            'total_harga' => $request->product['total_harga'],
+            'status' => 'Unpaid' // Set default status
         ]);
 
         return response()->json(['message' => 'Tiket berhasil ditambahkan ke keranjang', 'cart' => $cart], 201);
-
     }
 
     public function show($id)
@@ -83,7 +89,7 @@ class CartController extends Controller
         // Data transaksi
         $transactionDetails = [
             'transaction_details' => [
-                'order_id' => $cart->id,
+                'order_id' => $cart->order_id,
                 'gross_amount' => (int) $cart->total_harga,
             ],
             'customer_details' => [
@@ -105,7 +111,7 @@ class CartController extends Controller
             $snapToken = \Midtrans\Snap::getSnapToken($transactionDetails);
 
             return response()->json([
-                'id' => $cart->id,
+                'id' => $cart->order_id,
                 'snap_token' => $snapToken,
             ]);
 
@@ -121,15 +127,12 @@ class CartController extends Controller
     {
         $notification = $request->all();
 
-        // Anda bisa menggunakan validasi dari Midtrans jika perlu
-        // Midtrans::validSignature($notification)
-
         // Contoh bagaimana menangani notifikasi status pembayaran
         $transactionStatus = $notification['transaction_status'];
         $orderId = $notification['order_id'];
 
         // Cari pesanan berdasarkan order_id
-        $order = Cart::where('id', $orderId)->first();
+        $order = Cart::where('order_id', $orderId)->first();
 
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
@@ -148,4 +151,31 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Payment notification handled']);
     }
+
+    public function getUserOrders()
+    {
+        // Ambil semua pesanan untuk pengguna yang sedang login
+        $orders = Cart::where('user_id', auth()->id())->with('ticket')->get();
+
+        return response()->json($orders);
+    }
+
+    public function getOrderById($id)
+{
+    // Cari pesanan berdasarkan ID
+    $order = Cart::where('id', $id)
+        ->where('user_id', auth()->id())  // Pastikan pesanan milik user yang sedang login
+        ->with('ticket')  // Sertakan data tiket yang terkait
+        ->first();
+
+    // Jika pesanan tidak ditemukan, kembalikan pesan error
+    if (!$order) {
+        return response()->json(['message' => 'Order not found'], 404);
+    }
+
+    // Kembalikan detail pesanan
+    return response()->json($order);
+}
+
+
 }

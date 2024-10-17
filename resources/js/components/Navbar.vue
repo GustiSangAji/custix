@@ -42,7 +42,7 @@
         <ul class="navbar-nav ms-auto align-items-center">
           <!-- Jika user sudah login -->
           <li v-if="isAuthenticated" class="d-flex align-items-center">
-            <router-link to="/tiketsaya" class="nav-link fw-bold me-3">Tiket Saya</router-link>
+            <router-link to="/order" class="nav-link fw-bold me-3">Tiket Saya</router-link>
             <UserDropdown />
           </li>
           <!-- Jika user belum login -->

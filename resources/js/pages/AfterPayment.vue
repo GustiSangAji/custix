@@ -11,9 +11,8 @@
         <div v-if="paymentStatus === 'capture'" class="alert alert-success">
           Pembayaran berhasil! E-tiket telah dikirim ke email Anda.
         </div>
-        <div v-if="paymentStatus === 'pending'" class="alert alert-warning">
-          Pembayaran sedang diproses. Silakan cek status di email Anda atau di
-          halaman profil.
+        <div v-if="paymentStatus === 'pending'" class="alert alert-danger">
+          Pembayaran gagal. Silakan coba lagi atau hubungi layanan pelanggan.
         </div>
         <div v-if="paymentStatus === 'unpaid'" class="alert alert-danger">
           Pembayaran gagal. Silakan coba lagi atau hubungi layanan pelanggan.
@@ -24,7 +23,8 @@
           <div class="card-body">
             <h5 class="card-title">Detail Pesanan</h5>
             <p class="card-text">
-              Tiket: {{ ticketDetail.kode_tiket }}<br />
+              Order ID: {{orderDetail.order_id}}<br />
+              Nama Tiket: {{ ticketDetail.name }}<br />
               Jumlah: {{ orderDetail.jumlah_pemesanan }}<br />
               Nama Pemesan: {{ user.nama }}<br />
               Nomor Ponsel: {{ user.phone }}<br />

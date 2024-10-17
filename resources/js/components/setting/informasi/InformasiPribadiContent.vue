@@ -178,7 +178,7 @@ export default defineComponent({
 </script>
 
 <template>
-  <div class="col-md-9 col-lg-10">
+  <div class="col-md-8 col-lg-9">
     <!--begin::Basic info-->
     <div class="card mb-5 mb-xl-10">
         <!--begin::Card header-->

@@ -109,3 +109,8 @@ Route::get('/order', [CartController::class, 'index']);
 Route::get('/order/{id}', [CartController::class, 'show']);
 Route::post('/payment/{id}', [CartController::class, 'checkout']);
 Route::post('/afterpayment', [CartController::class, 'callback']);
+
+
+Route::get('/user/orders', [CartController::class, 'getUserOrders']);
+Route::get('/user/orders/{id}', [CartController::class, 'getOrderById']);
+

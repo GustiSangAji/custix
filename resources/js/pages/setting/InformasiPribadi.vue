@@ -1,6 +1,6 @@
 <template>
   <LayoutLanding>
-    <div class="container-fluid py-4">
+    <div class="container mt-8">
       <div class="row">
         <Sidebar />
 
