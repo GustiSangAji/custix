@@ -66,7 +66,7 @@ const routes: Array<RouteRecordRaw> = [
             {
                 path: "orders/:id",
                 name: 'OrderDetail',
-                component: () => import("@/pages/DetailOrder.vue"),
+                component: () => import("@/components/order/DetailOrder.vue"),
                 props: true,  
             },
         ]

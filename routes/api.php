@@ -113,4 +113,6 @@ Route::post('/afterpayment', [CartController::class, 'callback']);
 
 Route::get('/user/orders', [CartController::class, 'getUserOrders']);
 Route::get('/user/orders/{id}', [CartController::class, 'getOrderById']);
+Route::post('/save-qr-code', [CartController::class, 'saveQrCode']);
+
 

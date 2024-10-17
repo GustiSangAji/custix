@@ -6,7 +6,7 @@
           <div class="card-header">
             <img
               class="go-pay-icon"
-               v-if="order?.ticket?.image"
+              v-if="order?.ticket?.image"
               :src="`/storage/${order.ticket.image}`"
               alt="event-image"
             />
@@ -27,17 +27,14 @@
               <p class="mb-1 text-muted">Kode Pesanan</p>
               <p class="fw-bold fs-6">{{ order?.order_id }}</p> <!-- Menampilkan kode pesanan dari order -->
               <p class="mb-1 text-muted">Total Pembayaran</p>
-              <p class="fw-bold fs-6">{{ order?.total_harga }}</p> <!-- Menampilkan total pembayaran dari order -->
+              <p class="fw-bold fs-6">{{ formatPrice(order?.total_harga) }}</p> <!-- Menampilkan total pembayaran dari order -->
             </div>
           </div>
-          <div class="card-footer text-center" style="margin-top: -30px;"> 
+          <div class="card-footer text-center" style="margin-top: -30px;">
             <div class="card card-body d-flex flex-column align-items-center">
-              <img
-                src="/media/icons/qrcode.png"
-                alt="QR Code"
-                class="qr-code rounded mb-6"
-              />
+              <!-- Menampilkan QR Code menggunakan qrcode-vue -->
               <h4 class="fw-bold fs-6 mb-3">Scan kode QR di bawah ini</h4>
+              <qrcode-vue :value="order?.order_id" :size="200" /> <!-- Menggunakan order ID sebagai nilai QR Code -->
             </div>
           </div>
         </div>
@@ -48,10 +45,14 @@
 
 <script>
 import axios from "axios";
+import QrcodeVue from 'qrcode.vue'; // Import qrcode-vue
 
 export default {
   name: "OrderDetail",
   props: ["id"],
+  components: {
+    QrcodeVue, // Tambahkan komponen QrcodeVue
+  },
   data() {
     return {
       order: null,
@@ -71,6 +72,13 @@ export default {
         .catch((error) => {
           console.error("Error fetching order detail:", error);
         });
+    },
+    // Fungsi formatPrice untuk format harga
+    formatPrice(price) {
+      return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+      }).format(price);
     },
   },
 };

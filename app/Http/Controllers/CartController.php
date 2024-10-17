@@ -162,20 +162,40 @@ class CartController extends Controller
 
     public function getOrderById($id)
 {
-    // Cari pesanan berdasarkan ID
     $order = Cart::where('id', $id)
-        ->where('user_id', auth()->id())  // Pastikan pesanan milik user yang sedang login
-        ->with('ticket')  // Sertakan data tiket yang terkait
+        ->where('user_id', auth()->id())
+        ->with('ticket')
         ->first();
 
-    // Jika pesanan tidak ditemukan, kembalikan pesan error
     if (!$order) {
         return response()->json(['message' => 'Order not found'], 404);
     }
 
-    // Kembalikan detail pesanan
-    return response()->json($order);
+    return response()->json($order); // Ambil data order beserta qr_code
 }
+
+public function saveQrCode(Request $request)
+{
+    // Validasi input
+    $request->validate([
+        'order_id' => 'required|exists:carts,order_id',
+        'qr_code' => 'required',
+    ]);
+
+    // Cari cart berdasarkan order_id
+    $cart = Cart::where('order_id', $request->order_id)->first();
+
+    if ($cart) {
+        $cart->qr_code = $request->qr_code; // Simpan QR code ke kolom qr_code
+        $cart->save();
+
+        return response()->json(['message' => 'QR code berhasil disimpan'], 200);
+    }
+
+    return response()->json(['message' => 'Order tidak ditemukan'], 404);
+}
+
+
 
 
 }
