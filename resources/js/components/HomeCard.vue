@@ -56,45 +56,38 @@ export default {
     return { router };
   },
   computed: {
-    // Menyusun URL gambar jika tersedia, atau fallback ke gambar default
     imageUrl() {
       if (this.ticket.image && typeof this.ticket.image === "string") {
-        return `/storage/${this.ticket.image}`; // Pastikan path sesuai
+        return `/storage/${this.ticket.image}`;
       }
       return "/images/default-ticket.jpg"; // Gambar default jika tidak ada gambar
     },
   },
   methods: {
-    // Mengatur fallback jika gambar tidak ditemukan
     onImageError(event) {
       event.target.src = "/images/default-ticket.jpg";
     },
-
-    // Format tanggal dengan locale Indonesia
     formatDate(date) {
       const options = { year: "numeric", month: "long", day: "numeric" };
       return new Date(date).toLocaleDateString("id-ID", options);
     },
 
-    // Cek akses dan redirect berdasarkan hasil API waiting room
     async checkAccessAndRedirect() {
       try {
-        const response = await axios.get("/waiting-room-status"); // Panggil API status waiting room
+        const response = await axios.get("/waiting-room-status");
         const { accessGranted } = response.data;
 
         if (accessGranted) {
-          // Jika akses diizinkan, arahkan ke halaman Food Detail
-          this.router.push(`/tiket/${this.ticket.id}`);
+          this.router.push(`/tiket/${this.ticket.id}`); // Arahkan ke halaman tiket jika ada akses
         } else {
-          // Jika tidak, arahkan ke halaman Waiting Room
-          this.router.push("/waiting-room");
+          alert('Kamu sedang berada dalam waiting room. Harap menunggu sampai giliranmu tiba.');
+          this.router.push("/waiting-room"); // Redirect ke waiting room jika akses penuh
         }
       } catch (error) {
         console.error("Error checking access:", error);
-        // Anda bisa menambahkan notifikasi atau handler error di sini
+        alert("Terjadi kesalahan saat mengecek akses. Silakan coba lagi nanti.");
       }
-    },
-  },
+    }
+  }
 };
 </script>
-  

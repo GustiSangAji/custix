@@ -20,14 +20,14 @@ export default {
   },
   methods: {
     checkStatus() {
-      axios.get('/waiting-room-status') // Pastikan URL benar
+      axios.get('/waiting-room-status') // Pastikan URL API benar
         .then(response => {
           this.accessGranted = response.data.accessGranted;
           this.queuePosition = response.data.queuePosition;
 
           if (this.accessGranted) {
             // Arahkan ke halaman pembelian tiket jika slot tersedia
-            this.$router.push({ name: 'FoodDetail', params: { id: this.$route.params.id } });
+            this.$router.push(`/tiket/${this.$route.params.id}`);
           }
         })
         .catch(error => {

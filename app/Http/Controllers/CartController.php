@@ -148,4 +148,40 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Payment notification handled']);
     }
+    
+    public function afterpayment(Request $request)
+{
+    $userId = Auth::id();
+
+    // Logika setelah pembayaran sukses
+    DB::table('ticket_access')
+        ->where('user_id', $userId)
+        ->update(['active' => false]);
+
+    // Lepaskan pengguna dari sistem akses tiket
+    DB::table('ticket_access')
+        ->where('user_id', $userId)
+        ->delete();
+
+    // Kosongkan pengguna dari antrian dan beri akses ke pengguna berikutnya
+    $nextInQueue = DB::table('ticket_queue')
+        ->orderBy('position', 'asc')
+        ->first();
+
+    if ($nextInQueue) {
+        DB::table('ticket_access')->insert([
+            'user_id' => $nextInQueue->user_id,
+            'active' => true,
+            'created_at' => now(),
+        ]);
+
+        // Hapus pengguna dari antrian
+        DB::table('ticket_queue')
+            ->where('user_id', $nextInQueue->user_id)
+            ->delete();
+    }
+
+    return response()->json(['message' => 'Payment successful and access released.']);
+}
+
 }

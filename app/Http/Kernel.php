@@ -56,6 +56,7 @@ class Kernel extends HttpKernel
     protected $middlewareAliases = [
         // Middleware lainnya
         'auth' => \App\Http\Middleware\Authenticate::class,
+        'CheckSingleAccess' => \App\Http\Middleware\CheckSingleAccess::class,
         'admin' => \App\Http\Middleware\CheckAdmin::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
@@ -75,7 +76,6 @@ class Kernel extends HttpKernel
         // Tambahkan middleware baru untuk limit akses tiket
 
             // ...
-            'CheckSingleAccess' => \App\Http\Middleware\CheckSingleAccess::class,
         
         
     ];

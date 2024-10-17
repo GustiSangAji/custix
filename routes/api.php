@@ -105,14 +105,18 @@ Route::prefix('laporan')->group(function () {
 });
 
 // Order Routes
-Route::middleware('CheckSingleAccess')->group(function () {
     Route::post('/order', [CartController::class, 'store']);
     Route::get('/order', [CartController::class, 'index']);
     Route::get('/order/{id}', [CartController::class, 'show']);
     Route::post('/payment/{id}', [CartController::class, 'checkout']);
     Route::post('/afterpayment', [CartController::class, 'callback']);
-    Route::get('/waiting-room-status', [TicketWaitingRoomController::class, 'status']);
-    Route::post('/grant-access', [TicketWaitingRoomController::class, 'grantAccess']);
-});
+    Route::post('/afterpay', [CartController::class, 'afterpayment']);
+    
 
 // Waiting Room Status
+Route::middleware('auth')->group(function () {
+    Route::get('/waiting-room-status', [TicketWaitingRoomController::class, 'status']);
+    Route::post('/clear-access', [TicketWaitingRoomController::class, 'clearQueue']);
+    Route::post('/grant-access', [TicketWaitingRoomController::class, 'grantAccess']);
+    Route::post('/terminate-access', [TicketWaitingRoomController::class, 'terminateAccess']);
+});
