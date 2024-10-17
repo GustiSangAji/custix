@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 use App\Models\Cart; // Model keranjang (buat model jika belum ada)
 use App\Models\Tiket; // Model tiket
 use Midtrans\Config;
-use Illuminate\Support\Facades\Log;
 use Midtrans\Notification;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class CartController extends Controller
@@ -152,20 +153,22 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Payment notification handled']);
     }
-    
+
     public function afterpayment(Request $request)
     {
         $userId = Auth::id();
-    
-        // Logika untuk menghapus pengguna dari ticket_access
+
+        // Logika pembayaran berhasil, ubah status tiket atau lainnya...
+
+        // Hapus akses pengguna dari ticket_access setelah pembayaran selesai
         DB::table('ticket_access')->where('user_id', $userId)->delete();
-    
+
         // Hapus pengguna dari antrian jika ada
         DB::table('ticket_queue')->where('user_id', $userId)->delete();
-    
+
         // Berikan akses kepada pengguna berikutnya dalam antrian
-        $nextInQueue = DB::table('ticket_queue')->orderBy('position', 'asc')->first();
-    
+        $nextInQueue = DB::table('ticket_queue')->orderBy('created_at', 'asc')->first();
+
         if ($nextInQueue) {
             // Tambahkan pengguna berikutnya ke dalam ticket_access
             DB::table('ticket_access')->insert([
@@ -173,13 +176,21 @@ class CartController extends Controller
                 'active' => true,
                 'created_at' => now(),
             ]);
-    
+
             // Hapus pengguna dari antrian
             DB::table('ticket_queue')->where('user_id', $nextInQueue->user_id)->delete();
         }
-    
-        return response()->json(['message' => 'Payment successful and access released.']);
-    }
-    
 
+        return response()->json(['message' => 'Payment successful and access released.']);
+    }
+
+    public function removeAccess(Request $request)
+    {
+        $userId = $request->input('user_id');
+
+        // Hapus pengguna dari ticket_access
+        DB::table('ticket_access')->where('user_id', $userId)->delete();
+
+        return response()->json(['message' => 'Akses pengguna berhasil dihapus']);
+    }
 }

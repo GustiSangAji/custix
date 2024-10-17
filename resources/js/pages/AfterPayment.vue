@@ -11,9 +11,8 @@
         <div v-if="paymentStatus === 'capture'" class="alert alert-success">
           Pembayaran berhasil! E-tiket telah dikirim ke email Anda.
         </div>
-        <div v-if="paymentStatus === 'pending'" class="alert alert-warning">
-          Pembayaran sedang diproses. Silakan cek status di email Anda atau di
-          halaman profil.
+        <div v-if="paymentStatus === 'pending'" class="alert alert-danger">
+          Pembayaran gagal. Silakan coba lagi atau hubungi layanan pelanggan.
         </div>
         <div v-if="paymentStatus === 'Unpaid'" class="alert alert-danger">
           Pembayaran gagal. Silakan coba lagi atau hubungi layanan pelanggan.
@@ -24,7 +23,7 @@
           <div class="card-body">
             <h5 class="card-title">Detail Pesanan</h5>
             <p class="card-text">
-              Order ID: {{orderDetail.order_id}}<br />
+              Order ID: {{ orderDetail.order_id }}<br />
               Nama Tiket: {{ ticketDetail.name }}<br />
               Jumlah: {{ orderDetail.jumlah_pemesanan }}<br />
               Nama Pemesan: {{ user.nama }}<br />
@@ -38,7 +37,9 @@
               <p class="fw-bold">{{ formatPrice(orderDetail.total_harga) }}</p>
             </div>
 
-            <router-link to="/" class="btn btn-primary mt-3">Kembali ke Beranda</router-link>
+            <button @click="handleBackToHome" class="btn btn-primary mt-3">
+              Kembali ke Beranda
+            </button>
           </div>
         </div>
       </div>
@@ -81,14 +82,29 @@ export default {
     this.getOrderDetails(); // Ambil detail pesanan dan tiket
   },
   methods: {
+    handleBackToHome() {
+      this.removeUserAccess(); // Panggil metode untuk menghapus akses
+      this.$router.push("/"); // Redirect ke beranda
+    },
+    removeUserAccess() {
+      axios
+        .post(`http://localhost:8000/api/remove-access`, {
+          user_id: this.user.id,
+        })
+        .then((response) => {
+          console.log("Akses pengguna berhasil dihapus:", response.data);
+        })
+        .catch((error) => {
+          console.error("Gagal menghapus akses pengguna:", error);
+        });
+    },
     // Mendapatkan status pembayaran dari query parameter
     getPaymentStatus() {
-  const queryParams = new URLSearchParams(window.location.search);
-  this.paymentStatus = queryParams.get("transaction_status") || 'Unpaid'; // Default ke 'Unpaid'
+      const queryParams = new URLSearchParams(window.location.search);
+      this.paymentStatus = queryParams.get("transaction_status") || "Unpaid"; // Default ke 'Unpaid'
 
-  console.log("Payment status dari URL:", this.paymentStatus);
-},
-
+      console.log("Payment status dari URL:", this.paymentStatus);
+    },
 
     formatPrice(value) {
       return value.toLocaleString("id-ID", {
@@ -109,13 +125,18 @@ export default {
           this.orderDetail = response.data;
 
           // Ambil detail tiket berdasarkan ticket_id dari orderDetail
-          return axios.get(`http://localhost:8000/api/tickets/${response.data.ticket_id}`);
+          return axios.get(
+            `http://localhost:8000/api/tickets/${response.data.ticket_id}`
+          );
         })
         .then((ticketResponse) => {
           this.ticketDetail = ticketResponse.data;
         })
         .catch((error) => {
-          console.error("Terjadi kesalahan saat mengambil detail pesanan:", error);
+          console.error(
+            "Terjadi kesalahan saat mengambil detail pesanan:",
+            error
+          );
         });
     },
   },

@@ -80,14 +80,21 @@ export default {
         if (accessGranted) {
           this.router.push(`/tiket/${this.ticket.id}`); // Arahkan ke halaman tiket jika ada akses
         } else {
-          alert('Kamu sedang berada dalam waiting room. Harap menunggu sampai giliranmu tiba.');
-          this.router.push("/waiting-room"); // Redirect ke waiting room jika akses penuh
+          alert(
+            "Kamu sedang berada dalam waiting room. Harap menunggu sampai giliranmu tiba."
+          );
+          this.router.push({
+            path: "/waiting-room",
+            query: { id: this.ticket.id },
+          }); // Kirim ID tiket melalui query parameter
         }
       } catch (error) {
         console.error("Error checking access:", error);
-        alert("Terjadi kesalahan saat mengecek akses. Silakan coba lagi nanti.");
+        alert(
+          "Terjadi kesalahan saat mengecek akses. Silakan coba lagi nanti."
+        );
       }
-    }
-  }
+    },
+  },
 };
 </script>

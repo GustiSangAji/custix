@@ -11,7 +11,7 @@ class CheckSingleAccess
 {
     protected $key = 'ticket_access';  // Kunci untuk akses tiket
     protected $queueKey = 'ticket_queue'; // Kunci untuk antrian tiket
-    protected $limit = 1; // Limit jumlah pengguna yang bisa mengakses (ubah dari 1 ke 2)
+    protected $limit = 2; // Limit jumlah pengguna yang bisa mengakses (ubah dari 1 ke 2)
 
     /**
      * Handle an incoming request.
