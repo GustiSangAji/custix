@@ -2,72 +2,87 @@
 import { ref, watch, h } from "vue";
 import { createColumnHelper } from "@tanstack/vue-table";
 import { useDelete } from "@/libs/hooks";
-import type { Laporan } from "@/types"; // Pastikan Anda memiliki tipe Laporan
+import type { Cart } from "@/types"; 
 import { formatRupiah } from "@/libs/rupiah";
+import axios from 'axios';
 
-const columnHelper = createColumnHelper<Laporan>();
+const columnHelper = createColumnHelper<Cart>();
 const paginateRef = ref<any>(null);
-const selected = ref<string>("");  // Untuk menyimpan UUID laporan yang dipilih
-const openForm = ref(false);  // Kontrol visibilitas form
+const selected = ref<string>("");
+const openForm = ref(false);
 
-const { delete: deleteReport } = useDelete({
-    onSuccess: () => paginateRef.value.refetch(), // Refetch data setelah berhasil dihapus
+const { delete: deleteCart } = useDelete({
+    onSuccess: () => paginateRef.value.refetch(),
 });
 
-// Kolom-kolom untuk tabel laporan
 const columns = [
-    columnHelper.accessor("email", {
-        header: "Email",
+    columnHelper.accessor("id", {
+        header: "Kode Transaksi",
     }),
-    columnHelper.accessor("nama_tiket", {
+    columnHelper.accessor("ticket.name", {
         header: "Nama Tiket",
     }),
-    columnHelper.accessor("jumlah", {
-        header: "Jumlah",
+    columnHelper.accessor("jumlah_pemesanan", {
+        header: "Jumlah Pemesanan",
     }),
-    columnHelper.accessor("harga", {
-        header: "Harga",
+    columnHelper.accessor("total_harga", {
+        header: "Total Harga",
         cell: (cell) => formatRupiah(cell.getValue()),
     }),
-    columnHelper.accessor("tanggal_pembelian", {
+    columnHelper.accessor("created_at", {
         header: "Tanggal Pembelian",
         cell: (cell) => {
             const dateValue = cell.getValue();
-            return dateValue ? new Date(dateValue).toLocaleDateString() : "-"; // Format tanggal
+            return dateValue ? new Date(dateValue).toLocaleDateString() : "-";
         },
     }),
     columnHelper.accessor("status", {
         header: "Status",
-        cell: (cell) => h("span", { class: cell.getValue() === "paid" ? "text-success" : "text-danger" }, cell.getValue() === "paid" ? "Sudah Dibayar" : "Belum Dibayar"),
+        cell: (cell) =>
+            h(
+                "span", 
+                { class: cell.getValue() === "Paid" ? "text-success" : "text-danger" },
+                cell.getValue() === "Paid" ? "Sudah Dibayar" : "Belum Dibayar"
+            ),
     }),
-    columnHelper.accessor("uuid", {
+    columnHelper.accessor("id", {
         header: "Aksi",
         cell: (cell) =>
             h("div", { class: "d-flex gap-2" }, [
                 h("button", {
                     class: "btn btn-sm btn-icon btn-info",
                     onClick: () => {
-                        selected.value = cell.getValue();  // Set UUID laporan yang dipilih
-                        openForm.value = true;  // Buka form
+                        selected.value = cell.getValue();
+                        openForm.value = true;
                     },
-                }, h("i", { class: "la la-eye fs-2" })), // Tombol detail
-                h("button", {
-                    class: "btn btn-sm btn-icon btn-danger",
-                    onClick: () => deleteReport(`/laporan/${cell.getValue()}`),
-                }, h("i", { class: "la la-trash fs-2" }))
+                }, h("i", { class: "la la-eye fs-2" })),
             ]),
     }),
 ];
 
-// Fungsi untuk refresh data di tabel
 const refresh = () => paginateRef.value.refetch();
 
-// Watch perubahan openForm dan reset selected ketika form ditutup
+const downloadExcel = async () => {
+    try {
+        const response = await axios.get('laporan/export/excel', { responseType: 'blob' });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'Laporan.xlsx');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error("Gagal mengunduh laporan:", error);
+        alert('Gagal mengunduh laporan, silakan coba lagi.');
+    }
+};
+
 watch(openForm, (newVal) => {
     if (!newVal) {
-        selected.value = "";  // Reset UUID saat form ditutup
+        selected.value = "";
     }
-    window.scrollTo(0, 0);  // Scroll ke atas ketika form dibuka
+    window.scrollTo(0, 0);
 });
 </script>
 
@@ -81,16 +96,16 @@ watch(openForm, (newVal) => {
 
     <div class="card">
         <div class="card-header align-items-center">
-            <h2 class="mb-0">Laporan Pembelian Tiket</h2>
-            <!-- Tombol tambah dihapus sesuai permintaan -->
+            <h2 class="mb-0">Daftar Cart</h2>
+            <button class="btn btn-primary" @click="downloadExcel">Download Laporan Excel</button>
         </div>
         <div class="card-body">
             <paginate
                 ref="paginateRef"
-                id="table-laporan"
-                url="/laporan"  
+                id="table-carts"
+                url="/laporan"
                 :columns="columns"
             ></paginate>
         </div>
     </div>
-</template> 
+</template>

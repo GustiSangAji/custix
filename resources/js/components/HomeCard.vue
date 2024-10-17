@@ -1,6 +1,6 @@
 <template>
   <div class="card shadow-sm rounded overflow-hidden">
-    <img :src="imageUrl" class="card-img-top" :alt="ticket.name" v-if="imageUrl" />
+    <img :src="imageUrl" class="card-img-top " :alt="ticket.name" v-if="imageUrl" />
     <div class="card-body p-4">
       <h5 class="card-title fw-bold text-uppercase mb-3">{{ ticket.name }}</h5>
       <p class="card-text fs-6 mb-3 text-muted">
