@@ -11,15 +11,21 @@
         <div class="bg-success fw-bold text-light px-3 py-2 rounded">
           Mulai Dari Rp. {{ ticket.price }}
         </div>
-        <router-link :to="'/tiket/' + ticket.id" class="btn btn-danger px-4 py-2 fw-bold">
+        <button
+          class="btn btn-danger px-4 py-2 fw-bold"
+          @click="beliTiket"
+        >
           Beli Tiket
-        </router-link>
+        </button>
+        
       </div>
     </div>
   </div>
 </template>
 
 <script>
+import Swal from 'sweetalert2';
+
 export default {
   name: "HomeCard",
   props: {
@@ -40,6 +46,28 @@ export default {
     formatDate(date) {
       const options = { year: "numeric", month: "long", day: "numeric" };
       return new Date(date).toLocaleDateString("id-ID", options);
+    },
+    beliTiket() {
+      const userId = localStorage.getItem("userId");
+      
+      if (!userId) {
+        Swal.fire({
+          title: "Anda harus login",
+          text: "Silakan login untuk memesan tiket.",
+          icon: "warning",
+          confirmButtonText: "Login",
+          cancelButtonText: "Batal",
+          showCancelButton: true,
+          reverseButtons: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.$router.push({ name: "sign-in" }); // Ganti dengan nama route yang sesuai
+          }
+        });
+      } else {
+        // Jika pengguna sudah login, arahkan ke halaman detail tiket
+        this.$router.push({ name: 'ticket-detail', params: { id: this.ticket.id } }); // Ganti dengan nama route yang sesuai
+      }
     },
   },
 };

@@ -229,23 +229,6 @@ export default {
     // Pastikan userId tersedia di localStorage
     const userId = localStorage.getItem("userId");
 
-    if (!userId) {
-      Swal.fire({
-        title: "Anda harus login",
-        text: "Silakan login untuk memesan tiket.",
-        icon: "warning",
-        confirmButtonText: "Login",
-        cancelButtonText: "Batal",
-        showCancelButton: true,
-        reverseButtons: true,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.$router.push({ name: "sign-in" });
-        }
-      });
-      return;
-    }
-
     // Pastikan data product sudah tersedia
     if (!this.product || !this.product.id) {
       console.error("Produk belum tersedia atau tidak ada ID produk.");

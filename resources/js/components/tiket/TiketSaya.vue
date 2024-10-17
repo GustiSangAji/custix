@@ -11,7 +11,7 @@
           <div class="card-body">
             <div v-if="orders.length > 0">
               <div class="d-flex flex-column align-items-start">
-                <div v-for="order in orders" :key="order.id" class="ticket rounded d-flex flex-column flex-md-row p-6 align-self-start w-100">
+                <div v-for="order in orders" :key="order.id" class="ticket mb-6 rounded d-flex flex-column flex-md-row p-6 align-self-start w-100">
                   <div class="ticket-info flex-grow-1">
                     <h5 class="event-name font-weight-bold mb-4 fs-4">{{ order.ticket.name }}</h5>
                     <h3 class="text-muted mb-2 fw-normal fs-6">{{ order.ticket.datetime }} | {{ order.jumlah_pemesanan }} Tiket</h3>
