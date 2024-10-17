@@ -153,7 +153,7 @@
               </p>
               <button
                 type="submit"
-                class="btn btn-primary w-100"
+                class="btn btn-primary block-btn w-100"
                 @click="pemesanan"
               >
                 Pesan
@@ -226,63 +226,65 @@ export default {
       }
     },
     pemesanan() {
-    // Pastikan userId tersedia di localStorage
-    const userId = localStorage.getItem("userId");
+      // Pastikan userId tersedia di localStorage
+      const userId = localStorage.getItem("userId");
 
-    if (!userId) {
-      Swal.fire({
-        title: "Anda harus login",
-        text: "Silakan login untuk memesan tiket.",
-        icon: "warning",
-        confirmButtonText: "Login",
-        cancelButtonText: "Batal",
-        showCancelButton: true,
-        reverseButtons: true,
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.$router.push({ name: "sign-in" });
-        }
-      });
-      return;
-    }
+      if (!userId) {
+        Swal.fire({
+          title: "Anda harus login",
+          text: "Silakan login untuk memesan tiket.",
+          icon: "warning",
+          confirmButtonText: "Login",
+          cancelButtonText: "Batal",
+          showCancelButton: true,
+          reverseButtons: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.$router.push({ name: "sign-in" });
+          }
+        });
+        return;
+      }
 
-    // Pastikan data product sudah tersedia
-    if (!this.product || !this.product.id) {
-      console.error("Produk belum tersedia atau tidak ada ID produk.");
-      return;
-    }
+      // Pastikan data product sudah tersedia
+      if (!this.product || !this.product.id) {
+        console.error("Produk belum tersedia atau tidak ada ID produk.");
+        return;
+      }
 
-    // Mempersiapkan payload
-    const payload = {
-      jumlah_pemesanan: this.pesan.jumlah_pemesanan,
-      product: {
-        id: this.product.id, // Memastikan product.id sudah ada
-        nama_tiket: this.product.name,
-        total_harga: this.pesan.jumlah_pemesanan * this.product.price,
-      },
-      user_id: userId,
-      tanggal: this.formatShortDate(this.product.datetime),
-      tiket: `#${this.product.name.replace(/\s+/g, "")}`,
-    };
-
-    // Mengirim permintaan pesanan
-    axios
-  .post("/order", payload)
-  .then((response) => {
-    console.log("Pemesanan Berhasil:", response.data); // Tambahkan ini
-      this.$router.push({
-        name: "paymentDetail",
-        params: {
-          orderId: response.data.cart.id,
+      // Mempersiapkan payload
+      const payload = {
+        jumlah_pemesanan: this.pesan.jumlah_pemesanan,
+        product: {
+          id: this.product.id, // Memastikan product.id sudah ada
+          nama_tiket: this.product.name,
+          total_harga: this.pesan.jumlah_pemesanan * this.product.price,
         },
-      });
-  })
-  .catch((error) => {
-    console.error("Terjadi kesalahan:", error);
-  });
-   },
+        user_id: userId,
+        tanggal: this.formatShortDate(this.product.datetime),
+        tiket: `#${this.product.name.replace(/\s+/g, "")}`,
+      };
+
+      // Mengirim permintaan pesanan
+      axios
+        .post("/order", payload)
+        .then((response) => {
+          console.log("Pemesanan Berhasil:", response.data);
+          this.$router.push({
+            name: "paymentDetail",
+            params: {
+              orderId: response.data.cart.id,
+            },
+          });
+        })
+        .catch((error) => {
+          console.error("Terjadi kesalahan:", error);
+        });
+    },
   },
+
   mounted() {
+    // Mengambil data produk berdasarkan ID di URL
     axios
       .get("http://localhost:8000/api/tickets/" + this.$route.params.id)
       .then((response) => this.setProduct(response.data))

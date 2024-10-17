@@ -37,8 +37,8 @@
               <p class="fw-bold">{{ formatPrice(orderDetail.total_harga) }}</p>
             </div>
 
-            <button @click="handleBackToHome" class="btn btn-primary mt-3">
-              Kembali ke Beranda
+            <button @click="handleBackToHome" class="btn btn-primary block-btn mt-3">
+              Selesai
             </button>
           </div>
         </div>

@@ -30,7 +30,7 @@
         <!-- Tombol Beli Tiket -->
         <button
           @click="checkAccessAndRedirect"
-          class="btn btn-danger px-4 py-2 fw-bold"
+          class="btn btn-danger block-btn px-4 py-2 fw-bold"
         >
           Beli Tiket
         </button>

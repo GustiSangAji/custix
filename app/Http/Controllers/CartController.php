@@ -42,14 +42,10 @@ class CartController extends Controller
             return response()->json(['message' => 'Tiket tidak tersedia'], 400);
         }
 
-        // Kurangi stok tiket
-        $ticket->quantity -= $request->jumlah_pemesanan;
-        $ticket->save();
-
         // Menghasilkan order_id yang unik
         do {
-            $orderId = Str::random(10);
-        } while (Cart::where('order_id', $orderId)->exists()); // Cek apakah order_id sudah ada
+            $orderId = $ticket->kode_tiket . now()->format('YmdHis') . auth()->id(); // Tambahkan ID pengguna
+        } while (Cart::where('order_id', $orderId)->exists());
 
         // Buat entri baru di keranjang
         $cart = Cart::create([
@@ -140,9 +136,20 @@ class CartController extends Controller
             return response()->json(['message' => 'Order not found'], 404);
         }
 
+        // Ambil tiket terkait pesanan
+        $ticket = Tiket::find($order->ticket_id);
+
         // Perbarui status berdasarkan status transaksi dari Midtrans
         if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
             $order->status = 'Paid';
+
+            // Kurangi stok tiket jika status adalah 'capture' atau 'settlement'
+            if ($ticket && $ticket->quantity >= $order->jumlah_pemesanan) {
+                $ticket->quantity -= $order->jumlah_pemesanan;
+                $ticket->save();
+            } else {
+                return response()->json(['message' => 'Not enough tickets available'], 400);
+            }
         } elseif ($transactionStatus == 'pending') {
             $order->status = 'Unpaid';
         } elseif ($transactionStatus == 'deny' || $transactionStatus == 'expire' || $transactionStatus == 'cancel') {
@@ -153,6 +160,7 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Payment notification handled']);
     }
+
 
     public function afterpayment(Request $request)
     {
