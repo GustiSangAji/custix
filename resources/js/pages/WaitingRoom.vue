@@ -33,6 +33,8 @@ export default {
         .catch(error => {
           console.error('Terjadi kesalahan saat memeriksa status:', error);
         });
+
+        
     }
   },
   mounted() {

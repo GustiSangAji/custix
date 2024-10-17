@@ -2,27 +2,30 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Order;
-use App\Models\Customer;
-use App\Models\Product;
 use Illuminate\Http\Request;
+use App\Models\Tiket; // Impor model Tiket
+use App\Models\User;  // Impor model User
+use App\Models\Cart; // Impor model Cart
+use Illuminate\Support\Facades\DB; // Impor DB facade jika diperlukan
 
 class DashboardController extends Controller
 {
     public function index()
     {
-        $pelanggan = Customer::count();
-        $pendapatan = Order::sum('total'); // Total pendapatan dari pesanan
-        $tiket = Product::where('category', 'Tiket')->count(); // Hitung produk kategori Tiket
-        $pesanan = Order::count(); // Total pesanan
-        $produkTerjual = Product::sum('quantity_sold'); // Total produk terjual
+        // Menghitung total pengguna
+        $totalPelanggan = User::count();
 
+        // Menghitung total pendapatan dari tabel 'carts' (asumsi status '2' adalah 'Paid')
+        $totalPendapatan = Cart::where('status', 'Paid')->sum('total_harga'); // Pastikan status yang digunakan sesuai
+
+        // Menghitung total quantity tiket yang tersedia
+        $totalTiket = Tiket::where('status', 'available')->sum('quantity'); // Menghitung total quantity tiket
+
+        // Mengembalikan data dalam format JSON
         return response()->json([
-            'pelanggan' => $pelanggan,
-            'pendapatan' => $pendapatan,
-            'tiket' => $tiket,
-            'pesanan' => $pesanan,
-            'produkTerjual' => $produkTerjual
+            'pelanggan' => $totalPelanggan,
+            'pendapatan' => $totalPendapatan,
+            'tiket' => $totalTiket, // Menggunakan total quantity
         ]);
     }
 }
