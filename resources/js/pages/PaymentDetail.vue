@@ -218,8 +218,12 @@ export default {
           });
         },
         onError: (result) => {
-          console.log("Payment Error:", result);
-          alert("Pembayaran gagal. Silakan coba lagi.");
+          console.log("Payment Pending:", result);
+          this.$router.push({
+            name: "afterpayment",
+            params: { orderId: this.orderId },
+            query: { transaction_status: 'Unpaid' }, // Status pending
+          });
         },
         onClose: () => {
           console.log("Payment popup closed");

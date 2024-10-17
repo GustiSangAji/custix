@@ -95,4 +95,16 @@ class TicketWaitingRoomController extends Controller
 
         return response()->json(['message' => 'Access terminated.']);
     }
+
+    public function removeUser($userId)
+{
+    // Menghapus pengguna dari tabel ticket_access
+    DB::table('ticket_access')->where('user_id', $userId)->delete();
+
+    // Juga hapus dari antrian jika ada
+    DB::table('ticket_queue')->where('user_id', $userId)->delete();
+
+    return response()->json(['message' => 'User removed from access and queue.']);
+}
+
 }
