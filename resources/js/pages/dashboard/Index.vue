@@ -63,193 +63,138 @@
       </div>
     </div>
 
-    <!-- Grafik Pesanan Terbaru -->
+    <!-- Grafik Pendapatan -->
     <div class="card mt-4 shadow-sm">
       <div class="card-header">
-        <h3 class="card-title">Pesanan Terbaru</h3>
-        <div class="card-toolbar">
-          <a class="btn btn-primary btn-sm">Penjualan</a>
-          <a class="btn btn-secondary btn-sm">Pengeluaran</a>
-        </div>
+        <h3 class="card-title">Pendapatan Bulanan</h3>
       </div>
       <div class="card-body">
-        <apexchart ref="chartRef" type="bar" :options="chart" :series="series"></apexchart>
+        <apexchart ref="chartRef" type="bar" :options="chart" :series="series" width="100%" height="250"></apexchart>
       </div>
     </div>
   </div>
 </template>
 
+<script lang="ts">
+import { defineComponent, ref, onBeforeMount, watch } from "vue";
+import { useThemeStore } from "@/stores/theme";
+import { getCSSVariableValue } from "@/assets/ts/_utils";
+import axios from "axios";
+import type { ApexOptions } from "apexcharts";
+import type VueApexCharts from "vue3-apexcharts";
 
+// Fungsi untuk mengubah nama bulan ke angka (1-12)
+const convertMonthToNumber = (month: string) => {
+  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+  return months.indexOf(month) + 1; // indexOf mengembalikan -1 jika tidak ditemukan, tambahkan 1 agar sesuai bulan
+};
 
-  <script lang="ts">
-  import { defineComponent, ref, onBeforeMount, computed, watch } from "vue";
-  import { useThemeStore } from "@/stores/theme";
-  import { getCSSVariableValue } from "@/assets/ts/_utils";
-  import axios from "axios";
-  import type { ApexOptions } from "apexcharts";
-  import type VueApexCharts from "vue3-apexcharts";
+export default defineComponent({
+  name: "DashboardWidgets",
+  setup() {
+    const pelanggan = ref(0);
+    const pendapatan = ref(0);
+    const tiket = ref(0);
 
-  export default defineComponent({
-    name: "DashboardWidgets",
-    props: {
-      widgetClasses: String,
-    },
-    setup() {
-      // Data dashboard yang akan diambil dari API
-      const pelanggan = ref(0);
-      const pendapatan = ref(0);
-      const tiket = ref(0);
-    
-      
-      // Ref untuk Chart dan pengaturan chart
-      const chartRef = ref<typeof VueApexCharts | null>(null);
-      const chart = ref<ApexOptions>({});
-      const store = useThemeStore();
-      
-      // Data untuk grafik (series)
-      const series = [
-        {
-          name: "Laba Bersih",
-          type: "bar",
-          stacked: true,
-          data: [40, 50, 65, 70, 50, 30],
-        },
-        {
-          name: "Pendapatan",
-          type: "bar",
-          stacked: true,
-          data: [20, 20, 25, 30, 30, 20],
-        },
-        {
-          name: "Expenses",
-          type: "area",
-          data: [50, 80, 60, 90, 50, 70],
-        },
-      ];
+    const chartRef = ref<typeof VueApexCharts | null>(null);
+    const chart = ref<ApexOptions>({});
 
-      // Mengambil data dari API Laravel
-      const fetchData = async () => {
-        try {
-          // Ambil data dari API
-          const response = await axios.get("/dashboard");
-          pelanggan.value = response.data.pelanggan;
-          pendapatan.value = response.data.pendapatan;
-          tiket.value = response.data.tiket;
-        } catch (error) {
-          console.error("Error fetching data:", error);
+    const series = ref([
+      {
+        name: "Pendapatan",
+        type: "bar",
+        stacked: true,
+        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Dummy data untuk 12 bulan
+      },
+    ]);
+
+    const fetchData = async () => {
+      try {
+        const response = await axios.get("/dashboard");
+        pelanggan.value = response.data.pelanggan;
+        pendapatan.value = response.data.pendapatan;
+        tiket.value = response.data.tiket;
+
+        if (response.data.pendapatan_bulanan && Array.isArray(response.data.pendapatan_bulanan)) {
+          const bulanData = Array(12).fill(0); // Inisialisasi array untuk 12 bulan
+          response.data.pendapatan_bulanan.forEach((item: any) => {
+            const bulanIndex = convertMonthToNumber(item.bulan); // Konversi bulan dari string ke angka
+            if (bulanIndex >= 1 && bulanIndex <= 12) {
+              bulanData[bulanIndex - 1] = item.total_pendapatan; // Update dengan pendapatan sebenarnya
+            }
+          });
+          series.value[0].data = bulanData;
         }
-      };
 
-      // Opsi untuk chart menggunakan ApexChart
-      const chartOptions = (): ApexOptions => {
-        const labelColor = getCSSVariableValue("--bs-gray-500");
-        const borderColor = getCSSVariableValue("--bs-gray-200");
-        const baseColor = getCSSVariableValue("--bs-primary");
-        const baseLightColor = getCSSVariableValue("--bs-light-primary");
-
-        return {
-          chart: {
-            fontFamily: "inherit",
-            type: "bar",
-            stacked: true,
-            height: 350,
-            toolbar: {
-              show: false,
-            },
-          },
-          plotOptions: {
-            bar: {
-              horizontal: false,
-              columnWidth: ["12%"],
-              borderRadius: 4,
-            },
-          },
-          legend: {
-            show: true,
-          },
-          dataLabels: {
-            enabled: false,
-          },
-          stroke: {
-            curve: "smooth",
-            show: true,
-            width: 2,
-            colors: [baseColor],
-          },
-          fill: {
-            type: "solid",
-          },
-          xaxis: {
-            categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun"],
-            axisBorder: {
-              show: false,
-            },
-            axisTicks: {
-              show: false,
-            },
-            labels: {
-              style: {
-                colors: labelColor,
-                fontSize: "12px",
-              },
-            },
-          },
-          yaxis: {
-            labels: {
-              style: {
-                colors: labelColor,
-                fontSize: "12px",
-              },
-            },
-          },
-          grid: {
-            borderColor: borderColor,
-            strokeDashArray: 4,
-            yaxis: {
-              lines: {
-                show: true,
-              },
-            },
-          },
-          colors: [baseColor, baseLightColor],
-          series,
-        };
-      };
-
-      // Memantau perubahan tema
-      const themeMode = computed(() => store.mode);
-      watch(themeMode, () => {
         if (chartRef.value) {
-          chartRef.value.updateOptions(chartOptions());
+          chartRef.value.updateOptions(chart.value);
         }
-      });
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+    };
 
-      // Ambil data dari API saat komponen di-mount
-      onBeforeMount(() => {
-        fetchData();
-        chart.value = chartOptions();
-      });
-
-      // Fungsi untuk format angka ke dalam Rupiah
-      const formatRupiah = (value: number) =>
-        new Intl.NumberFormat("id-ID", {
-          style: "currency",
-          currency: "IDR",
-        }).format(value);
+    const chartOptions = (): ApexOptions => {
+      const labelColor = getCSSVariableValue("--bs-gray-500");
+      const baseColor = getCSSVariableValue("--bs-primary");
 
       return {
-        pelanggan,
-        pendapatan,
-        tiket,
-        chart,
-        series,
-        chartRef,
-        formatRupiah,
+        chart: {
+          type: "bar",
+          height: 250, // Ukuran chart diperkecil
+          stacked: true,
+        },
+        plotOptions: {
+          bar: {
+            columnWidth: "55%",
+          },
+        },
+        xaxis: {
+          categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], // Kategori untuk 12 bulan
+        },
+        yaxis: {
+          title: {
+            text: "Pendapatan (Rp)",
+          },
+          labels: {
+            formatter: (val: number) => formatRupiah(val), // Format label sumbu Y
+          },
+        },
+        tooltip: {
+          y: {
+            formatter: (val: number) => formatRupiah(val), // Format tooltip
+          },
+        },
+        colors: [baseColor],
       };
-    },
-  });
-  </script>
+    };
 
+    watch(series, (newSeries) => {
+      if (chartRef.value) {
+        chartRef.value.updateSeries(newSeries);
+      }
+    });
+
+    onBeforeMount(() => {
+      fetchData();
+      chart.value = chartOptions();
+    });
+
+    const formatRupiah = (value: number) =>
+      new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(value);
+
+    return {
+      pelanggan,
+      pendapatan,
+      tiket,
+      chart,
+      series,
+      chartRef,
+      formatRupiah,
+    };
+  },
+});
+</script>
 
 <style scoped lang="scss">
 .widget-hover {
@@ -260,12 +205,11 @@
 }
 
 .large-widget {
-  min-height: 250px; /* Sesuaikan tinggi minimum */
-  width: 100%; /* Lebar penuh */
+  min-height: 250px;
+  width: 100%;
 }
 
 .card-xl-stretch {
-  height: 350px; /* Atur tinggi widget */
+  height: 250px; /* Tinggi widget lebih kecil */
 }
 </style>
-
