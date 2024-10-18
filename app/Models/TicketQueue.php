@@ -7,5 +7,6 @@ use Illuminate\Database\Eloquent\Model;
 class TicketQueue extends Model
 {
     use HasFactory;
+    protected $table = 'ticket_queue';
     protected $fillable = ['user_id'];
 }

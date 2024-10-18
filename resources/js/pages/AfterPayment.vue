@@ -122,9 +122,6 @@ export default {
     formatDate(date) {
       const options = { year: "numeric", month: "long", day: "numeric" };
       return new Date(date).toLocaleDateString("id-ID", options);
-      const queryParams = new URLSearchParams(window.location.search);
-      this.paymentStatus = queryParams.get("transaction_status") || 'unpaid'; // Default ke 'unpaid'
-      console.log("Payment status dari URL:", this.paymentStatus);
     },
 
     getPaymentStatus() {

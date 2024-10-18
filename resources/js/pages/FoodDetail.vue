@@ -227,10 +227,8 @@ export default {
       }
     },
     pemesanan() {
-    // Pastikan userId tersedia di localStorage
-    const userId = localStorage.getItem("userId");
+      const userId = localStorage.getItem("userId");
 
-      // Pastikan data product sudah tersedia
       if (!this.product || !this.product.id) {
         console.error("Produk belum tersedia atau tidak ada ID produk.");
         return;
@@ -263,31 +261,44 @@ export default {
         });
     },
     removeAccess() {
-      const userId = localStorage.getItem('userId');
+      const userId = localStorage.getItem("userId");
       if (userId) {
         axios
-          .post('/remove-access', { user_id: userId })
+          .post("/remove-access", { user_id: userId })
           .then((response) => {
-            console.log('Akses dihentikan:', response.data);
+            console.log("Akses dihentikan:", response.data);
           })
           .catch((error) => {
-            console.error('Terjadi kesalahan saat menghentikan akses:', error);
+            console.error("Terjadi kesalahan saat menghentikan akses:", error);
           });
       } else {
-        console.error('User ID tidak ditemukan di localStorage.');
+        console.error("User ID tidak ditemukan di localStorage.");
       }
     },
   },
-
   mounted() {
     axios
       .get("http://localhost:8000/api/tickets/" + this.$route.params.id)
       .then((response) => this.setProduct(response.data))
       .catch((error) => console.log(error));
-  },
 
+    // Listener untuk tombol back browser
+    window.addEventListener("popstate", this.removeAccess);
+  },
+  beforeRouteLeave(to, from, next) {
+    // Mengecek apakah pengguna sedang menuju halaman yang berbeda dari detail tiket
+    if (to.name !== "ticketDetail") {
+      // Jangan hapus akses jika berpindah ke halaman lain di dalam aplikasi
+      next();
+    } else {
+      // Hapus akses jika keluar dari halaman detail tiket atau aplikasi
+      this.removeAccess();
+      next();
+    }
+  },
   beforeDestroy() {
-    this.removeAccess();
+    // Menghapus listener ketika komponen dihancurkan
+    window.removeEventListener("popstate", this.removeAccess);
   },
 };
 </script>
