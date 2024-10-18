@@ -10,6 +10,7 @@ const columnHelper = createColumnHelper<Cart>();
 const paginateRef = ref<any>(null);
 const selected = ref<string>("");
 const openForm = ref(false);
+const isDownloading = ref(false); // State untuk mengatur status tombol download
 
 const { delete: deleteCart } = useDelete({
     onSuccess: () => paginateRef.value.refetch(),
@@ -63,6 +64,9 @@ const columns = [
 const refresh = () => paginateRef.value.refetch();
 
 const downloadExcel = async () => {
+    if (isDownloading.value) return; // Cegah aksi dobel jika sedang mengunduh
+    isDownloading.value = true; // Aktifkan status "sedang mengunduh"
+
     try {
         const response = await axios.get('laporan/export/excel', { responseType: 'blob' });
         const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -75,6 +79,8 @@ const downloadExcel = async () => {
     } catch (error) {
         console.error("Gagal mengunduh laporan:", error);
         alert('Gagal mengunduh laporan, silakan coba lagi.');
+    } finally {
+        isDownloading.value = false; // Reset status setelah unduhan selesai
     }
 };
 
@@ -97,7 +103,13 @@ watch(openForm, (newVal) => {
     <div class="card">
         <div class="card-header align-items-center">
             <h2 class="mb-0">Daftar Cart</h2>
-            <button class="btn btn-primary" @click="downloadExcel">Download Laporan Excel</button>
+            <button 
+                class="btn btn-primary block-btn" 
+                @click="downloadExcel" 
+                :disabled="isDownloading" 
+            >
+                {{ isDownloading ? 'Mengunduh...' : 'Download Laporan Excel' }}
+            </button>
         </div>
         <div class="card-body">
             <paginate
@@ -105,7 +117,7 @@ watch(openForm, (newVal) => {
                 id="table-carts"
                 url="/laporan"
                 :columns="columns"
-            ></paginate>
+            />
         </div>
     </div>
 </template>

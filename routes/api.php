@@ -102,6 +102,7 @@ Route::prefix('laporan')->group(function () {
     Route::put('/{laporan}', [LaporanController::class, 'update']);  // Mengupdate laporan tertentu
     Route::delete('/{laporan}', [LaporanController::class, 'destroy']);  // Menghapus laporan tertentu
     Route::get('export/excel', [LaporanController::class, 'export_excel']);
+    Route::get('laporan/view/pdf', [LaporanController::class, 'view_pdf']);
 
 });
 

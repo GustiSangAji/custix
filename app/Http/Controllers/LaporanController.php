@@ -1,7 +1,7 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Log;
 use App\Exports\ExportLaporan;
 use Maatwebsite\Excel\Facades\Excel;
 use App\Models\Cart;
@@ -21,8 +21,9 @@ class LaporanController extends Controller
         ]);
     }
 
-    public function index(Request $request)
-    {
+   public function index(Request $request)
+{
+    try {
         $per = $request->per ?? 10;
         $page = $request->page ? $request->page - 1 : 0;
 
@@ -36,7 +37,13 @@ class LaporanController extends Controller
         })->with(['user', 'ticket'])->latest()->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
 
         return response()->json($data);
+    } catch (\Exception $e) {
+        // Log the error for further investigation
+        Log::error('Error fetching laporan: ' . $e->getMessage());
+        return response()->json(['error' => 'Terjadi kesalahan saat mengambil data'], 500);
     }
+}
+
 
     public function export_excel(Request $request)
     {
@@ -51,4 +58,6 @@ class LaporanController extends Controller
         // Mengirimkan data yang sudah difilter ke dalam class ExportLaporan
         return Excel::download(new ExportLaporan($carts), 'Laporan.xlsx');
     }
+
+    
 }
