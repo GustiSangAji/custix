@@ -3,6 +3,7 @@ import {
     createWebHistory,
     type RouteRecordRaw,
 } from "vue-router";
+import { defineAsyncComponent } from "vue";
 import { useAuthStore } from "@/stores/auth"; // Store untuk autentikasi
 import { useConfigStore } from "@/stores/config"; // Store untuk konfigurasi
 import NProgress from "nprogress"; // Library untuk menampilkan progress bar
@@ -62,6 +63,12 @@ const routes: Array<RouteRecordRaw> = [
         path: "/informasi-pribadi",
         component: () => import("@/pages/setting/InformasiPribadi.vue"),
     },
+    {
+        path: '/verify',
+        name: 'Verify',
+        component: () => import("@/pages/Verify.vue"),
+        props: (route) => ({ order_id: route.query.order_id }),
+    },    
     {
         path: "/order",
         component: () => import("@/pages/Setting.vue"), // Pastikan ini layout yang benar
@@ -123,6 +130,14 @@ const routes: Array<RouteRecordRaw> = [
                     pageTitle: "Website Laporan",
                     breadcrumbs: ["Website", "laporan"],
                 },
+            },
+            {
+                path: "/laporan/export/excel",
+                name: "dashboard.laporan.export",
+                component: defineAsyncComponent(() => {
+                    window.open('http://localhost:8000/api/laporan/export/excel'); // Ganti dengan URL yang sesuai
+                    return Promise.resolve({ render() { return null; } });
+                }),
             },
             {
                 path: "/event/tiket",

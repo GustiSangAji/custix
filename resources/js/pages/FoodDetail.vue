@@ -283,18 +283,17 @@ export default {
       .catch((error) => console.log(error));
 
     // Listener untuk tombol back browser
-    window.addEventListener("popstate", this.removeAccess);
+    window.addEventListener("popstate", (event) => {
+      console.log("popstate event fired", event);
+      this.removeAccess();
+    });
   },
   beforeRouteLeave(to, from, next) {
-    // Mengecek apakah pengguna sedang menuju halaman yang berbeda dari detail tiket
+    // Panggil removeAccess setiap kali pengguna berpindah halaman
     if (to.name !== "ticketDetail") {
-      // Jangan hapus akses jika berpindah ke halaman lain di dalam aplikasi
-      next();
-    } else {
-      // Hapus akses jika keluar dari halaman detail tiket atau aplikasi
-      this.removeAccess();
-      next();
+      this.removeAccess(); // Panggil removeAccess
     }
+    next();
   },
   beforeDestroy() {
     // Menghapus listener ketika komponen dihancurkan

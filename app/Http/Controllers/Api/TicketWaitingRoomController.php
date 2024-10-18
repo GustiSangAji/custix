@@ -10,6 +10,7 @@ use Illuminate\Support\Facades\DB;
 use App\Models\TicketAccess;
 use App\Models\TicketQueue;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class TicketWaitingRoomController extends Controller
 {

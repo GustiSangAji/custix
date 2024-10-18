@@ -42,7 +42,6 @@ class CartController extends Controller
             return response()->json(['message' => 'Tiket tidak tersedia'], 400);
         }
 
-        // Menghasilkan order_id yang unik
         do {
             $orderId = $ticket->kode_tiket . now()->format('YmdHis') . auth()->id(); // Tambahkan ID pengguna
         } while (Cart::where('order_id', $orderId)->exists());
@@ -59,6 +58,7 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Tiket berhasil ditambahkan ke keranjang', 'cart' => $cart], 201);
     }
+
 
     public function show($id)
     {
@@ -244,3 +244,4 @@ class CartController extends Controller
         return response()->json(['message' => 'Order tidak ditemukan'], 404);
     }
 }
+
