@@ -35,9 +35,9 @@
               <!-- Menampilkan QR Code menggunakan qrcode-vue -->
               <h4 class="fw-bold fs-6 mb-3 text-dark">Scan kode QR di bawah ini</h4>
               <qrcode-vue 
-                  :value="`https://e6fc-118-99-113-12.ngrok-free.app/verify?order_id=${order?.order_id}`" 
-                  :size="200" 
-                />
+                :value="`https://e6fc-118-99-113-12.ngrok-free.app/verify?order_id=${order?.order_id}`" 
+                :size="200" 
+              />
             </div>
           </div>
         </div>
