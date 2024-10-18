@@ -10,9 +10,6 @@ use App\Models\Tiket; // Model tiket
 use Midtrans\Config;
 use Midtrans\Notification;
 use App\Models\User;
-use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\DB;
-use Illuminate\Support\Str;
 
 class CartController extends Controller
 {
@@ -42,10 +39,9 @@ class CartController extends Controller
             return response()->json(['message' => 'Tiket tidak tersedia'], 400);
         }
 
-        // Menghasilkan order_id yang unik
-        do {
-            $orderId = $ticket->kode_tiket . now()->format('YmdHis') . auth()->id(); // Tambahkan ID pengguna
-        } while (Cart::where('order_id', $orderId)->exists());
+        // Kurangi stok tiket
+        $ticket->quantity -= $request->jumlah_pemesanan;
+        $ticket->save();
 
         // Buat entri baru di keranjang
         $cart = Cart::create([
@@ -59,6 +55,7 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Tiket berhasil ditambahkan ke keranjang', 'cart' => $cart], 201);
     }
+
 
     public function show($id)
     {
@@ -159,109 +156,4 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Payment notification handled']);
     }
-
-    public function afterpayment(Request $request)
-    {
-        $userId = Auth::id();
-
-        // Logika pembayaran berhasil, ubah status tiket atau lainnya...
-
-        // Hapus akses pengguna dari ticket_access setelah pembayaran selesai
-        DB::table('ticket_access')->where('user_id', $userId)->delete();
-
-        // Hapus pengguna dari antrian jika ada
-        DB::table('ticket_queue')->where('user_id', $userId)->delete();
-
-        // Berikan akses kepada pengguna berikutnya dalam antrian
-        $nextInQueue = DB::table('ticket_queue')->orderBy('created_at', 'asc')->first();
-
-        if ($nextInQueue) {
-            // Tambahkan pengguna berikutnya ke dalam ticket_access
-            DB::table('ticket_access')->insert([
-                'user_id' => $nextInQueue->user_id,
-                'active' => true,
-                'created_at' => now(),
-            ]);
-
-            // Hapus pengguna dari antrian
-            DB::table('ticket_queue')->where('user_id', $nextInQueue->user_id)->delete();
-        }
-
-        return response()->json(['message' => 'Payment successful and access released.']);
-    }
-
-    public function removeAccess(Request $request)
-    {
-        $userId = $request->input('user_id');
-
-        // Hapus pengguna dari ticket_access
-        DB::table('ticket_access')->where('user_id', $userId)->delete();
-
-        return response()->json(['message' => 'Akses pengguna berhasil dihapus']);
-    }
-
-
-    public function getUserOrders()
-    {
-        // Ambil semua pesanan untuk pengguna yang sedang login
-        $orders = Cart::where('user_id', auth()->id())->with('ticket')->get();
-
-        return response()->json($orders);
-    }
-
-    public function getOrderById($id)
-    {
-        $order = Cart::where('id', $id)
-            ->where('user_id', auth()->id())
-            ->with('ticket')
-            ->first();
-
-        if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
-        }
-
-        return response()->json($order); // Ambil data order beserta qr_code
-    }
-
-    public function saveQrCode(Request $request)
-    {
-        // Validasi input
-        $request->validate([
-            'order_id' => 'required|exists:carts,order_id',
-            'qr_code' => 'required',
-        ]);
-
-        // Cari cart berdasarkan order_id
-        $cart = Cart::where('order_id', $request->order_id)->first();
-
-        if ($cart) {
-            $cart->qr_code = $request->qr_code; // Simpan QR code ke kolom qr_code
-            $cart->save();
-
-            return response()->json(['message' => 'QR code berhasil disimpan'], 200);
-        }
-
-        return response()->json(['message' => 'Order tidak ditemukan'], 404);
-    }
-
-    public function verifyTicket(Request $request) {
-        $request->validate(['order_id' => 'required|exists:carts,order_id']);
-    
-        $cart = Cart::where('order_id', $request->order_id)->first();
-    
-        if (!$cart) {
-            return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
-        }
-    
-        if ($cart->status === 'Used') {
-            return response()->json(['message' => 'Tiket sudah digunakan'], 400);
-        }
-    
-        // Update status tiket sebagai telah digunakan
-        $cart->status = 'Used';
-        $cart->save();
-    
-        return response()->json(['message' => 'Tiket valid dan berhasil diverifikasi'], 200);
-    }
-    
 }
