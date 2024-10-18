@@ -3,11 +3,13 @@
 namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\DB;
 use App\Models\TicketAccess;
 use App\Models\TicketQueue;
+use App\Models\User;
 
 class TicketWaitingRoomController extends Controller
 {
@@ -61,10 +63,10 @@ class TicketWaitingRoomController extends Controller
     public function grantAccess()
     {
         $user = Auth::user();
-
+        
         // Cek jumlah pengguna yang aktif
         $currentAccessCount = TicketAccess::where('active', true)->count();
-
+        
         if ($currentAccessCount < $this->limit) {
             // Grant akses ke user
             TicketAccess::create([
@@ -80,38 +82,42 @@ class TicketWaitingRoomController extends Controller
             return response()->json(['message' => 'Added to queue.']);
         }
     }
-
-    public function terminateAccess()
+    public function terminateAccess(Request $request)
     {
-        $user = Auth::user();
-
-        // Hapus dari akses
-        TicketAccess::where('user_id', $user->id)->delete();
-        Log::info("Terminating session for user: {$user->id}");
-
-        // Proses antrian
-        $nextUser = TicketQueue::orderBy('created_at')->first();
-        if ($nextUser) {
-            // Pindahkan user dari antrian ke akses
-            TicketAccess::create([
-                'user_id' => $nextUser->user_id,
-                'active' => true
-            ]);
-            Log::info("User {$nextUser->user_id} granted access from queue.");
-            DB::table('ticket_queue')->where('user_id', $nextUser->user_id)->delete(); // Hapus dari antrian
+        $userId = $request->user_id;
+    
+        // Tambahkan log untuk memastikan request diterima
+        Log::info("Menghapus akses untuk user ID: $userId");
+    
+        // Hapus user dari ticket_access
+        $deleted = DB::table('ticket_access')->where('user_id', $userId)->delete();
+    
+        // Cek apakah penghapusan berhasil
+        if ($deleted) {
+            Log::info("User ID: $userId berhasil dihapus dari ticket_access.");
+        } else {
+            Log::error("Gagal menghapus user ID: $userId dari ticket_access.");
         }
-
-        return response()->json(['message' => 'Access terminated.']);
+    
+        return response()->json(['message' => 'Akses dihapus'], 200);
     }
+    
 
-    public function removeUser($userId)
+    public function removeAccess(Request $request)
     {
-        // Menghapus pengguna dari tabel ticket_access
-        DB::table('ticket_access')->where('user_id', $userId)->delete();
-
-        // Juga hapus dari antrian jika ada
-        DB::table('ticket_queue')->where('user_id', $userId)->delete();
-
-        return response()->json(['message' => 'User removed from access and queue.']);
+        // Mendapatkan user_id dari request
+        $userId = $request->input('user_id');
+    
+        // Hapus pengguna dari ticket_access
+        $deleted = DB::table('ticket_access')->where('user_id', $userId)->delete();
+    
+        if ($deleted) {
+            Log::info("User ID: $userId berhasil dihapus dari ticket_access.");
+            return response()->json(['message' => 'Akses pengguna berhasil dihapus'], 200);
+        } else {
+            Log::error("Gagal menghapus user ID: $userId dari ticket_access.");
+            return response()->json(['message' => 'Tidak ada akses yang ditemukan untuk pengguna ini'], 404);
+        }
     }
+    
 }

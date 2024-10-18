@@ -169,6 +169,7 @@
 <script>
 import LayoutLanding from "@/layouts/LayoutLanding.vue";
 import axios from "axios";
+import Swal from "sweetalert2"; // Pastikan Anda telah menginstal SweetAlert2
 
 export default {
   name: "TicketDetail",
@@ -235,20 +236,17 @@ export default {
         return;
       }
 
-      // Mempersiapkan payload
       const payload = {
         jumlah_pemesanan: this.pesan.jumlah_pemesanan,
         product: {
-          id: this.product.id, // Memastikan product.id sudah ada
+          id: this.product.id,
           nama_tiket: this.product.name,
           total_harga: this.pesan.jumlah_pemesanan * this.product.price,
         },
         user_id: userId,
         tanggal: this.formatShortDate(this.product.datetime),
-        tiket: `#${this.product.name.replace(/\s+/g, "")}`,
       };
 
-      // Mengirim permintaan pesanan
       axios
         .post("/order", payload)
         .then((response) => {
@@ -264,14 +262,32 @@ export default {
           console.error("Terjadi kesalahan:", error);
         });
     },
+    removeAccess() {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        axios
+          .post('/remove-access', { user_id: userId })
+          .then((response) => {
+            console.log('Akses dihentikan:', response.data);
+          })
+          .catch((error) => {
+            console.error('Terjadi kesalahan saat menghentikan akses:', error);
+          });
+      } else {
+        console.error('User ID tidak ditemukan di localStorage.');
+      }
+    },
   },
 
   mounted() {
-    // Mengambil data produk berdasarkan ID di URL
     axios
       .get("http://localhost:8000/api/tickets/" + this.$route.params.id)
       .then((response) => this.setProduct(response.data))
       .catch((error) => console.log(error));
+  },
+
+  beforeDestroy() {
+    this.removeAccess();
   },
 };
 </script>
@@ -292,6 +308,7 @@ export default {
 .input-group {
   max-width: 250px;
 }
+
 .btn-outline-secondary {
   min-width: 40px;
 }
