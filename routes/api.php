@@ -125,9 +125,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/terminate-access', [TicketWaitingRoomController::class, 'terminateAccess']);
     Route::post('/remove-access', [CartController::class, 'removeAccess']);
 });
-Route::post('/remove-access', [TicketWaitingRoomController::class, 'removeAccess']);
 
+Route::get('/user/orders', [CartController::class, 'getUserOrders']);
+Route::get('/user/orders/{id}', [CartController::class, 'getOrderById']);
+Route::post('/save-qr-code', [CartController::class, 'saveQrCode']);
 
 // routes/api.php
-
 route::get('/dashboard', [DashboardController::class, 'index']);

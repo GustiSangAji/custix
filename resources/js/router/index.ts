@@ -33,7 +33,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: "/tiket/:id",
-        name: 'tiket',
+        name: "ticket-detail",
         component: () => import("@/pages/FoodDetail.vue"), // Halaman detail tiket
     },
     {
@@ -58,6 +58,28 @@ const routes: Array<RouteRecordRaw> = [
         name: "afterpayment", 
         component: () => import("@/pages/AfterPayment.vue"),
     },
+    {
+        path: "/informasi-pribadi",
+        component: () => import("@/pages/setting/InformasiPribadi.vue"),
+    },
+    {
+        path: "/order",
+        component: () => import("@/pages/Setting.vue"), // Pastikan ini layout yang benar
+        children: [
+            {
+                path: "",
+                name: "TiketSaya",
+                component: () => import("@/components/tiket/TiketSaya.vue"), // Halaman Tiket Saya
+            },
+            {
+                path: "orders/:id",
+                name: 'OrderDetail',
+                component: () => import("@/components/order/DetailOrder.vue"),
+                props: true,  
+            },
+        ]
+    },
+
     {
         path: "/dashboard",
         component: () => import("@/layouts/default-layout/DefaultLayout.vue"), // Layout untuk dashboard
