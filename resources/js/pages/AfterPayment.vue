@@ -23,7 +23,7 @@
           <div class="card-body">
             <h5 class="card-title">Detail Pesanan</h5>
             <p class="card-text">
-              <strong>Order ID:</strong> {{  orderDetail.order_id  }}<br />
+              <strong>Order ID:</strong> {{ orderDetail.order_id }}<br />
               <strong>Nama Tiket:</strong> {{ ticketDetail.name }}<br />
               <strong>Jumlah:</strong> {{ orderDetail.jumlah_pemesanan }}<br />
               <strong>Nama Pemesan:</strong> {{ user.nama }}<br />
@@ -39,7 +39,7 @@
             <!-- Menampilkan QR Code berdasarkan Order ID -->
             <h5 class="text-center mt-4">QR Code Tiket Masuk</h5>
             <div class="d-flex justify-content-center">
-              <qrcode-vue :value="orderDetail.order_id" :size="200" /> <!-- Hanya menggunakan order ID -->
+              <qrcode-vue :value="`https://e6fc-118-99-113-12.ngrok-free.app/verify?order_id=${orderDetail.order_id}`" :size="200" />
             </div>
 
             <button @click="handleBackToHome" class="btn btn-primary block-btn mt-3">
@@ -107,7 +107,7 @@ export default {
     },
     getPaymentStatus() {
       const queryParams = new URLSearchParams(window.location.search);
-      this.paymentStatus = queryParams.get("transaction_status") || "Unpaid"; // Default ke 'Unpaid'
+      this.paymentStatus = queryParams.get("transaction_status") || "unpaid"; // Default ke 'unpaid'
 
       console.log("Payment status dari URL:", this.paymentStatus);
     },
@@ -119,18 +119,9 @@ export default {
       });
     },
 
-    formatDate(date) {
+    formatDate(dateString) {
       const options = { year: "numeric", month: "long", day: "numeric" };
-      return new Date(date).toLocaleDateString("id-ID", options);
-      const queryParams = new URLSearchParams(window.location.search);
-      this.paymentStatus = queryParams.get("transaction_status") || 'unpaid'; // Default ke 'unpaid'
-      console.log("Payment status dari URL:", this.paymentStatus);
-    },
-
-    getPaymentStatus() {
-      const queryParams = new URLSearchParams(window.location.search);
-      this.paymentStatus = queryParams.get("transaction_status") || 'unpaid'; // Default ke 'unpaid'
-      console.log("Payment status dari URL:", this.paymentStatus);
+      return new Date(dateString).toLocaleDateString("id-ID", options);
     },
 
     getOrderDetails() {
@@ -153,10 +144,7 @@ export default {
           }
         })
         .catch((error) => {
-          console.error(
-            "Terjadi kesalahan saat mengambil detail pesanan:",
-            error
-          );
+          console.error("Terjadi kesalahan saat mengambil detail pesanan:", error);
         });
     },
 
@@ -179,19 +167,7 @@ export default {
         console.error('orderDetail tidak tersedia saat menyimpan QR code');
       }
     },
-
-    // Definisikan metode formatDate
-    formatDate(dateString) {
-      const options = { year: 'numeric', month: 'long', day: 'numeric' };
-      return new Date(dateString).toLocaleDateString('id-ID', options);
-    },
-
-    formatPrice(price) {
-      return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
-      }).format(price);
-    },
   },
 };
 </script>
+

@@ -63,6 +63,12 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/setting/InformasiPribadi.vue"),
     },
     {
+        path: '/verify',
+        name: 'Verify',
+        component: () => import("@/pages/Verify.vue"),
+        props: (route) => ({ order_id: route.query.order_id }),
+    },    
+    {
         path: "/order",
         component: () => import("@/pages/Setting.vue"), // Pastikan ini layout yang benar
         children: [

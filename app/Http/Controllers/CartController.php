@@ -243,4 +243,25 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Order tidak ditemukan'], 404);
     }
+
+    public function verifyTicket(Request $request) {
+        $request->validate(['order_id' => 'required|exists:carts,order_id']);
+    
+        $cart = Cart::where('order_id', $request->order_id)->first();
+    
+        if (!$cart) {
+            return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
+        }
+    
+        if ($cart->status === 'Used') {
+            return response()->json(['message' => 'Tiket sudah digunakan'], 400);
+        }
+    
+        // Update status tiket sebagai telah digunakan
+        $cart->status = 'Used';
+        $cart->save();
+    
+        return response()->json(['message' => 'Tiket valid dan berhasil diverifikasi'], 200);
+    }
+    
 }

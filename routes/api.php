@@ -129,6 +129,8 @@ Route::middleware('auth')->group(function () {
 Route::get('/user/orders', [CartController::class, 'getUserOrders']);
 Route::get('/user/orders/{id}', [CartController::class, 'getOrderById']);
 Route::post('/save-qr-code', [CartController::class, 'saveQrCode']);
+Route::post('/verify-ticket', [CartController::class, 'verifyTicket']);
+
 
 // routes/api.php
 route::get('/dashboard', [DashboardController::class, 'index']);
