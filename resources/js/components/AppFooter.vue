@@ -12,14 +12,13 @@
         </div>
         <!-- Tentang Dewatiket -->
         <div class="col-md-2 mb-4">
-          <h5 class="text-white mb-3">Tentang Dewatiket</h5>
+          <h5 class="text-white mb-3">Tentang CusTix</h5>
           <ul class="list-unstyled">
             <li><router-link to="/about-us" class="text-white">About Us</router-link></li>
             <li><router-link to="/metode-pembayaran" class="text-white">Metode Pembayaran</router-link></li>
             <li><router-link to="/surat-kuasa" class="text-white">Surat Kuasa</router-link></li>
             <li><router-link to="/syarat-ketentuan" class="text-white">Syarat dan Ketentuan</router-link></li>
             <li><router-link to="/kebijakan-privasi" class="text-white">Kebijakan Privasi</router-link></li>
-            <li><router-link to="/pengembalian-dana" class="text-white">Pengembalian Dana</router-link></li>
             <li><router-link to="/hubungi-kami" class="text-white">Hubungi Kami</router-link></li>
           </ul>
         </div>
@@ -39,8 +38,8 @@
         <div class="col-md-3 mb-4">
           <h5 class="text-white mb-3">Fitur</h5>
           <ul class="list-unstyled">
-            <li><router-link to="/fitur/orderflex" class="text-white">Dewatiket OrderFlex</router-link></li>
-            <li><router-link to="/fitur/widget" class="text-white">Widget Dewatiket</router-link></li>
+            <li><router-link to="/fitur/orderflex" class="text-white">CusTix OrderFlex</router-link></li>
+            <li><router-link to="/fitur/widget" class="text-white">Widget CusTix</router-link></li>
           </ul>
         </div>
       </div>

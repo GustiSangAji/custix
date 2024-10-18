@@ -44,6 +44,7 @@ class Kernel extends HttpKernel
             \Illuminate\Routing\Middleware\SubstituteBindings::class,
         ],
     ];
+    
 
     /**
      * The application's middleware aliases.
@@ -55,6 +56,7 @@ class Kernel extends HttpKernel
     protected $middlewareAliases = [
         // Middleware lainnya
         'auth' => \App\Http\Middleware\Authenticate::class,
+        'CheckSingleAccess' => \App\Http\Middleware\CheckSingleAccess::class,
         'admin' => \App\Http\Middleware\CheckAdmin::class,
         'auth.basic' => \Illuminate\Auth\Middleware\AuthenticateWithBasicAuth::class,
         'auth.session' => \Illuminate\Session\Middleware\AuthenticateSession::class,
@@ -72,7 +74,10 @@ class Kernel extends HttpKernel
         'json' => \App\Http\Middleware\EnsureApiJson::class,
         
         // Tambahkan middleware baru untuk limit akses tiket
-        'check.ticket.access' => \App\Http\Middleware\CheckTicketAccess::class,
+
+            // ...
+        
+        
     ];
     
 }

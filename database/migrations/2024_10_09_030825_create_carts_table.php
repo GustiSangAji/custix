@@ -18,7 +18,7 @@ return new class extends Migration
             $table->foreignId('ticket_id')->constrained('tikets')->onDelete('cascade'); // ID tiket (pastikan nama tabel sesuai)
             $table->integer('jumlah_pemesanan'); // Jumlah tiket yang dipesan
             $table->integer('total_harga'); // Total harga tiket
-            $table->enum('status', ['Unpaid', 'Paid']);
+            $table->enum('status', ['Unpaid', 'Paid','Used']);
             $table->timestamps();
         });
     }

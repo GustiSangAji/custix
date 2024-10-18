@@ -20,7 +20,7 @@
       <!-- Navbar Content -->
       <div class="collapse navbar-collapse" id="navbarNav">
         <!-- Center Search Bar -->
-        <form class="d-flex mx-5 search-bar">
+        <form class="d-flex mx-auto search-bar">
           <div class="input-group">
             <input
               type="text"
@@ -37,14 +37,16 @@
             </span>
           </div>
         </form>
+
         <!-- Right Menu Items -->
-        <ul class="navbar-nav ms-auto">
+        <ul class="navbar-nav ms-auto align-items-center">
           <!-- Jika user sudah login -->
-          <li v-if="isAuthenticated">
+          <li v-if="isAuthenticated" class="d-flex align-items-center">
+            <router-link to="/order" class="nav-link fw-bold me-3">Tiket Saya</router-link>
             <UserDropdown />
           </li>
           <!-- Jika user belum login -->
-          <li v-else>
+          <li v-else class="nav-item">
             <router-link to="/sign-in" class="btn btn-light-primary rounded me-2">Masuk</router-link>
             <router-link to="/sign-up" class="btn btn-active-dark rounded">Daftar</router-link>
           </li>
@@ -57,7 +59,7 @@
 <script>
 import { useAuthStore } from "@/stores/auth";
 import { computed, onMounted, ref } from "vue";
-import UserDropdown from "@/components/dropdown/UserDropdown.vue"; 
+import UserDropdown from "@/components/dropdown/UserDropdown.vue";
 
 export default {
   name: "Navbar",
@@ -108,12 +110,5 @@ export default {
 }
 .search-bar:hover {
   width: 55%;
-}
-.hover-fade {
-  transition: background-color 0.3s ease, color 0.3s ease;
-}
-.hover-fade:hover {
-  background-color: #f5f5f5 !important;
-  color: #333 !important;
 }
 </style>

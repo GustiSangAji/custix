@@ -6,7 +6,7 @@ use Illuminate\Database\Seeder;
 use App\Models\Laporan;
 
 class LaporanSeeder extends Seeder
-{
+{   
     /**
      * Run the database seeds.
      *

@@ -105,7 +105,7 @@
                     {{ formatPrice(orderDetail.total_harga) }}
                   </p>
                 </div>
-                <button @click="pay" class="btn btn-primary mt-3">
+                <button @click="pay" class="btn btn-primary block-btn mt-3">
                   Bayar Sekarang
                 </button>
               </div>

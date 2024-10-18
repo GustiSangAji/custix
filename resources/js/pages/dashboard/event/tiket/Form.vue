@@ -292,34 +292,37 @@ watch(
                         </div>
                     </div>
                 </div>
-                <div class="col-md-6">
-                    <div class="fv-row mb-7">
-                        <label class="form-label fw-bold fs-6">Banner Tiket</label>
-                        <file-upload
-                            :files="ticket.banner" 
-                            :accepted-file-types="fileTypes" 
-                            required
-                            v-on:updatefiles="(file) => (ticket.banner = file)" 
-                        ></file-upload>
-                        <div class="fv-help-block">
-                            <ErrorMessage name="banner" />
-                        </div>
-                    </div>
-                </div>
-                <div class="col-md-6">
-                    <div class="fv-row mb-7">
-                        <label class="form-label fw-bold fs-6">Gambar Tiket</label>
-                        <file-upload
-                            :files="ticket.image" 
-                            :accepted-file-types="fileTypes" 
-                            required
-                            v-on:updatefiles="(file) => (ticket.image = file)" 
-                        ></file-upload>
-                        <div class="fv-help-block">
-                            <ErrorMessage name="image" />
-                        </div>
-                    </div>
-                </div>
+                <div class="row d-flex align-items-start">
+    <div class="col-md-6">
+        <div class="fv-row mb-7">
+            <label class="form-label fw-bold fs-6">Banner Tiket</label>
+            <file-upload
+                :files="ticket.banner"
+                :accepted-file-types="fileTypes"
+                required
+                v-on:updatefiles="(file) => (ticket.banner = file)"
+            ></file-upload>
+            <div class="fv-help-block">
+                <ErrorMessage name="banner" />
+            </div>
+        </div>
+    </div>
+    <div class="col-md-6">
+        <div class="fv-row mb-7">
+            <label class="form-label fw-bold fs-6">Gambar Tiket</label>
+            <file-upload
+                :files="ticket.image"
+                :accepted-file-types="fileTypes"
+                required
+                v-on:updatefiles="(file) => (ticket.image = file)"
+            ></file-upload>
+            <div class="fv-help-block">
+                <ErrorMessage name="image" />
+            </div>
+        </div>
+    </div>
+</div>
+
             </div>
         </div>
         <div class="card-footer d-flex">
