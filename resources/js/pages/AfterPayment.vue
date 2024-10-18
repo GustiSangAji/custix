@@ -41,7 +41,7 @@
                   <!-- Menampilkan QR Code berdasarkan Order ID -->
                   <h5 class="text-center mt-4">QR Code Tiket Masuk</h5>
                   <div class="d-flex justify-content-center">
-                    <qrcode-vue :value="`https://e6fc-118-99-113-12.ngrok-free.app/verify?order_id=${orderDetail.order_id}`" :size="200" />
+                    <qrcode-vue :value="`https://e205-118-99-113-12.ngrok-free.app/verify?order_id=${orderDetail.order_id}`" :size="200" />
                   </div>
                   
                   <!-- Tombol Selesai di Tengah -->

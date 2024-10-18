@@ -47,7 +47,7 @@
       verifyTicket() {
         this.loading = true; // Menunjukkan loading
         axios
-          .post("https://e6fc-118-99-113-12.ngrok-free.app/api/verify-ticket", { order_id: this.order_id })
+          .post("https://e205-118-99-113-12.ngrok-free.app/api/verify-ticket", { order_id: this.order_id })
           .then((response) => {
             this.loading = false; // Menghentikan loading
             if (response.data.message === 'Tiket valid dan berhasil diverifikasi') {
