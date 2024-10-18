@@ -158,15 +158,6 @@ const routes: Array<RouteRecordRaw> = [
                 },
             },
             {
-                path: "orders",
-                name: "dashboard.orders",
-                component: () => import("@/pages/dashboard/orders/Index.vue"),
-                meta: {
-                    pageTitle: "Website Orders",
-                    breadcrumbs: ["Website", "Orders"],
-                },
-            },
-            {
                 path: "orders/show",
                 name: "dashboard.orders.show",
                 component: () => import("@/pages/dashboard/orders/Show.vue"),
