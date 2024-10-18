@@ -123,7 +123,10 @@ Route::middleware('auth')->group(function () {
     Route::post('/clear-access', [TicketWaitingRoomController::class, 'clearQueue']);
     Route::post('/grant-access', [TicketWaitingRoomController::class, 'grantAccess']);
     Route::post('/terminate-access', [TicketWaitingRoomController::class, 'terminateAccess']);
+    Route::post('/remove-access', [CartController::class, 'removeAccess']);
 });
+Route::post('/remove-access', [TicketWaitingRoomController::class, 'removeAccess']);
+
 
 // routes/api.php
 

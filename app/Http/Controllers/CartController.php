@@ -8,9 +8,10 @@ use Illuminate\Http\Request;
 use App\Models\Cart; // Model keranjang (buat model jika belum ada)
 use App\Models\Tiket; // Model tiket
 use Midtrans\Config;
-use Illuminate\Support\Facades\Log;
 use Midtrans\Notification;
 use App\Models\User;
+use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class CartController extends Controller
@@ -41,14 +42,10 @@ class CartController extends Controller
             return response()->json(['message' => 'Tiket tidak tersedia'], 400);
         }
 
-        // Kurangi stok tiket
-        $ticket->quantity -= $request->jumlah_pemesanan;
-        $ticket->save();
-
         // Menghasilkan order_id yang unik
         do {
-            $orderId = Str::random(10);
-        } while (Cart::where('order_id', $orderId)->exists()); // Cek apakah order_id sudah ada
+            $orderId = $ticket->kode_tiket . now()->format('YmdHis') . auth()->id(); // Tambahkan ID pengguna
+        } while (Cart::where('order_id', $orderId)->exists());
 
         // Buat entri baru di keranjang
         $cart = Cart::create([
@@ -139,9 +136,20 @@ class CartController extends Controller
             return response()->json(['message' => 'Order not found'], 404);
         }
 
+        // Ambil tiket terkait pesanan
+        $ticket = Tiket::find($order->ticket_id);
+
         // Perbarui status berdasarkan status transaksi dari Midtrans
         if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
             $order->status = 'Paid';
+
+            // Kurangi stok tiket jika status adalah 'capture' atau 'settlement'
+            if ($ticket && $ticket->quantity >= $order->jumlah_pemesanan) {
+                $ticket->quantity -= $order->jumlah_pemesanan;
+                $ticket->save();
+            } else {
+                return response()->json(['message' => 'Not enough tickets available'], 400);
+            }
         } elseif ($transactionStatus == 'pending') {
             $order->status = 'Unpaid';
         } elseif ($transactionStatus == 'deny' || $transactionStatus == 'expire' || $transactionStatus == 'cancel') {
@@ -152,34 +160,16 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Payment notification handled']);
     }
-    
-    public function afterpayment(Request $request)
-    {
-        $userId = Auth::id();
-    
-        // Logika untuk menghapus pengguna dari ticket_access
-        DB::table('ticket_access')->where('user_id', $userId)->delete();
-    
-        // Hapus pengguna dari antrian jika ada
-        DB::table('ticket_queue')->where('user_id', $userId)->delete();
-    
-        // Berikan akses kepada pengguna berikutnya dalam antrian
-        $nextInQueue = DB::table('ticket_queue')->orderBy('position', 'asc')->first();
-    
-        if ($nextInQueue) {
-            // Tambahkan pengguna berikutnya ke dalam ticket_access
-            DB::table('ticket_access')->insert([
-                'user_id' => $nextInQueue->user_id,
-                'active' => true,
-                'created_at' => now(),
-            ]);
-    
-            // Hapus pengguna dari antrian
-            DB::table('ticket_queue')->where('user_id', $nextInQueue->user_id)->delete();
-        }
-    
-        return response()->json(['message' => 'Payment successful and access released.']);
-    }
-    
 
+
+
+    public function removeAccess(Request $request)
+    {
+        $userId = $request->input('user_id');
+
+        // Hapus pengguna dari ticket_access
+        DB::table('ticket_access')->where('user_id', $userId)->delete();
+
+        return response()->json(['message' => 'Akses pengguna berhasil dihapus']);
+    }
 }
