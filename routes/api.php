@@ -121,3 +121,11 @@ Route::middleware('auth')->group(function () {
     Route::post('/terminate-access', [TicketWaitingRoomController::class, 'terminateAccess']);
     Route::post('/remove-access', [CartController::class, 'removeAccess']);
 });
+
+
+
+Route::get('/user/orders', [CartController::class, 'getUserOrders']);
+Route::get('/user/orders/{id}', [CartController::class, 'getOrderById']);
+Route::post('/save-qr-code', [CartController::class, 'saveQrCode']);
+
+

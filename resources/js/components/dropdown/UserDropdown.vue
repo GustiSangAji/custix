@@ -40,9 +40,18 @@
           :to="isAdmin ? '/dashboard/profile' : '/user/profile'"
           class="px-5 my-1 menu-item fw-semibold"
         >
-          Account Settings
+          Transaksi
         </router-link>
       </li>
+      <li class="menu-item px-5 my-1">
+        <router-link
+          to="/informasi-pribadi"
+          class="px-5 my-1 menu-item fw-semibold"
+        >
+          Informasi Pribadi
+        </router-link>
+      </li>
+      <li class="menu-item px-5 my-1"></li>
       <li class="menu-item px-5 my-1">
         <router-link to="/home" @click="logout" class="px-5 my-1 menu-item fw-semibold"> Sign Out </router-link>
       </li>

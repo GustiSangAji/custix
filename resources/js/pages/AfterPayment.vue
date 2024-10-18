@@ -1,40 +1,45 @@
 <template>
   <LayoutLanding>
     <div v-if="orderDetail && ticketDetail">
-      <div class="container mt-10">
-        <h5 class="text-center">Status Pembayaran</h5>
+      <div class="container mt-5">
+        <h5 class="text-center mb-4">Status Pembayaran</h5>
 
         <!-- Menampilkan pesan berdasarkan status pembayaran -->
-        <div v-if="paymentStatus === 'settlement'" class="alert alert-success">
+        <div v-if="paymentStatus === 'settlement'" class="alert alert-success text-center">
           Pembayaran berhasil! E-tiket telah dikirim ke email Anda.
         </div>
-        <div v-if="paymentStatus === 'capture'" class="alert alert-success">
+        <div v-if="paymentStatus === 'capture'" class="alert alert-success text-center">
           Pembayaran berhasil! E-tiket telah dikirim ke email Anda.
         </div>
-        <div v-if="paymentStatus === 'pending'" class="alert alert-danger">
+        <div v-if="paymentStatus === 'pending'" class="alert alert-danger text-center">
           Pembayaran gagal. Silakan coba lagi atau hubungi layanan pelanggan.
         </div>
-        <div v-if="paymentStatus === 'Unpaid'" class="alert alert-danger">
+        <div v-if="paymentStatus === 'unpaid'" class="alert alert-danger text-center">
           Pembayaran gagal. Silakan coba lagi atau hubungi layanan pelanggan.
         </div>
 
         <!-- Detail Pesanan -->
-        <div class="card mt-4">
+        <div class="card mt-4 shadow">
           <div class="card-body">
             <h5 class="card-title">Detail Pesanan</h5>
             <p class="card-text">
-              Order ID: {{ orderDetail.order_id }}<br />
-              Nama Tiket: {{ ticketDetail.name }}<br />
-              Jumlah: {{ orderDetail.jumlah_pemesanan }}<br />
-              Nama Pemesan: {{ user.nama }}<br />
-              Nomor Ponsel: {{ user.phone }}<br />
-              Email: {{ user.email }}<br />
-              Tanggal Pemesanan: {{ formatDate(orderDetail.created_at) }}
+              <strong>Order ID:</strong> {{  orderDetail.order_id  }}<br />
+              <strong>Nama Tiket:</strong> {{ ticketDetail.name }}<br />
+              <strong>Jumlah:</strong> {{ orderDetail.jumlah_pemesanan }}<br />
+              <strong>Nama Pemesan:</strong> {{ user.nama }}<br />
+              <strong>Nomor Ponsel:</strong> {{ user.phone }}<br />
+              <strong>Email:</strong> {{ user.email }}<br />
+              <strong>Tanggal Pemesanan:</strong> {{ formatDate(orderDetail.created_at) }}
             </p>
 
-            <div class="d-flex justify-content-between align-items-center">
+            <div class="d-flex justify-content-between align-items-center mt-3">
               <h6>Total Pembayaran</h6>
               <p class="fw-bold">{{ formatPrice(orderDetail.total_harga) }}</p>
+            </div>
+            <!-- Menampilkan QR Code berdasarkan Order ID -->
+            <h5 class="text-center mt-4">QR Code Tiket Masuk</h5>
+            <div class="d-flex justify-content-center">
+              <qrcode-vue :value="orderDetail.order_id" :size="200" /> <!-- Hanya menggunakan order ID -->
             </div>
 
             <button @click="handleBackToHome" class="btn btn-primary block-btn mt-3">
@@ -46,7 +51,7 @@
     </div>
 
     <div v-else>
-      <p>Memuat detail pembayaran...</p>
+      <p class="text-center">Memuat detail pembayaran...</p>
     </div>
   </LayoutLanding>
 </template>
@@ -56,11 +61,13 @@ import axios from "axios";
 import LayoutLanding from "@/layouts/LayoutLanding.vue";
 import { computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import QrcodeVue from 'qrcode.vue'; // Import QrcodeVue
 
 export default {
   name: "AfterPayment",
   components: {
     LayoutLanding,
+    QrcodeVue, // Tambahkan QrcodeVue ke dalam komponen
   },
   setup() {
     const authStore = useAuthStore();
@@ -98,7 +105,6 @@ export default {
           console.error("Gagal menghapus akses pengguna:", error);
         });
     },
-    // Mendapatkan status pembayaran dari query parameter
     getPaymentStatus() {
       const queryParams = new URLSearchParams(window.location.search);
       this.paymentStatus = queryParams.get("transaction_status") || "Unpaid"; // Default ke 'Unpaid'
@@ -116,6 +122,15 @@ export default {
     formatDate(date) {
       const options = { year: "numeric", month: "long", day: "numeric" };
       return new Date(date).toLocaleDateString("id-ID", options);
+      const queryParams = new URLSearchParams(window.location.search);
+      this.paymentStatus = queryParams.get("transaction_status") || 'unpaid'; // Default ke 'unpaid'
+      console.log("Payment status dari URL:", this.paymentStatus);
+    },
+
+    getPaymentStatus() {
+      const queryParams = new URLSearchParams(window.location.search);
+      this.paymentStatus = queryParams.get("transaction_status") || 'unpaid'; // Default ke 'unpaid'
+      console.log("Payment status dari URL:", this.paymentStatus);
     },
 
     getOrderDetails() {
@@ -131,6 +146,11 @@ export default {
         })
         .then((ticketResponse) => {
           this.ticketDetail = ticketResponse.data;
+
+          // Panggil fungsi untuk menyimpan QR code di sini
+          if (this.paymentStatus === 'settlement' || this.paymentStatus === 'capture') {
+            this.saveQrCodeToDatabase();
+          }
         })
         .catch((error) => {
           console.error(
@@ -139,16 +159,39 @@ export default {
           );
         });
     },
+
+    saveQrCodeToDatabase() {
+      if (this.orderDetail) {
+        const qrCodeValue = this.orderDetail.order_id; // Menggunakan order_id sebagai nilai QR code
+
+        axios
+          .post(`http://localhost:8000/api/save-qr-code`, {
+            order_id: this.orderDetail.order_id, // Kirim order_id
+            qr_code: qrCodeValue, // Nilai QR code
+          })
+          .then((response) => {
+            console.log('QR code berhasil disimpan ke database:', response.data);
+          })
+          .catch((error) => {
+            console.error('Gagal menyimpan QR code ke database:', error);
+          });
+      } else {
+        console.error('orderDetail tidak tersedia saat menyimpan QR code');
+      }
+    },
+
+    // Definisikan metode formatDate
+    formatDate(dateString) {
+      const options = { year: 'numeric', month: 'long', day: 'numeric' };
+      return new Date(dateString).toLocaleDateString('id-ID', options);
+    },
+
+    formatPrice(price) {
+      return new Intl.NumberFormat('id-ID', {
+        style: 'currency',
+        currency: 'IDR',
+      }).format(price);
+    },
   },
 };
 </script>
-
-<style scoped>
-.container {
-  max-width: 800px;
-  margin: 0 auto;
-}
-.card {
-  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-}
-</style>
