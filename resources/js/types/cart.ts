@@ -17,6 +17,7 @@ export interface Ticket {
 // Tipe untuk Cart
 export interface Cart {
     id: number;
+    order_id: string;
     user_id: number;
     ticket_id: number;
     jumlah_pemesanan: number;
