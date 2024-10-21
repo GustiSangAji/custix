@@ -24,9 +24,10 @@ class TiketFactory extends Factory
      */
     public function definition()
     {
+
         // Mengupload gambar palsu ke storage lokal
         $image = UploadedFile::fake()->image('event.jpg', 640, 480)->store('images', 'public');
-        $banner = UploadedFile::fake()->image('banner.jpg', 1280, 720)->store('banners', 'public');
+        $banner = UploadedFile::fake()->image('banner.jpg', 4032, 1008)->store('banners', 'public');
 
         return [
             'uuid' => Str::uuid(),

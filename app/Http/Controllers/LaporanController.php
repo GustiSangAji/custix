@@ -30,7 +30,7 @@ class LaporanController extends Controller
         DB::statement('set @no=0+' . $page * $per);
         $data = Cart::when($request->search, function (Builder $query, string $search) {
             $query->whereHas('user', function (Builder $query) use ($search) {
-                $query->where('name', 'like', "%$search%");
+                $query->where('nama', 'like', "%$search%");
             })->orWhereHas('ticket', function (Builder $query) use ($search) {
                 $query->where('name', 'like', "%$search%");
             });
