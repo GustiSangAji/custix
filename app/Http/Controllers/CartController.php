@@ -60,6 +60,7 @@ class CartController extends Controller
         return response()->json(['message' => 'Tiket berhasil ditambahkan ke keranjang', 'cart' => $cart], 201);
     }
 
+
     public function show($id)
     {
         $cart = Cart::findOrFail($id);
@@ -160,6 +161,7 @@ class CartController extends Controller
         return response()->json(['message' => 'Payment notification handled']);
     }
 
+
     public function afterpayment(Request $request)
     {
         $userId = Auth::id();
@@ -198,49 +200,5 @@ class CartController extends Controller
         DB::table('ticket_access')->where('user_id', $userId)->delete();
 
         return response()->json(['message' => 'Akses pengguna berhasil dihapus']);
-    }
-
-
-    public function getUserOrders()
-    {
-        // Ambil semua pesanan untuk pengguna yang sedang login
-        $orders = Cart::where('user_id', auth()->id())->with('ticket')->get();
-
-        return response()->json($orders);
-    }
-
-    public function getOrderById($id)
-    {
-        $order = Cart::where('id', $id)
-            ->where('user_id', auth()->id())
-            ->with('ticket')
-            ->first();
-
-        if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
-        }
-
-        return response()->json($order); // Ambil data order beserta qr_code
-    }
-
-    public function saveQrCode(Request $request)
-    {
-        // Validasi input
-        $request->validate([
-            'order_id' => 'required|exists:carts,order_id',
-            'qr_code' => 'required',
-        ]);
-
-        // Cari cart berdasarkan order_id
-        $cart = Cart::where('order_id', $request->order_id)->first();
-
-        if ($cart) {
-            $cart->qr_code = $request->qr_code; // Simpan QR code ke kolom qr_code
-            $cart->save();
-
-            return response()->json(['message' => 'QR code berhasil disimpan'], 200);
-        }
-
-        return response()->json(['message' => 'Order tidak ditemukan'], 404);
     }
 }

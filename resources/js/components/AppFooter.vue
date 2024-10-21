@@ -19,7 +19,6 @@
             <li><router-link to="/surat-kuasa" class="text-white">Surat Kuasa</router-link></li>
             <li><router-link to="/syarat-ketentuan" class="text-white">Syarat dan Ketentuan</router-link></li>
             <li><router-link to="/kebijakan-privasi" class="text-white">Kebijakan Privasi</router-link></li>
-            <li><router-link to="/pengembalian-dana" class="text-white">Pengembalian Dana</router-link></li>
             <li><router-link to="/hubungi-kami" class="text-white">Hubungi Kami</router-link></li>
           </ul>
         </div>

@@ -1,23 +1,27 @@
 <script setup lang="ts">
 import { ref, watch, h } from "vue";
 import { createColumnHelper } from "@tanstack/vue-table";
-import { useDelete } from "@/libs/hooks";  // Hook untuk delete, sesuaikan dengan project Anda
-import type { Cart } from "@/types";  // Pastikan Anda memiliki tipe Cart
-import { formatRupiah } from "@/libs/rupiah";  // Fungsi format Rupiah
+import { useDelete } from "@/libs/hooks";
+import type { Cart } from "@/types"; 
+import { formatRupiah } from "@/libs/rupiah";
+import axios from 'axios';
 
+// Kolom tabel dan data pagination
 const columnHelper = createColumnHelper<Cart>();
 const paginateRef = ref<any>(null);
-const selected = ref<string>("");  // Untuk menyimpan UUID cart yang dipilih
-const openForm = ref(false);  // Kontrol visibilitas form
+const selected = ref<string>(""); // Menyimpan data yang dipilih
+const openForm = ref(false); // Kontrol untuk membuka form
+const isDownloading = ref(false); // Status pengunduhan
 
+// Hook delete cart
 const { delete: deleteCart } = useDelete({
-    onSuccess: () => paginateRef.value.refetch(),  // Refetch data setelah berhasil dihapus
+    onSuccess: () => paginateRef.value.refetch(), // Refresh data setelah delete berhasil
 });
 
-// Kolom-kolom untuk tabel carts
+// Definisi kolom tabel
 const columns = [
     columnHelper.accessor("id", {
-        header: "Kode Transaksi",  // Mengubah header menjadi "ID Cart"
+        header: "Kode Transaksi",
     }),
     columnHelper.accessor("ticket.name", {
         header: "Nama Tiket",
@@ -27,22 +31,23 @@ const columns = [
     }),
     columnHelper.accessor("total_harga", {
         header: "Total Harga",
-        cell: (cell) => formatRupiah(cell.getValue()),  // Format Rupiah
+        cell: (cell) => formatRupiah(cell.getValue()), // Format Rupiah untuk total harga
     }),
     columnHelper.accessor("created_at", {
         header: "Tanggal Pembelian",
         cell: (cell) => {
             const dateValue = cell.getValue();
-            return dateValue ? new Date(dateValue).toLocaleDateString() : "-";  // Format tanggal
+            return dateValue ? new Date(dateValue).toLocaleDateString() : "-"; // Format tanggal
         },
     }),
     columnHelper.accessor("status", {
         header: "Status",
-        cell: (cell) => h(
-            "span", 
-            { class: cell.getValue() === "Paid" ? "text-success" : "text-danger" },
-            cell.getValue() === "Paid" ? "Sudah Dibayar" : "Belum Dibayar"
-        ),
+        cell: (cell) =>
+            h(
+                "span", 
+                { class: cell.getValue() === "Paid" ? "text-success" : "text-danger" },
+                cell.getValue() === "Paid" ? "Sudah Dibayar" : "Belum Dibayar" // Status pembayaran
+            ),
     }),
     columnHelper.accessor("id", {
         header: "Aksi",
@@ -51,28 +56,54 @@ const columns = [
                 h("button", {
                     class: "btn btn-sm btn-icon btn-info",
                     onClick: () => {
-                        selected.value = cell.getValue();  // Set ID cart yang dipilih
-                        openForm.value = true;  // Buka form
+                        selected.value = cell.getValue();
+                        openForm.value = true;
                     },
-                }, h("i", { class: "la la-eye fs-2" })),  // Tombol detail
+                }, h("i", { class: "la la-eye fs-2" })), // Tombol untuk melihat detail
             ]),
     }),
 ];
 
-// Fungsi untuk refresh data di tabel
+// Fungsi untuk me-refresh data
 const refresh = () => paginateRef.value.refetch();
 
-// Watch perubahan openForm dan reset selected ketika form ditutup
+// Fungsi download laporan dalam format Excel
+const downloadExcel = async () => {
+    if (isDownloading.value) return;
+    isDownloading.value = true;
+    try {
+        const response = await axios.get('/laporan/export/excel', { responseType: 'blob' });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'Laporan.xlsx');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error("Gagal mengunduh laporan:", error);
+        alert('Gagal mengunduh laporan, silakan coba lagi.');
+    } finally {
+        isDownloading.value = false;
+    }
+};
+
+// Fungsi print laporan
+const printLaporan = () => {
+    window.print(); // Memunculkan dialog cetak browser
+};
+
+// Menangani perubahan form
 watch(openForm, (newVal) => {
     if (!newVal) {
-        selected.value = "";  // Reset ID saat form ditutup
+        selected.value = "";
     }
-    window.scrollTo(0, 0);  // Scroll ke atas ketika form dibuka
+    window.scrollTo(0, 0); // Scroll ke atas ketika form ditutup
 });
 </script>
 
-
 <template>
+    <!-- Form untuk menampilkan detail Cart -->
     <Form
         :selected="selected"
         v-if="openForm"
@@ -80,17 +111,40 @@ watch(openForm, (newVal) => {
         @refresh="refresh"
     />
 
+    <!-- Kartu yang menampilkan daftar Cart -->
     <div class="card">
         <div class="card-header align-items-center">
             <h2 class="mb-0">Daftar Cart</h2>
+            <!-- Tombol download Excel -->
+            <button 
+                class="btn btn-sm btn-primary block-btn" 
+                @click="downloadExcel" 
+                :disabled="isDownloading"
+                style="background-color: #4CAF50; color: white;"
+            >
+                {{ isDownloading ? 'Mengunduh...' : 'Download Excel' }}
+            </button>
+            <!-- Tombol print laporan -->
+            <button 
+                class="btn btn-sm btn-secondary block-btn ml-2" 
+                @click="printLaporan" 
+                style="background-color: #FF5733; color: white;"
+            >
+                Cetak Laporan
+            </button>
         </div>
+
+
+
+        
+        <!-- Tabel yang menampilkan daftar cart -->
         <div class="card-body">
             <paginate
                 ref="paginateRef"
                 id="table-carts"
                 url="/laporan"
                 :columns="columns"
-            ></paginate>
+            />
         </div>
     </div>
 </template>

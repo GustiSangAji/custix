@@ -31,10 +31,13 @@
             </div>
           </div>
           <div class="card-footer text-center" style="margin-top: -30px;">
-            <div class="card card-body d-flex flex-column align-items-center">
+            <div class="card card-body bg-white d-flex flex-column align-items-center">
               <!-- Menampilkan QR Code menggunakan qrcode-vue -->
-              <h4 class="fw-bold fs-6 mb-3">Scan kode QR di bawah ini</h4>
-              <qrcode-vue :value="order?.order_id" :size="200" /> <!-- Menggunakan order ID sebagai nilai QR Code -->
+              <h4 class="fw-bold fs-6 mb-3 text-dark">Scan kode QR di bawah ini</h4>
+              <qrcode-vue 
+                  :value="`https://e6fc-118-99-113-12.ngrok-free.app/verify?order_id=${order?.order_id}`" 
+                  :size="200" 
+                />
             </div>
           </div>
         </div>

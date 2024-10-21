@@ -1,7 +1,10 @@
 <?php
 
 namespace App\Http\Controllers;
-
+use Illuminate\Support\Facades\Log;
+use App\Exports\ExportLaporan;
+use Maatwebsite\Excel\Facades\Excel;
+use Barryvdh\DomPDF\Facade\pdf;
 use App\Models\Cart;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
@@ -9,9 +12,6 @@ use Illuminate\Support\Facades\DB;
 
 class LaporanController extends Controller
 {
-    /**
-     * Menampilkan daftar cart dengan filter status.
-     */
     public function get(Request $request)
     {
         return response()->json([
@@ -22,11 +22,9 @@ class LaporanController extends Controller
         ]);
     }
 
-    /**
-     * Menampilkan daftar cart dengan pagination dan pencarian.
-     */
-    public function index(Request $request)
-    {
+   public function index(Request $request)
+{
+    try {
         $per = $request->per ?? 10;
         $page = $request->page ? $request->page - 1 : 0;
 
@@ -40,9 +38,34 @@ class LaporanController extends Controller
         })->with(['user', 'ticket'])->latest()->paginate($per, ['*', DB::raw('@no := @no + 1 AS no')]);
 
         return response()->json($data);
+    } catch (\Exception $e) {
+        // Log the error for further investigation
+        Log::error('Error fetching laporan: ' . $e->getMessage());
+        return response()->json(['error' => 'Terjadi kesalahan saat mengambil data'], 500);
     }
-    public function show(Cart $cart)
+}
+
+
+    public function export_excel(Request $request)
     {
-        return response()->json(['success' => true, 'cart' => $cart->load(['user', 'ticket'])]);
+        $carts = Cart::when($request->search, function (Builder $query, string $search) {
+            $query->whereHas('user', function (Builder $query) use ($search) {
+                $query->where('name', 'like', "%$search%");
+            })->orWhereHas('ticket', function (Builder $query) use ($search) {
+                $query->where('name', 'like', "%$search%");
+            });
+        })->with(['user', 'ticket'])->get();
+    
+        // Mengirimkan data yang sudah difilter ke dalam class ExportLaporan
+        return Excel::download(new ExportLaporan($carts), 'Laporan.xlsx');
+    }
+
+    
+    public function generatePdf(Request $request)
+    {
+        $data = $request->all();
+
+        $pdf = Pdf::loadView('laporan.pdf', compact('data'));
+        return $pdf->download('laporan.pdf');
     }
 }
