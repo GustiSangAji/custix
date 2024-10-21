@@ -12,7 +12,7 @@ const selected = ref<string>("");
 const openForm = ref(false);
 const isDownloading = ref(false); // State untuk mengatur status tombol download
 
-const { delete: deleteCart } = useDelete({
+useDelete({
     onSuccess: () => paginateRef.value.refetch(),
 });
 
