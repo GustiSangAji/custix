@@ -8,13 +8,15 @@ use Illuminate\Http\Request;
 
 class TicketController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
-        // Mengambil semua tiket yang tersedia
+        $perPage = $request->input('per_page', 6);
         $tickets = Tiket::where('status', 'available')
-        ->get(['id','kode_tiket', 'name', 'place', 'datetime', 'quantity', 'price','description','banner', 'image']);
+            ->paginate($perPage, ['id', 'kode_tiket', 'name', 'place', 'datetime', 'quantity', 'price', 'description', 'banner', 'image']);
+    
         return response()->json($tickets);
     }
+
 
     public function limited()
     {

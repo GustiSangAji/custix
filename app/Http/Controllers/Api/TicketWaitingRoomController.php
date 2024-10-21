@@ -10,10 +10,11 @@ use Illuminate\Support\Facades\DB;
 use App\Models\TicketAccess;
 use App\Models\TicketQueue;
 use App\Models\User;
+use Illuminate\Support\Str;
 
 class TicketWaitingRoomController extends Controller
 {
-    protected $limit = 2; // Limit akses ke halaman pembayaran (2 pengguna)
+    protected $limit = 1; // Limit akses ke halaman pembayaran (2 pengguna)
 
     public function status()
     {
@@ -41,7 +42,7 @@ class TicketWaitingRoomController extends Controller
         $queuePosition = DB::table('ticket_queue')
             ->where('user_id', $userId)
             ->value('position');
-        
+
         // Jika pengguna belum dalam antrian, tambahkan ke antrian
         if (!$queuePosition) {
             $maxPosition = DB::table('ticket_queue')->max('position');
@@ -60,57 +61,55 @@ class TicketWaitingRoomController extends Controller
         ]);
     }
 
-    public function grantAccess()
+    public function grantAccess(Request $request)
     {
-        $user = Auth::user();
-        
-        // Cek jumlah pengguna yang aktif
-        $currentAccessCount = TicketAccess::where('active', true)->count();
-        
-        if ($currentAccessCount < $this->limit) {
-            // Grant akses ke user
-            TicketAccess::create([
-                'user_id' => $user->id,
-                'active' => true
-            ]);
-            Log::info("User {$user->id} granted access.");
-            return response()->json(['message' => 'Access granted.']);
+        $userId = $request->input('user_id');
+
+        // Masukkan logika untuk memberikan akses di ticket_access
+        $access = DB::table('ticket_access')->insert([
+            'user_id' => $userId,
+            'access_granted_at' => now(),
+        ]);
+
+        // Jika akses berhasil diberikan, hapus dari ticket_queue
+        if ($access) {
+            $this->clearQueue(new Request(['user_id' => $userId])); // Menghapus dari queue
+            return response()->json(['message' => 'Akses berhasil diberikan dan antrian dihapus'], 200);
         } else {
-            // Masukkan ke antrian jika slot penuh
-            TicketQueue::create(['user_id' => $user->id]);
-            Log::info("User {$user->id} added to queue.");
-            return response()->json(['message' => 'Added to queue.']);
+            return response()->json(['message' => 'Gagal memberikan akses'], 500);
         }
     }
+
+
     public function terminateAccess(Request $request)
     {
         $userId = $request->user_id;
-    
+
         // Tambahkan log untuk memastikan request diterima
         Log::info("Menghapus akses untuk user ID: $userId");
-    
+
         // Hapus user dari ticket_access
         $deleted = DB::table('ticket_access')->where('user_id', $userId)->delete();
-    
+
         // Cek apakah penghapusan berhasil
         if ($deleted) {
             Log::info("User ID: $userId berhasil dihapus dari ticket_access.");
         } else {
             Log::error("Gagal menghapus user ID: $userId dari ticket_access.");
         }
-    
+
         return response()->json(['message' => 'Akses dihapus'], 200);
     }
-    
+
 
     public function removeAccess(Request $request)
     {
         // Mendapatkan user_id dari request
         $userId = $request->input('user_id');
-    
+
         // Hapus pengguna dari ticket_access
         $deleted = DB::table('ticket_access')->where('user_id', $userId)->delete();
-    
+
         if ($deleted) {
             Log::info("User ID: $userId berhasil dihapus dari ticket_access.");
             return response()->json(['message' => 'Akses pengguna berhasil dihapus'], 200);
@@ -119,5 +118,18 @@ class TicketWaitingRoomController extends Controller
             return response()->json(['message' => 'Tidak ada akses yang ditemukan untuk pengguna ini'], 404);
         }
     }
-    
+
+    public function clearQueue(Request $request)
+    {
+        $request->validate([
+            'user_id' => 'required|integer', // Ubah ke 'integer' jika menggunakan unsignedBigInteger
+        ]);
+
+        TicketQueue::where('user_id', $request->user_id)->delete();
+
+        return response()->json(['message' => 'User removed from queue successfully.']);
+    }
+
+
+
 }
