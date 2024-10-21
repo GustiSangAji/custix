@@ -203,24 +203,30 @@ class CartController extends Controller
 
     public function getUserOrders()
     {
-        // Ambil semua pesanan untuk pengguna yang sedang login
-        $orders = Cart::where('user_id', auth()->id())->with('ticket')->get();
+        
+        $orders = Cart::where('user_id', auth()->id())
+                    ->where('status', 'Paid')
+                    ->with('ticket')
+                    ->get();
 
         return response()->json($orders);
     }
 
+
     public function getOrderById($id)
     {
+        
         $order = Cart::where('id', $id)
-            ->where('user_id', auth()->id())
-            ->with('ticket')
-            ->first();
+                    ->where('user_id', auth()->id()) 
+                    ->where('status', 'Paid')    
+                    ->with('ticket')
+                    ->first();
 
         if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
+            return response()->json(['message' => 'Order not found or not paid'], 404);
         }
 
-        return response()->json($order); // Ambil data order beserta qr_code
+        return response()->json($order);
     }
 
     public function saveQrCode(Request $request)
