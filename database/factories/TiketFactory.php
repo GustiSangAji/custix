@@ -5,7 +5,6 @@ namespace Database\Factories;
 use App\Models\Tiket;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Http\UploadedFile;
 use Illuminate\Support\Str;
 
 class TiketFactory extends Factory
@@ -24,10 +23,17 @@ class TiketFactory extends Factory
      */
     public function definition()
     {
+        // Ganti dengan path ke folder gambar asli Anda
+        $imagePath = storage_path('app/public/images');
+        $bannerPath = storage_path('app/public/banners');
 
-        // Mengupload gambar palsu ke storage lokal
-        $image = UploadedFile::fake()->image('event.jpg', 640, 480)->store('images', 'public');
-        $banner = UploadedFile::fake()->image('banner.jpg', 4032, 1008)->store('banners', 'public');
+        // Ambil semua file gambar dari folder
+        $images = array_diff(scandir($imagePath), ['..', '.']);
+        $banners = array_diff(scandir($bannerPath), ['..', '.']);
+
+        // Pilih gambar secara acak
+        $image = 'images/' . $this->faker->randomElement($images);
+        $banner = 'banners/' . $this->faker->randomElement($banners);
 
         return [
             'uuid' => Str::uuid(),
@@ -35,7 +41,7 @@ class TiketFactory extends Factory
             'name' => $this->faker->sentence(3), // Nama event
             'place' => $this->faker->city, // Lokasi event
             'datetime' => $this->faker->dateTimeBetween('now', '+1 year'), // Tanggal event
-            'status' => $this->faker->randomElement(['available', 'unavailable']), // Status tiket
+            'status' => $this->faker->randomElement(['available']), // Status tiket
             'quantity' => $this->faker->numberBetween(50, 500), // Stok tiket
             'price' => $this->faker->randomFloat(2, 10, 500), // Harga tiket
             'image' => $image, // Path gambar tiket
