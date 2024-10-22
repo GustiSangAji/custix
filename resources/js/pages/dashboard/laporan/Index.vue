@@ -11,7 +11,8 @@ const columnHelper = createColumnHelper<Cart>();
 const paginateRef = ref<any>(null);
 const selected = ref<string>(""); // Menyimpan data yang dipilih
 const openForm = ref(false); // Kontrol untuk membuka form
-const isDownloading = ref(false); // Status pengunduhan
+const isDownloadingExcel = ref(false); // Status pengunduhan Excel
+const isDownloadingPDF = ref(false); // Status pengunduhan PDF
 
 // Hook delete cart
 const { delete: deleteCart } = useDelete({
@@ -69,8 +70,8 @@ const refresh = () => paginateRef.value.refetch();
 
 // Fungsi download laporan dalam format Excel
 const downloadExcel = async () => {
-    if (isDownloading.value) return;
-    isDownloading.value = true;
+    if (isDownloadingExcel.value) return;
+    isDownloadingExcel.value = true;
     try {
         const response = await axios.get('/laporan/export/excel', { responseType: 'blob' });
         const url = window.URL.createObjectURL(new Blob([response.data]));
@@ -81,17 +82,34 @@ const downloadExcel = async () => {
         link.click();
         document.body.removeChild(link);
     } catch (error) {
-        console.error("Gagal mengunduh laporan:", error);
-        alert('Gagal mengunduh laporan, silakan coba lagi.');
+        console.error("Gagal mengunduh laporan Excel:", error);
+        alert('Gagal mengunduh laporan Excel, silakan coba lagi.');
     } finally {
-        isDownloading.value = false;
+        isDownloadingExcel.value = false;
     }
 };
 
-// Fungsi print laporan
-const printLaporan = () => {
-    window.print(); // Memunculkan dialog cetak browser
+// Fungsi download laporan dalam format PDF
+const downloadPDF = async () => {
+    if (isDownloadingPDF.value) return;
+    isDownloadingPDF.value = true;
+    try {
+        const response = await axios.get('/laporan/pdf', { responseType: 'blob' });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'Laporan.pdf');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error("Gagal mengunduh laporan PDF:", error);
+        alert('Gagal mengunduh laporan PDF, silakan coba lagi.');
+    } finally {
+        isDownloadingPDF.value = false;
+    }
 };
+
 
 // Menangani perubahan form
 watch(openForm, (newVal) => {
@@ -115,27 +133,27 @@ watch(openForm, (newVal) => {
     <div class="card">
         <div class="card-header align-items-center">
             <h2 class="mb-0">Daftar Cart</h2>
-            <!-- Tombol download Excel -->
-            <button 
-                class="btn btn-sm btn-primary block-btn" 
-                @click="downloadExcel" 
-                :disabled="isDownloading"
-                style="background-color: #4CAF50; color: white;"
-            >
-                {{ isDownloading ? 'Mengunduh...' : 'Download Excel' }}
-            </button>
-            <!-- Tombol print laporan -->
-            <button 
-                class="btn btn-sm btn-secondary block-btn ml-2" 
-                @click="printLaporan" 
-                style="background-color: #FF5733; color: white;"
-            >
-                Cetak Laporan
-            </button>
+            <!-- Tombol download Excel dan PDF -->
+            <div class="d-flex gap-2">
+                <button 
+                    class="btn btn-sm btn-primary block-btn" 
+                    @click="downloadExcel" 
+                    :disabled="isDownloadingExcel"
+                    title="Download Excel"
+                >
+                    <i class="la la-file-excel"></i>
+                </button>
+                
+                <button 
+                    class="btn btn-sm btn-danger block-btn" 
+                    @click="downloadPDF" 
+                    :disabled="isDownloadingPDF"
+                    title="Download PDF"
+                >
+                    <i class="la la-file-pdf"></i>
+                </button>
+            </div>
         </div>
-
-
-
         
         <!-- Tabel yang menampilkan daftar cart -->
         <div class="card-body">

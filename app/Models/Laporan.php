@@ -17,7 +17,7 @@ class Laporan extends Model
         'email',
         'nama_tiket',
         'jumlah',
-        'harga',
+        'harga',    
         'tanggal_pembelian',
         'status',
     ];

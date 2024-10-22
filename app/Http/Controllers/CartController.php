@@ -42,7 +42,6 @@ class CartController extends Controller
             return response()->json(['message' => 'Tiket tidak tersedia'], 400);
         }
 
-        // Menghasilkan order_id yang unik
         do {
             $orderId = $ticket->kode_tiket . now()->format('YmdHis') . auth()->id(); // Tambahkan ID pengguna
         } while (Cart::where('order_id', $orderId)->exists());
@@ -161,7 +160,6 @@ class CartController extends Controller
         return response()->json(['message' => 'Payment notification handled']);
     }
 
-
     public function afterpayment(Request $request)
     {
         $userId = Auth::id();
@@ -201,4 +199,69 @@ class CartController extends Controller
 
         return response()->json(['message' => 'Akses pengguna berhasil dihapus']);
     }
+
+
+    public function getUserOrders()
+    {
+        // Ambil semua pesanan untuk pengguna yang sedang login
+        $orders = Cart::where('user_id', auth()->id())->with('ticket')->get();
+
+        return response()->json($orders);
+    }
+
+    public function getOrderById($id)
+    {
+        $order = Cart::where('id', $id)
+            ->where('user_id', auth()->id())
+            ->with('ticket')
+            ->first();
+
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+
+        return response()->json($order); // Ambil data order beserta qr_code
+    }
+
+    public function saveQrCode(Request $request)
+    {
+        // Validasi input
+        $request->validate([
+            'order_id' => 'required|exists:carts,order_id',
+            'qr_code' => 'required',
+        ]);
+
+        // Cari cart berdasarkan order_id
+        $cart = Cart::where('order_id', $request->order_id)->first();
+
+        if ($cart) {
+            $cart->qr_code = $request->qr_code; // Simpan QR code ke kolom qr_code
+            $cart->save();
+
+            return response()->json(['message' => 'QR code berhasil disimpan'], 200);
+        }
+
+        return response()->json(['message' => 'Order tidak ditemukan'], 404);
+    }
+
+    public function verifyTicket(Request $request) {
+        $request->validate(['order_id' => 'required|exists:carts,order_id']);
+    
+        $cart = Cart::where('order_id', $request->order_id)->first();
+    
+        if (!$cart) {
+            return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
+        }
+    
+        if ($cart->status === 'Used') {
+            return response()->json(['message' => 'Tiket sudah digunakan'], 400);
+        }
+    
+        // Update status tiket sebagai telah digunakan
+        $cart->status = 'Used';
+        $cart->save();
+    
+        return response()->json(['message' => 'Tiket valid dan berhasil diverifikasi'],200);
+    }
 }
+

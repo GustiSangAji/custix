@@ -19,31 +19,39 @@
         </div>
 
         <!-- Detail Pesanan -->
-        <div class="card mt-4 shadow">
-          <div class="card-body">
-            <h5 class="card-title">Detail Pesanan</h5>
-            <p class="card-text">
-              Tiket: {{ ticketDetail.kode_tiket }}<br />
-              Jumlah: {{ orderDetail.jumlah_pemesanan }}<br />
-              Nama Pemesan: {{ user.nama }}<br />
-              Nomor Ponsel: {{ user.phone }}<br />
-              Email: {{ user.email }}<br />
-              Tanggal Pemesanan: {{ formatDate(orderDetail.created_at) }}
-            </p>
+        <div class="row justify-content-center">
+          <div class="col-md-8 col-lg-6">
+            <div class="card mt-4 shadow">
+              <div class="card-body">
+                <h5 class="card-title">Detail Pesanan</h5>
+                <p class="card-text">
+                  <strong>Order ID:</strong> {{ orderDetail.order_id }}<br />
+                  <strong>Nama Tiket:</strong> {{ ticketDetail.name }}<br />
+                  <strong>Jumlah:</strong> {{ orderDetail.jumlah_pemesanan }}<br />
+                  <strong>Nama Pemesan:</strong> {{ user.nama }}<br />
+                  <strong>Nomor Ponsel:</strong> {{ user.phone }}<br />
+                  <strong>Email:</strong> {{ user.email }}<br />
+                  <strong>Tanggal Pemesanan:</strong> {{ formatDate(orderDetail.created_at) }}
+                </p>
 
-            <div class="d-flex justify-content-between align-items-center mt-3">
-              <h6>Total Pembayaran</h6>
-              <p class="fw-bold">{{ formatPrice(orderDetail.total_harga) }}</p>
-            </div>
-            <!-- Menampilkan QR Code berdasarkan Order ID -->
-            <h5 class="text-center mt-4">QR Code Tiket Masuk</h5>
-            <div class="d-flex justify-content-center">
-              <qrcode-vue :value="`https://e6fc-118-99-113-12.ngrok-free.app/verify?order_id=${orderDetail.order_id}`" :size="200" />
-            </div>
+                <div class="d-flex justify-content-between align-items-center mt-3">
+                  <h6>Total Pembayaran</h6>
+                  <p class="fw-bold">{{ formatPrice(orderDetail.total_harga) }}</p>
+                </div>
+                <!-- Menampilkan QR Code berdasarkan Order ID -->
+                <h5 class="text-center mt-4">QR Code Tiket Masuk</h5>
+                <div class="d-flex justify-content-center bg-white">
+                  <qrcode-vue :value="`https://2037-118-99-113-12.ngrok-free.app/verify?order_id=${orderDetail.order_id}`" :size="200" />
+                </div>
 
-            <button @click="handleBackToHome" class="btn btn-primary block-btn mt-3">
-              Selesai
-            </button>
+                <!-- Tombol Selesai di Tengah -->
+                <div class="text-center mt-6">
+                  <button @click="handleBackToHome" class="btn btn-primary block-btn">
+                    Selesai
+                  </button>
+                </div>
+              </div>
+            </div>
           </div>
         </div>
       </div>
@@ -87,40 +95,17 @@ export default {
     this.getPaymentStatus(); // Ambil status pembayaran saat halaman dimuat
     this.getOrderDetails(); // Ambil detail pesanan dan tiket
   },
+
   methods: {
-    handleBackToHome() {
-      this.removeUserAccess(); // Panggil metode untuk menghapus akses
-      this.$router.push("/"); // Redirect ke beranda
+    formatDate(date) {
+      const options = { year: "numeric", month: "long", day: "numeric" };
+      return new Date(date).toLocaleDateString("id-ID", options);
     },
-    removeUserAccess() {
-      axios
-        .post(`http://localhost:8000/api/remove-access`, {
-          user_id: this.user.id,
-        })
-        .then((response) => {
-          console.log("Akses pengguna berhasil dihapus:", response.data);
-        })
-        .catch((error) => {
-          console.error("Gagal menghapus akses pengguna:", error);
-        });
-    },
+
     getPaymentStatus() {
       const queryParams = new URLSearchParams(window.location.search);
-      this.paymentStatus = queryParams.get("transaction_status") || "unpaid"; // Default ke 'unpaid'
-
+      this.paymentStatus = queryParams.get("transaction_status") || 'unpaid'; // Default ke 'unpaid'
       console.log("Payment status dari URL:", this.paymentStatus);
-    },
-
-    formatPrice(value) {
-      return value.toLocaleString("id-ID", {
-        style: "currency",
-        currency: "IDR",
-      });
-    },
-
-    formatDate(dateString) {
-      const options = { year: "numeric", month: "long", day: "numeric" };
-      return new Date(dateString).toLocaleDateString("id-ID", options);
     },
 
     getOrderDetails() {
@@ -166,7 +151,31 @@ export default {
         console.error('orderDetail tidak tersedia saat menyimpan QR code');
       }
     },
+
+    handleBackToHome() {
+      this.removeUserAccess(); // Panggil metode untuk menghapus akses
+      this.$router.push("/"); // Redirect ke beranda
+    },
+    
+    removeUserAccess() {
+      axios
+        .post(`http://localhost:8000/api/remove-access`, {
+          user_id: this.user.id,
+        })
+        .then((response) => {
+          console.log("Akses pengguna berhasil dihapus:", response.data);
+        })
+        .catch((error) => {
+          console.error("Gagal menghapus akses pengguna:", error);
+        });
+    },
+
+    formatPrice(value) {
+      return value.toLocaleString("id-ID", {
+        style: "currency",
+        currency: "IDR",
+      });
+    }
   },
 };
 </script>
-

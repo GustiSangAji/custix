@@ -17,7 +17,8 @@
                 <span class="text-muted">Total Pelanggan</span>
               </div>
             </div>
-            <span class="text-dark fw-bold fs-2">{{ pelanggan }}</span>
+            <!-- Ubah warna teks jumlah pelanggan menjadi biru -->
+            <span class="text-primary fw-bold fs-2">{{ pelanggan }}</span>
           </div>
         </div>
       </div>
@@ -63,13 +64,16 @@
       </div>
     </div>
 
-    <!-- Grafik Pendapatan -->
+    <!-- Grafik Pendapatan Bulanan -->
     <div class="card mt-4 shadow-sm">
       <div class="card-header">
         <h3 class="card-title">Pendapatan Bulanan</h3>
+        <div class="card-toolbar">
+          <a class="btn btn-primary btn-sm">Penjualan</a>
+        </div>
       </div>
       <div class="card-body">
-        <apexchart ref="chartRef" type="bar" :options="chart" :series="series" width="100%" height="250"></apexchart>
+        <apexchart ref="chartRef" type="bar" :options="chart" :series="series"></apexchart>
       </div>
     </div>
   </div>
@@ -83,12 +87,6 @@ import axios from "axios";
 import type { ApexOptions } from "apexcharts";
 import type VueApexCharts from "vue3-apexcharts";
 
-// Fungsi untuk mengubah nama bulan ke angka (1-12)
-const convertMonthToNumber = (month: string) => {
-  const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
-  return months.indexOf(month) + 1; // indexOf mengembalikan -1 jika tidak ditemukan, tambahkan 1 agar sesuai bulan
-};
-
 export default defineComponent({
   name: "DashboardWidgets",
   setup() {
@@ -98,15 +96,16 @@ export default defineComponent({
 
     const chartRef = ref<typeof VueApexCharts | null>(null);
     const chart = ref<ApexOptions>({});
+    const store = useThemeStore();
 
-    const series = ref([
+    const series = [
       {
         name: "Pendapatan",
         type: "bar",
         stacked: true,
-        data: [0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0], // Dummy data untuk 12 bulan
+        data: Array(12).fill(0), // Data dummy untuk 12 bulan
       },
-    ]);
+    ];
 
     const fetchData = async () => {
       try {
@@ -118,12 +117,12 @@ export default defineComponent({
         if (response.data.pendapatan_bulanan && Array.isArray(response.data.pendapatan_bulanan)) {
           const bulanData = Array(12).fill(0); // Inisialisasi array untuk 12 bulan
           response.data.pendapatan_bulanan.forEach((item: any) => {
-            const bulanIndex = convertMonthToNumber(item.bulan); // Konversi bulan dari string ke angka
+            const bulanIndex = convertMonthToNumber(item.bulan); // Konversi nama bulan ke angka
             if (bulanIndex >= 1 && bulanIndex <= 12) {
-              bulanData[bulanIndex - 1] = item.total_pendapatan; // Update dengan pendapatan sebenarnya
+              bulanData[bulanIndex - 1] = item.total_pendapatan;
             }
           });
-          series.value[0].data = bulanData;
+          series[0].data = bulanData; // Update data pendapatan
         }
 
         if (chartRef.value) {
@@ -137,35 +136,64 @@ export default defineComponent({
     const chartOptions = (): ApexOptions => {
       const labelColor = getCSSVariableValue("--bs-gray-500");
       const baseColor = getCSSVariableValue("--bs-primary");
+      const darkMode = store.isDarkMode; // Asumsikan kamu punya flag mode gelap di theme store
 
       return {
         chart: {
           type: "bar",
-          height: 250, // Ukuran chart diperkecil
+          height: 450,
           stacked: true,
+          toolbar: { show: false },
         },
         plotOptions: {
           bar: {
-            columnWidth: "55%",
+            borderRadius: 5, // Membuat ujung batang lebih rounded
+            columnWidth: "25%",
+            dataLabels: {
+              enabled: false, // Menghilangkan data labels di batang
+            },
           },
         },
+        dataLabels: {
+          enabled: false, // Ini juga untuk memastikan data labels dinonaktifkan secara global
+        },
         xaxis: {
-          categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"], // Kategori untuk 12 bulan
+          categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+          labels: {
+            style: {
+              colors: darkMode ? "#fff" : labelColor,
+            },
+          },
         },
         yaxis: {
           title: {
             text: "Pendapatan (Rp)",
+            style: {
+              color: darkMode ? "#fff" : labelColor,
+            },
           },
           labels: {
-            formatter: (val: number) => formatRupiah(val), // Format label sumbu Y
+            style: {
+              colors: darkMode ? "#fff" : labelColor,
+            },
+            formatter: (val: number) => formatRupiah(val),
           },
         },
         tooltip: {
+          enabled: true, // Aktifkan tooltip jika ingin menampilkan informasi saat hover
           y: {
-            formatter: (val: number) => formatRupiah(val), // Format tooltip
+            formatter: (val: number) => formatRupiah(val),
+          },
+          style: {
+            fontSize: "12px",
+            color: "#fff",
+            background: darkMode ? "#333" : "#fff",
           },
         },
         colors: [baseColor],
+        grid: {
+          borderColor: darkMode ? "#444" : "#e0e0e0",
+        },
       };
     };
 
@@ -182,6 +210,11 @@ export default defineComponent({
 
     const formatRupiah = (value: number) =>
       new Intl.NumberFormat("id-ID", { style: "currency", currency: "IDR" }).format(value);
+
+    const convertMonthToNumber = (month: string) => {
+      const months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+      return months.indexOf(month) + 1;
+    };
 
     return {
       pelanggan,
@@ -210,6 +243,30 @@ export default defineComponent({
 }
 
 .card-xl-stretch {
-  height: 250px; /* Tinggi widget lebih kecil */
+  height: 350px;
+}
+
+.card-body {
+  padding: 1rem; // Mengurangi padding
+}
+
+.text-primary {
+  color: #0d6efd; // Warna biru untuk jumlah pelanggan
+}
+
+.text-success {
+  font-size: 1.5rem; // Ukuran font yang lebih kecil
+  overflow: hidden; // Menyembunyikan overflow
+  text-overflow: ellipsis; // Menggunakan ellipsis jika ada overflow
+  white-space: nowrap; // Mencegah teks baru
+}
+
+body.dark-mode {
+  background-color: #121212; // Warna latar belakang gelap
+  color: #fff; // Teks berwarna putih
+}
+
+.card-header {
+  border-bottom: none;
 }
 </style>

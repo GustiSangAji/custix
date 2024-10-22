@@ -3,16 +3,8 @@
     <h1>Waiting Room</h1>
     <p v-if="accessGranted">Slot tersedia! Anda akan segera diarahkan...</p>
     <p v-else>
-      Anda berada di antrian. Posisi Anda: {{ queuePosition }}. Tunggu hingga
-      pengguna selesai.
+      Anda berada di antrian. Posisi Anda: {{ queuePosition }}. Tunggu hingga pengguna selesai.
     </p>
-
-    <!-- Tambahan untuk menampilkan data tiket jika tersedia -->
-    <div v-if="ticketData">
-      <h3>Detail Tiket</h3>
-      <p>Nama Tiket: {{ ticketData.name }}</p>
-      <p>Harga: {{ formatPrice(ticketData.price) }}</p>
-    </div>
   </div>
 </template>
 
@@ -28,29 +20,42 @@ export default {
     };
   },
   methods: {
-    checkStatus() {
-      axios
-        .get("/waiting-room-status") // Pastikan URL API benar
-        .then((response) => {
-          this.accessGranted = response.data.accessGranted;
-          this.queuePosition = response.data.queuePosition;
+    async checkStatus() {
+      try {
+        const response = await axios.get("/waiting-room-status");
+        console.log("Response dari waiting-room-status:", response.data);
+        this.accessGranted = response.data.accessGranted;
+        this.queuePosition = response.data.queuePosition;
 
-          if (this.accessGranted) {
-            // Ambil id dari query parameter dan arahkan ke halaman tiket
-            const ticketId = this.$route.query.id;
-            if (ticketId) {
-              this.$router.push(`/tiket/${ticketId}`); // Arahkan ke halaman tiket dengan ID yang benar
-            } else {
-              console.error("Ticket ID not found in query parameters.");
-            }
+        if (this.accessGranted) {
+          await this.removeFromQueue(); // Tunggu hingga proses penghapusan selesai
+
+          const ticketId = this.$route.query.id;
+          if (ticketId) {
+            this.$router.push(`/tiket/${ticketId}`);
+          } else {
+            console.error("Ticket ID not found in query parameters.");
           }
-        })
-        .catch((error) => {
-          console.error("Terjadi kesalahan saat memeriksa status:", error);
-        }); // Tambahkan titik koma di sini
+        }
+      } catch (error) {
+        console.error("Terjadi kesalahan saat memeriksa status:", error);
+      }
     },
 
-    // Format harga dalam IDR
+    async removeFromQueue() {
+      const userId = localStorage.getItem('userId');
+      if (userId) {
+        try {
+          const response = await axios.post('/clear-access', { user_id: userId });
+          console.log('User removed from ticket queue:', response.data);
+        } catch (error) {
+          console.error('Terjadi kesalahan saat menghapus dari antrian:', error);
+        }
+      } else {
+        console.error('User ID tidak ditemukan di localStorage.');
+      }
+    },
+
     formatPrice(value) {
       return value.toLocaleString("id-ID", {
         style: "currency",
@@ -64,6 +69,10 @@ export default {
   },
   beforeUnmount() {
     clearInterval(this.interval); // Hentikan interval saat komponen dihapus
+  },
+  beforeRouteLeave(to, from, next) {
+    this.removeFromQueue(); // Panggil fungsi untuk menghapus dari antrian
+    next(); // Melanjutkan navigasi
   },
 };
 </script>

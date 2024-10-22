@@ -1,37 +1,125 @@
 <template>
   <div class="card shadow-sm rounded overflow-hidden">
+    <!-- Gambar Produk -->
     <img
       :src="imageUrl"
       class="card-img-top"
       :alt="product.name"
+      v-if="imageUrl"
+      @error="onImageError"
     />
     <div class="card-body p-4">
-      <!-- Padding kiri dan kanan ditambah menggunakan px-4 -->
-      <h5 class="card-title fw-bold text-uppercase mb-3">{{ product.name }}</h5>
-      <p class="card-text text-muted mb-3">
-        <i class="bi bi-calendar-event"></i> {{ formattedDate }}<br />
-        <i class="bi bi-geo-alt"></i> {{ product.place }}
+      <!-- Nama Produk -->
+      <h5 class="card-title fw-bold text-uppercase mb-3">
+        {{ product.name }}
+      </h5>
+
+      <!-- Informasi Tanggal dan Tempat -->
+      <p class="card-text fs-6 mb-3 text-muted">
+        <i class="bi bi-calendar me-2"></i> {{ formatDate(product.datetime) }}
+        &nbsp;
+        <i class="bi bi-geo-alt me-2"></i> {{ product.place }}
       </p>
-      <router-link :to="'/tiket/'+product.id" class="btn btn-danger w-100 fw-bold">BELI TIKET</router-link>
+
+      <!-- Harga dan Tombol Beli -->
+      <div class="d-flex justify-content-between align-items-center">
+        <div class="bg-success fw-bold text-light px-3 py-2 rounded">
+          Mulai Dari Rp. {{ product.price }}
+        </div>
+
+        <!-- Tombol Beli Tiket -->
+        <button
+          @click="checkAccessAndRedirect"
+          class="btn btn-danger block-btn px-4 py-2 fw-bold"
+        >
+          Beli Tiket
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+import axios from "axios";
+import { useRouter } from "vue-router"; // Vue Router untuk redirect
+import Swal from "sweetalert2";
+
 export default {
   name: "TicketProduct",
-  props: ["product"],
+  props: {
+    product: {
+      type: Object,
+      required: true,
+    },
+  },
+  setup() {
+    const router = useRouter(); // Inisialisasi router
+    return { router };
+  },
   computed: {
     imageUrl() {
-      return `http://localhost:8000/storage/${this.product.image}`;
+      if (this.product.image && typeof this.product.image === "string") {
+        return `/storage/${this.product.image}`;
+      }
+      return "/images/default-ticket.jpg"; // Gambar default jika tidak ada gambar
     },
-    formattedDate() {
-      const date = new Date(this.product.datetime);
-      return date.toLocaleDateString("id-ID", {
-        day: "numeric",
-        month: "long",
-        year: "numeric",
-      });
+  },
+  methods: {
+    onImageError(event) {
+      event.target.src = "/images/default-ticket.jpg";
+    },
+    formatDate(date) {
+      const options = { year: "numeric", month: "long", day: "numeric" };
+      return new Date(date).toLocaleDateString("id-ID", options);
+    },
+
+    async checkAccessAndRedirect() {
+      const userId = localStorage.getItem("userId");
+
+      if (!userId) {
+        Swal.fire({
+          title: "Anda harus login",
+          text: "Silakan login untuk memesan tiket.",
+          icon: "warning",
+          confirmButtonText: "Login",
+          cancelButtonText: "Batal",
+          showCancelButton: true,
+          reverseButtons: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.$router.push({ name: "sign-in" }); // Ganti dengan nama route yang sesuai
+          }
+        });
+      } else {
+        // Jika pengguna sudah login, arahkan ke halaman detail tiket
+        try {
+          const response = await axios.get("/waiting-room-status");
+          const { accessGranted } = response.data;
+
+          if (accessGranted) {
+            this.router.push(`/tiket/${this.product.id}`); // Arahkan ke halaman tiket jika ada akses
+          } else {
+            Swal.fire({
+              title: "Menunggu Giliran",
+              text: "Kamu sedang berada dalam waiting room. Harap menunggu sampai giliranmu tiba.",
+              icon: "info",
+              confirmButtonText: "OK",
+            });
+            this.router.push({
+              path: "/waiting-room",
+              query: { id: this.product.id },
+            }); // Kirim ID tiket melalui query parameter
+          }
+        } catch (error) {
+          console.error("Error checking access:", error);
+          Swal.fire({
+            title: "Kesalahan",
+            text: "Terjadi kesalahan saat mengecek akses. Silakan coba lagi nanti.",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+        }
+      }
     },
   },
 };
