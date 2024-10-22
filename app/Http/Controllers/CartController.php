@@ -277,6 +277,7 @@ class CartController extends Controller
         return response()->json([
             'order' => [
                 'id' => $order->id,
+                'order_id' => $order->order_id,
                 'total_harga' => $order->total_harga,
                 'created_at' => $order->created_at,
             ],

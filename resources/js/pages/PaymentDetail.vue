@@ -165,71 +165,69 @@ export default {
       return new Date(date).toLocaleDateString("id-ID", options);
     },
     getOrderDetails() {
-  axios
-    .get(`http://localhost:8000/api/order-detail/${this.orderId}`)
-    .then((response) => {
-      console.log("Response Data:", response.data);
-      this.orderDetail = response.data.order; // Ambil data order
-      this.ticketDetail = response.data.ticket; // Ambil data tiket
-      this.user = response.data.user;
-    })
-    .catch((error) => {
-      console.error(
-        "Terjadi kesalahan saat mengambil detail pesanan:",
-        error
-      );
-    });
-},
-pay() {
-  // Gunakan this.orderDetail.id untuk mengambil order_id
-  axios
-    .post(`http://localhost:8000/api/payment/${this.orderDetail.id}`, {
-      orderId: this.orderDetail.id, // Menggunakan order_id dari orderDetail
-    })
-    .then((response) => {
-      let snapToken = response.data.snap_token;
+      axios
+        .get(`http://localhost:8000/api/order-detail/${this.orderId}`)
+        .then((response) => {
+          console.log("Response Data:", response.data);
+          this.orderDetail = response.data.order; // Ambil data order
+          this.ticketDetail = response.data.ticket; // Ambil data tiket
+          this.user = response.data.user;
+        })
+        .catch((error) => {
+          console.error(
+            "Terjadi kesalahan saat mengambil detail pesanan:",
+            error
+          );
+        });
+    },
+    pay() {
+      // Gunakan this.orderDetail.id untuk mengambil order_id
+      axios
+        .post(`http://localhost:8000/api/payment/${this.orderDetail.id}`, {
+          orderId: this.orderDetail.id, // Menggunakan order_id dari orderDetail
+        })
+        .then((response) => {
+          let snapToken = response.data.snap_token;
 
-      if (!snapToken) {
-        console.error("Snap Token is undefined or null.");
-        return;
-      }
+          if (!snapToken) {
+            console.error("Snap Token is undefined or null.");
+            return;
+          }
 
-      window.snap.pay(snapToken, {
-        onSuccess: (result) => {
-          console.log("Payment Success:", result);
-          this.$router.push({
-            name: "afterpayment",
-            params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
-            query: { transaction_status: result.transaction_status },
+          window.snap.pay(snapToken, {
+            onSuccess: (result) => {
+              console.log("Payment Success:", result);
+              this.$router.push({
+                name: "afterpayment",
+                params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
+                query: { transaction_status: result.transaction_status },
+              });
+            },
+            onPending: (result) => {
+              console.log("Payment Pending:", result);
+              this.$router.push({
+                name: "afterpayment",
+                params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
+                query: { transaction_status: "pending" },
+              });
+            },
+            onError: (result) => {
+              console.log("Payment Error:", result);
+              this.$router.push({
+                name: "afterpayment",
+                params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
+                query: { transaction_status: "Unpaid" },
+              });
+            },
+            onClose: () => {
+              console.log("Payment popup closed");
+            },
           });
-        },
-        onPending: (result) => {
-          console.log("Payment Pending:", result);
-          this.$router.push({
-            name: "afterpayment",
-            params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
-            query: { transaction_status: 'pending' },
-          });
-        },
-        onError: (result) => {
-          console.log("Payment Error:", result);
-          this.$router.push({
-            name: "afterpayment",
-            params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
-            query: { transaction_status: 'Unpaid' },
-          });
-        },
-        onClose: () => {
-          console.log("Payment popup closed");
-        },
-      });
-    })
-    .catch((error) => {
-      console.error("Error fetching payment data:", error);
-    });
-},
-
-
+        })
+        .catch((error) => {
+          console.error("Error fetching payment data:", error);
+        });
+    },
   },
 };
 </script>
