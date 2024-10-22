@@ -111,7 +111,7 @@ Route::prefix('laporan')->group(function () {
 // Order Routes
 Route::post('/order', [CartController::class, 'store']);
 Route::get('/order', [CartController::class, 'index']);
-Route::get('/order/{id}', [CartController::class, 'show']);
+Route::get('/order-detail/{id}', [CartController::class, 'getOrderDetail']);
 Route::post('/payment/{id}', [CartController::class, 'checkout']);
 Route::post('/afterpayment', [CartController::class, 'callback']);
 Route::post('/afterpay', [CartController::class, 'afterpayment']);
