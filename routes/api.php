@@ -103,10 +103,7 @@ Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail 
 Route::prefix('laporan')->group(function () {
     Route::post('/', [LaporanController::class, 'index']);
     Route::post('/store', [LaporanController::class, 'store']);
-    Route::get('api/laporan/{id}', [LaporanController::class, 'show']);
- // Ganti ini untuk menampilkan detail
-    Route::put('/{laporan}', [LaporanController::class, 'update']);
-    Route::delete('/{laporan}', [LaporanController::class, 'destroy']);
+    Route::get('api/laporan/{id}', [LaporanController::class, 'show']);// Menampilkan daftar laporan dengan pagination// Menampilkan laporan berdasarkan ID
     Route::get('export/excel', [LaporanController::class, 'export_excel']);
     Route::get('/pdf', [LaporanController::class, 'generatePdf']); // Rute PDF
 });

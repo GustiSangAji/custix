@@ -1,10 +1,27 @@
 <template>
-  <div class="waiting-room text-center">
-    <h1>Waiting Room</h1>
-    <p v-if="accessGranted">Slot tersedia! Anda akan segera diarahkan...</p>
-    <p v-else>
-      Anda berada di antrian. Posisi Anda: {{ queuePosition }}. Tunggu hingga pengguna selesai.
-    </p>
+  <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
+    <div class="card text-center shadow p-9" style="max-width: 400px; width: 100%;">
+      <h1 class="card-title mb-1">Waiting Room...</h1>
+
+      <div v-if="accessGranted" class="card-body">
+        <p class="text-success">Slot tersedia! Anda akan segera diarahkan...</p>
+        <div class="spinner-border text-success" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <div v-else class="card-body">
+        <p class="text-primary">
+          Terlalu banyak pengguna mengakses halaman ini. Posisi Anda:
+          <span class="fw-bold">{{ queuePosition }}</span>
+        </p>
+        <p>Silakan tunggu hingga pengguna selesai.</p>
+        <p>Estimasi 5 Menit</p>
+        <div class="spinner-border text-primary" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -43,24 +60,19 @@ export default {
     },
 
     async removeFromQueue() {
-      const userId = localStorage.getItem('userId');
+      const userId = localStorage.getItem("userId");
       if (userId) {
         try {
-          const response = await axios.post('/clear-access', { user_id: userId });
-          console.log('User removed from ticket queue:', response.data);
+          const response = await axios.post("/clear-access", {
+            user_id: userId,
+          });
+          console.log("User removed from ticket queue:", response.data);
         } catch (error) {
-          console.error('Terjadi kesalahan saat menghapus dari antrian:', error);
+          console.error("Terjadi kesalahan saat menghapus dari antrian:", error);
         }
       } else {
-        console.error('User ID tidak ditemukan di localStorage.');
+        console.error("User ID tidak ditemukan di localStorage.");
       }
-    },
-
-    formatPrice(value) {
-      return value.toLocaleString("id-ID", {
-        style: "currency",
-        currency: "IDR",
-      });
     },
   },
   mounted() {
@@ -76,9 +88,3 @@ export default {
   },
 };
 </script>
-
-<style scoped>
-.waiting-room {
-  margin-top: 50px;
-}
-</style>
