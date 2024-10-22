@@ -18,7 +18,7 @@
 
     const columns = [
         columnHelper.accessor("id", {
-            header: "no",
+            header: "No",
         }),
         columnHelper.accessor("order_id", {
             header: "Kode Transaksi",

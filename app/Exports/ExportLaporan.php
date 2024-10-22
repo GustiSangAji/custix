@@ -24,44 +24,46 @@ class ExportLaporan implements FromCollection, WithHeadings, WithStyles, WithEve
      * @return \Illuminate\Support\Collection
      */
     public function collection()
-{
-    // Fungsi untuk memformat angka ke Rupiah
-    $formatRupiah = function ($value) {
-        return 'Rp ' . number_format($value, 0, ',', '.');
-    };
+    {
+        // Fungsi untuk memformat angka ke Rupiah
+        $formatRupiah = function ($value) {
+            return 'Rp ' . number_format($value, 0, ',', '.');
+        };
 
-    // Hitung total harga
-    $totalHarga = $this->carts->sum('total_harga');
+        // Filter hanya untuk status "paid"
+        $cartsPaid = $this->carts->where('status', 'Paid');
 
-    // Ambil data carts yang sudah difilter di controller
-    $data = $this->carts->map(function ($cart, $index) use ($formatRupiah) {
-        return [
-            'no' => $index + 1, // nomor urut
-            'order_id' => $cart->order_id,
-            'email' => $cart->user->email ?? 'N/A',
-            'nama_tiket' => $cart->ticket->name ?? 'N/A',
-            'jumlah' => $cart->jumlah_pemesanan,
-            'harga' => $formatRupiah($cart->total_harga), // Format rupiah
-            'tanggal_pembelian' => $cart->created_at->format('Y-m-d'),
-            'status' => $cart->status,
+        // Hitung total harga dari status "paid" saja
+        $totalHargaPaid = $cartsPaid->sum('total_harga');
+
+        // Ambil data carts yang sudah difilter di controller
+        $data = $this->carts->map(function ($cart, $index) use ($formatRupiah) {
+            return [
+                'no' => $index + 1, // nomor urut
+                'order_id' => $cart->order_id,
+                'email' => $cart->user->email ?? 'N/A',
+                'nama_tiket' => $cart->ticket->name ?? 'N/A',
+                'jumlah' => $cart->jumlah_pemesanan,
+                'harga' => $formatRupiah($cart->total_harga), // Format rupiah
+                'tanggal_pembelian' => $cart->created_at->format('Y-m-d'),
+                'status' => $cart->status,
+            ];
+        })->toArray();
+
+        // Tambahkan total harga dari status "paid" ke dalam array dengan format rupiah
+        $data[] = [
+            'no' => '',
+            'order_id' => '',
+            'email' => '',
+            'nama_tiket' => '',
+            'jumlah' => '',
+            'harga' => $formatRupiah($totalHargaPaid), // Total harga dari paid diformat ke rupiah
+            'tanggal_pembelian' => '',
+            'status' => 'Total Harga Paid', // Label
         ];
-    })->toArray();
 
-    // Tambahkan total harga ke dalam array dengan format rupiah
-    $data[] = [
-        'no' => '',
-        'order_id' => '',
-        'email' => '',
-        'nama_tiket' => '',
-        'jumlah' => '',
-        'harga' => $formatRupiah($totalHarga), // Total harga diformat ke rupiah
-        'tanggal_pembelian' => '',
-        'status' => 'Total Harga', // Label
-    ];
-
-    return collect($data);
-}
-
+        return collect($data);
+    }
 
     // Menambahkan judul kolom
     public function headings(): array
