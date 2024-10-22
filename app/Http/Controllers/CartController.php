@@ -59,13 +59,6 @@ class CartController extends Controller
         return response()->json(['message' => 'Tiket berhasil ditambahkan ke keranjang', 'cart' => $cart], 201);
     }
 
-
-    public function show($id)
-    {
-        $cart = Cart::findOrFail($id);
-        return response()->json($cart);
-    }
-
     public function checkout($id)
     {
         $cart = Cart::with('user', 'ticket')->findOrFail($id);
@@ -203,24 +196,30 @@ class CartController extends Controller
 
     public function getUserOrders()
     {
-        // Ambil semua pesanan untuk pengguna yang sedang login
-        $orders = Cart::where('user_id', auth()->id())->with('ticket')->get();
+        
+        $orders = Cart::where('user_id', auth()->id())
+                    ->where('status', 'Paid')
+                    ->with('ticket')
+                    ->get();
 
         return response()->json($orders);
     }
 
+
     public function getOrderById($id)
     {
+        
         $order = Cart::where('id', $id)
-            ->where('user_id', auth()->id())
-            ->with('ticket')
-            ->first();
+                    ->where('user_id', auth()->id()) 
+                    ->where('status', 'Paid')    
+                    ->with('ticket')
+                    ->first();
 
         if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
+            return response()->json(['message' => 'Order not found or not paid'], 404);
         }
 
-        return response()->json($order); // Ambil data order beserta qr_code
+        return response()->json($order);
     }
 
     public function saveQrCode(Request $request)
@@ -263,5 +262,39 @@ class CartController extends Controller
     
         return response()->json(['message' => 'Tiket valid dan berhasil diverifikasi'],200);
     }
+
+
+    public function getOrderDetail($id)
+    {
+        // Mengambil order berdasarkan ID dan memuat relasi pengguna dan tiket
+        $order = Cart::with(['ticket', 'user'])->where('id', $id)->first();
+    
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+    
+        // Ambil hanya data yang diperlukan untuk halaman pembayaran
+        return response()->json([
+            'order' => [
+                'id' => $order->id,
+                'order_id' => $order->order_id,
+                'total_harga' => $order->total_harga,
+                'created_at' => $order->created_at,
+            ],
+            'ticket' => [
+                'kode_tiket' => $order->ticket->kode_tiket,
+                'name' => $order->ticket->name,
+                'image' => $order->ticket->image,
+            ],
+            'user' => [
+                'id' => $order->user->id,
+                'nama' => $order->user->nama,
+                'email' => $order->user->email,
+                'phone' => $order->user->phone,
+            ],
+        ]);
+    }
+    
+
 }
 

@@ -1,20 +1,35 @@
 <template>
   <LayoutLanding>
-    <div v-if="orderDetail && ticketDetail">
+    <div v-if="isLoading" class="text-center mt-5">
+      <p>Memuat...</p> <!-- Indikator loading -->
+    </div>
+    <div v-else-if="orderDetail && ticketDetail">
       <div class="container mt-5">
         <h5 class="text-center mb-4">Status Pembayaran</h5>
 
         <!-- Menampilkan pesan berdasarkan status pembayaran -->
-        <div v-if="paymentStatus === 'settlement'" class="alert alert-success text-center">
+        <div
+          v-if="paymentStatus === 'settlement'"
+          class="alert alert-success text-center"
+        >
           Pembayaran berhasil! E-tiket telah dikirim ke email Anda.
         </div>
-        <div v-if="paymentStatus === 'capture'" class="alert alert-success text-center">
+        <div
+          v-if="paymentStatus === 'capture'"
+          class="alert alert-success text-center"
+        >
           Pembayaran berhasil! E-tiket telah dikirim ke email Anda.
         </div>
-        <div v-if="paymentStatus === 'pending'" class="alert alert-danger text-center">
+        <div
+          v-if="paymentStatus === 'pending'"
+          class="alert alert-danger text-center"
+        >
           Pembayaran gagal. Silakan coba lagi atau hubungi layanan pelanggan.
         </div>
-        <div v-if="paymentStatus === 'unpaid'" class="alert alert-danger text-center">
+        <div
+          v-if="paymentStatus === 'unpaid'"
+          class="alert alert-danger text-center"
+        >
           Pembayaran gagal. Silakan coba lagi atau hubungi layanan pelanggan.
         </div>
 
@@ -25,28 +40,38 @@
               <div class="card-body">
                 <h5 class="card-title">Detail Pesanan</h5>
                 <p class="card-text">
-                  <strong>Order ID:</strong> {{ orderDetail.order_id }}<br />
+                  <strong>Order ID:</strong> {{ orderDetail.id }}<br />
                   <strong>Nama Tiket:</strong> {{ ticketDetail.name }}<br />
                   <strong>Jumlah:</strong> {{ orderDetail.jumlah_pemesanan }}<br />
                   <strong>Nama Pemesan:</strong> {{ user.nama }}<br />
                   <strong>Nomor Ponsel:</strong> {{ user.phone }}<br />
                   <strong>Email:</strong> {{ user.email }}<br />
-                  <strong>Tanggal Pemesanan:</strong> {{ formatDate(orderDetail.created_at) }}
+                  <strong>Tanggal Pemesanan:</strong>
+                  {{ formatDate(orderDetail.created_at) }}
                 </p>
 
                 <div class="d-flex justify-content-between align-items-center mt-3">
                   <h6>Total Pembayaran</h6>
-                  <p class="fw-bold">{{ formatPrice(orderDetail.total_harga) }}</p>
+                  <p class="fw-bold">
+                    {{ formatPrice(orderDetail.total_harga) }}
+                  </p>
                 </div>
+
                 <!-- Menampilkan QR Code berdasarkan Order ID -->
                 <h5 class="text-center mt-4">QR Code Tiket Masuk</h5>
                 <div class="d-flex justify-content-center bg-white">
-                  <qrcode-vue :value="`https://2037-118-99-113-12.ngrok-free.app/verify?order_id=${orderDetail.order_id}`" :size="200" />
+                  <qrcode-vue
+                    :value="`https://2037-118-99-113-12.ngrok-free.app/verify?order_id=${orderDetail.id}`"
+                    :size="200"
+                  />
                 </div>
 
                 <!-- Tombol Selesai di Tengah -->
                 <div class="text-center mt-6">
-                  <button @click="handleBackToHome" class="btn btn-primary block-btn">
+                  <button
+                    @click="handleBackToHome"
+                    class="btn btn-primary block-btn"
+                  >
                     Selesai
                   </button>
                 </div>
@@ -68,7 +93,7 @@ import axios from "axios";
 import LayoutLanding from "@/layouts/LayoutLanding.vue";
 import { computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
-import QrcodeVue from 'qrcode.vue'; // Import QrcodeVue
+import QrcodeVue from "qrcode.vue"; // Import QrcodeVue
 
 export default {
   name: "AfterPayment",
@@ -89,11 +114,12 @@ export default {
       orderDetail: null, // Data pesanan
       ticketDetail: null, // Data tiket
       paymentStatus: null, // Status pembayaran (success, pending, failure)
+      isLoading: true, // State untuk loading
     };
   },
   mounted() {
     this.getPaymentStatus(); // Ambil status pembayaran saat halaman dimuat
-    this.getOrderDetails(); // Ambil detail pesanan dan tiket
+    this.validatePaymentStatus(); // Validasi status pembayaran
   },
 
   methods: {
@@ -104,51 +130,70 @@ export default {
 
     getPaymentStatus() {
       const queryParams = new URLSearchParams(window.location.search);
-      this.paymentStatus = queryParams.get("transaction_status") || 'unpaid'; // Default ke 'unpaid'
+      this.paymentStatus = queryParams.get("transaction_status") || "unpaid"; // Default ke 'unpaid'
       console.log("Payment status dari URL:", this.paymentStatus);
+    },
+
+    validatePaymentStatus() {
+      if (this.paymentStatus === 'unpaid') {
+        // Redirect ke halaman pembayaran
+        this.$router.push(`/payment/${this.orderId}`); // Ganti dengan route yang sesuai untuk halaman pembayaran
+      } else {
+        this.getOrderDetails(); // Ambil detail pesanan jika pembayaran berhasil
+      }
     },
 
     getOrderDetails() {
       axios
-        .get(`http://localhost:8000/api/order/${this.orderId}`)
+        .get(`http://localhost:8000/api/order-detail/${this.orderId}`)
         .then((response) => {
-          this.orderDetail = response.data;
-
-          // Ambil detail tiket berdasarkan ticket_id dari orderDetail
-          return axios.get(
-            `http://localhost:8000/api/tickets/${response.data.ticket_id}`
-          );
-        })
-        .then((ticketResponse) => {
-          this.ticketDetail = ticketResponse.data;
+          this.orderDetail = response.data.order; // Ambil data order
+          this.ticketDetail = response.data.ticket; // Ambil data tiket
+          this.user = response.data.user; // Ambil data pengguna
 
           // Panggil fungsi untuk menyimpan QR code di sini
-          if (this.paymentStatus === 'settlement' || this.paymentStatus === 'capture') {
+          if (
+            this.paymentStatus === "settlement" ||
+            this.paymentStatus === "capture"
+          ) {
             this.saveQrCodeToDatabase();
           }
         })
         .catch((error) => {
-          console.error("Terjadi kesalahan saat mengambil detail pesanan:", error);
+          console.error(
+            "Terjadi kesalahan saat mengambil detail pesanan:",
+            error
+          );
+        })
+        .finally(() => {
+          this.isLoading = false; // Set loading ke false setelah selesai
         });
     },
 
     saveQrCodeToDatabase() {
       if (this.orderDetail) {
-        const qrCodeValue = this.orderDetail.order_id; // Menggunakan order_id sebagai nilai QR code
+        const qrCodeValue = this.orderDetail.id; // Ambil order_id untuk QR code
+        const orderId = this.orderDetail.id; // Ambil order_id yang benar
 
         axios
           .post(`http://localhost:8000/api/save-qr-code`, {
-            order_id: this.orderDetail.order_id, // Kirim order_id
-            qr_code: qrCodeValue, // Nilai QR code
+            order_id: orderId, // Kirim order_id yang benar
+            qr_code: qrCodeValue, // Nilai QR code, yang merupakan order_id
           })
           .then((response) => {
-            console.log('QR code berhasil disimpan ke database:', response.data);
+            console.log(
+              "QR code berhasil disimpan ke database:",
+              response.data
+            );
           })
           .catch((error) => {
-            console.error('Gagal menyimpan QR code ke database:', error);
+            console.error(
+              "Gagal menyimpan QR code ke database:",
+              error.response ? error.response.data : error
+            );
           });
       } else {
-        console.error('orderDetail tidak tersedia saat menyimpan QR code');
+        console.error("orderDetail tidak tersedia saat menyimpan QR code");
       }
     },
 
@@ -156,7 +201,7 @@ export default {
       this.removeUserAccess(); // Panggil metode untuk menghapus akses
       this.$router.push("/"); // Redirect ke beranda
     },
-    
+
     removeUserAccess() {
       axios
         .post(`http://localhost:8000/api/remove-access`, {
@@ -175,7 +220,11 @@ export default {
         style: "currency",
         currency: "IDR",
       });
-    }
+    },
   },
 };
 </script>
+
+<style scoped>
+/* Tambahkan gaya CSS jika diperlukan */
+</style>
