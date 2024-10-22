@@ -6,17 +6,21 @@
     import { formatRupiah } from "@/libs/rupiah";
     import axios from 'axios';
 
-    const columnHelper = createColumnHelper<Cart>();
-    const paginateRef = ref<any>(null);
-    const selected = ref<string>("");
-    const openForm = ref(false);
-    const isDownloading = ref(false); // State untuk mengatur status tombol download
+// Kolom tabel dan data pagination
+const columnHelper = createColumnHelper<Cart>();
+const paginateRef = ref<any>(null);
+const selected = ref<string>(""); // Menyimpan data yang dipilih
+const openForm = ref(false); // Kontrol untuk membuka form
+const isDownloadingExcel = ref(false); // Status pengunduhan Excel
+const isDownloadingPDF = ref(false); // Status pengunduhan PDF
 
-    useDelete({
-        onSuccess: () => paginateRef.value.refetch(),
-    });
+// Hook delete cart
+const { delete: deleteCart } = useDelete({
+    onSuccess: () => paginateRef.value.refetch(), // Refresh data setelah delete berhasil
+});
 
-    const columns = [
+    // Definisi kolom tabel
+const columns = [
         columnHelper.accessor("id", {
             header: "No",
         }),
@@ -31,13 +35,13 @@
         }),
         columnHelper.accessor("total_harga", {
             header: "Total Harga",
-            cell: (cell) => formatRupiah(cell.getValue()),
+            cell: (cell) => formatRupiah(cell.getValue()), // Format Rupiah untuk total harga
         }),
         columnHelper.accessor("created_at", {
             header: "Tanggal Pembelian",
             cell: (cell) => {
                 const dateValue = cell.getValue();
-                return dateValue ? new Date(dateValue).toLocaleDateString() : "-";
+                return dateValue ? new Date(dateValue).toLocaleDateString() : "-"; // Format tanggal
             },
         }),
         columnHelper.accessor("status", {
@@ -46,7 +50,7 @@
                 h(
                     "span", 
                     { class: cell.getValue() === "Paid" ? "text-success" : "text-danger" },
-                    cell.getValue() === "Paid" ? "Sudah Dibayar" : "Belum Dibayar"
+                    cell.getValue() === "Paid" ? "Sudah Dibayar" : "Belum Dibayar" // Status pembayaran
                 ),
         }),
         columnHelper.accessor("id", {
@@ -59,33 +63,54 @@
                             selected.value = cell.getValue();
                             openForm.value = true;
                         },
-                    }, h("i", { class: "la la-eye fs-2" })),
+                    }, h("i", { class: "la la-eye fs-2" })), // Tombol untuk melihat detail
                 ]),
         }),
     ];
 
     const refresh = () => paginateRef.value.refetch();
 
-    const downloadExcel = async () => {
-        if (isDownloading.value) return; // Cegah aksi dobel jika sedang mengunduh
-        isDownloading.value = true; // Aktifkan status "sedang mengunduh"
+// Fungsi download laporan dalam format Excel
+const downloadExcel = async () => {
+    if (isDownloadingExcel.value) return;
+    isDownloadingExcel.value = true;
+    try {
+        const response = await axios.get('/laporan/export/excel', { responseType: 'blob' });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'Laporan.xlsx');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error("Gagal mengunduh laporan Excel:", error);
+        alert('Gagal mengunduh laporan Excel, silakan coba lagi.');
+    } finally {
+        isDownloadingExcel.value = false;
+    }
+};
 
-        try {
-            const response = await axios.get('laporan/export/excel', { responseType: 'blob' });
-            const url = window.URL.createObjectURL(new Blob([response.data]));
-            const link = document.createElement('a');
-            link.href = url;
-            link.setAttribute('download', 'Laporan.xlsx');
-            document.body.appendChild(link);
-            link.click();
-            document.body.removeChild(link);
-        } catch (error) {
-            console.error("Gagal mengunduh laporan:", error);
-            alert('Gagal mengunduh laporan, silakan coba lagi.');
-        } finally {
-            isDownloading.value = false; // Reset status setelah unduhan selesai
-        }
-    };
+// Fungsi download laporan dalam format PDF
+const downloadPDF = async () => {
+    if (isDownloadingPDF.value) return;
+    isDownloadingPDF.value = true;
+    try {
+        const response = await axios.get('/laporan/pdf', { responseType: 'blob' });
+        const url = window.URL.createObjectURL(new Blob([response.data]));
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'Laporan.pdf');
+        document.body.appendChild(link);
+        link.click();
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error("Gagal mengunduh laporan PDF:", error);
+        alert('Gagal mengunduh laporan PDF, silakan coba lagi.');
+    } finally {
+        isDownloadingPDF.value = false;
+    }
+};
 
     watch(openForm, (newVal) => {
         if (!newVal) {
@@ -95,32 +120,49 @@
     });
     </script>
 
-    <template>
-        <Form
-            :selected="selected"
-            v-if="openForm"
-            @close="openForm = false"
-            @refresh="refresh"
-        />
+<template>
+    <!-- Form untuk menampilkan detail Cart -->
+    <Form
+        :selected="selected"
+        v-if="openForm"
+        @close="openForm = false"
+        @refresh="refresh"
+    />
 
-        <div class="card">
-            <div class="card-header align-items-center">
-                <h2 class="mb-0">Daftar Cart</h2>
+    <!-- Kartu yang menampilkan daftar Cart -->
+    <div class="card">
+        <div class="card-header align-items-center">
+            <h2 class="mb-0">Daftar Cart</h2>
+            <!-- Tombol download Excel dan PDF -->
+            <div class="d-flex gap-2">
                 <button 
-                    class="btn btn-primary block-btn" 
+                    class="btn btn-sm btn-primary block-btn" 
                     @click="downloadExcel" 
-                    :disabled="isDownloading" 
+                    :disabled="isDownloadingExcel"
+                    title="Download Excel"
                 >
-                    {{ isDownloading ? 'Mengunduh...' : 'Download Laporan Excel' }}
+                    <i class="la la-file-excel"></i>
+                </button>
+                
+                <button 
+                    class="btn btn-sm btn-danger block-btn" 
+                    @click="downloadPDF" 
+                    :disabled="isDownloadingPDF"
+                    title="Download PDF"
+                >
+                    <i class="la la-file-pdf"></i>
                 </button>
             </div>
-            <div class="card-body">
-                <paginate
-                    ref="paginateRef"
-                    id="table-carts"
-                    url="/laporan"
-                    :columns="columns"
-                />
-            </div>
         </div>
-    </template>
+        
+        <!-- Tabel yang menampilkan daftar cart -->
+        <div class="card-body">
+            <paginate
+                ref="paginateRef"
+                id="table-carts"
+                url="/laporan"
+                :columns="columns"
+            />
+        </div>
+    </div>
+</template>

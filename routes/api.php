@@ -101,12 +101,13 @@ Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail 
 
 // Laporan Routes
 Route::prefix('laporan')->group(function () {
-    Route::post('/', [LaporanController::class, 'index']);  // Menampilkan daftar laporan dengan pagination
-    Route::get('/{laporan}', [LaporanController::class, 'show']);  // Menampilkan laporan berdasarkan ID
+    Route::post('/', [LaporanController::class, 'index']);
+    Route::post('/store', [LaporanController::class, 'store']);
+    Route::get('api/laporan/{id}', [LaporanController::class, 'show']);// Menampilkan daftar laporan dengan pagination// Menampilkan laporan berdasarkan ID
     Route::get('export/excel', [LaporanController::class, 'export_excel']);
-    Route::get('laporan/view/pdf', [LaporanController::class, 'view_pdf']);
-
+    Route::get('/pdf', [LaporanController::class, 'generatePdf']); // Rute PDF
 });
+
 
 // Order Routes
 Route::post('/order', [CartController::class, 'store']);
@@ -130,7 +131,6 @@ Route::get('/user/orders', [CartController::class, 'getUserOrders']);
 Route::get('/user/orders/{id}', [CartController::class, 'getOrderById']);
 Route::post('/save-qr-code', [CartController::class, 'saveQrCode']);
 Route::post('/verify-ticket', [CartController::class, 'verifyTicket']);
-
 
 // routes/api.php
 route::get('/dashboard', [DashboardController::class, 'index']);

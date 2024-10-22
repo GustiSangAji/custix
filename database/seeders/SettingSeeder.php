@@ -17,11 +17,11 @@ class SettingSeeder extends Seeder
         DB::table('settings')->truncate();
 
         Setting::create([
-            'app' => 'e-SAKIP DLH',
-            'description' =>  'Aplikasi e-SAKIP Dinas Lingkungan Hidup',
-            'logo' =>  '/media/logo.png',
-            'bg_auth' =>  '/media/misc/bg-auth.jpg',
-            'banner' =>  '/media/misc/banner.jpg',
+            'app' => 'CusTix',
+            'description' =>  'Beli Tiketmu Disini',
+            'logo' =>  '/media/misc/aminkan.png',
+            'bg_auth' =>  '/media/misc/DmdnYIPmAIvW8d1dLHVkLjAUrS15GeY3bpAHTxxH.jpg',
+            'banner' =>  '/media/misc/DmdnYIPmAIvW8d1dLHVkLjAUrS15GeY3bpAHTxxH.jpg',
             'pemerintah' =>  'Pemerintah Provinsi Jawa Timur',
             'dinas' =>  'Dinas Lingkungan Hidup',
             'alamat' =>  '',
