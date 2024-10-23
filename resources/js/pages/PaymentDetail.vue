@@ -166,7 +166,7 @@ export default {
     },
     getOrderDetails() {
       axios
-        .get(`http://localhost:8000/api/order-detail/${this.orderId}`)
+        .get(`http://192.168.61.123:8000/api/order-detail/${this.orderId}`)
         .then((response) => {
           console.log("Response Data:", response.data);
           this.orderDetail = response.data.order; // Ambil data order
@@ -183,7 +183,7 @@ export default {
     pay() {
       // Gunakan this.orderDetail.id untuk mengambil order_id
       axios
-        .post(`http://localhost:8000/api/payment/${this.orderDetail.id}`, {
+        .post(`http://192.168.61.123:8000/api/payment/${this.orderDetail.id}`, {
           orderId: this.orderDetail.id, // Menggunakan order_id dari orderDetail
         })
         .then((response) => {

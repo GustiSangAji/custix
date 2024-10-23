@@ -145,7 +145,7 @@ export default {
 
     getOrderDetails() {
       axios
-        .get(`http://localhost:8000/api/order-detail/${this.orderId}`)
+        .get(`http://192.168.61.123/:8000/api/order-detail/${this.orderId}`)
         .then((response) => {
           this.orderDetail = response.data.order; // Ambil data order
           this.ticketDetail = response.data.ticket; // Ambil data tiket
@@ -176,7 +176,7 @@ export default {
         const orderId = this.orderDetail.id; // Ambil order_id yang benar
 
         axios
-          .post(`http://localhost:8000/api/save-qr-code`, {
+          .post(`http://192.168.61.123:8000/api/save-qr-code`, {
             order_id: orderId, // Kirim order_id yang benar
             qr_code: qrCodeValue, // Nilai QR code, yang merupakan order_id
           })
@@ -204,7 +204,7 @@ export default {
 
     removeUserAccess() {
       axios
-        .post(`http://localhost:8000/api/remove-access`, {
+        .post(`http://192.168.61.123:8000/api/remove-access`, {
           user_id: this.user.id,
         })
         .then((response) => {

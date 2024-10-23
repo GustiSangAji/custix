@@ -98,7 +98,7 @@ class LaporanController extends Controller
     public function generatePdf()
 {
     // Ambil data dari model Cart dengan status 'paid'
-    $carts = Cart::with(['ticket'])->where('status', 'paid')->get();
+    $carts = Cart::with(['ticket','user'])->where('status', 'paid')->get();
 
     // Cek apakah ada data
     if ($carts->isEmpty()) {
