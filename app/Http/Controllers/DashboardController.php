@@ -15,7 +15,7 @@ class DashboardController extends Controller
         $totalPelanggan = User::count();
 
         // Menghitung total pendapatan dari tabel 'carts' (asumsi status 'Paid' adalah 'dibayar')
-        $totalPendapatan = Cart::whereIn('status', ['Paid', 'Used'])->sum('total_harga');
+        $totalPendapatan = Cart::whereIn('status', ['Paid'])->sum('total_harga');
 
         // Menghitung total quantity tiket yang tersedia
         $totalTiket = Tiket::where('status', 'available')->sum('quantity');

@@ -22,7 +22,7 @@ class CartSeeder extends Seeder
                 'ticket_id' => $faker->numberBetween(1, 50), // Asumsi ada 50 tiket
                 'jumlah_pemesanan' => $faker->numberBetween(1, 3), // Jumlah tiket yang dipesan
                 'total_harga' => $faker->numberBetween(100000, 1000000), // Harga tiket dalam rentang tertentu
-                'status' => $faker->randomElement(['Unpaid', 'Paid', 'Used']), // Status tiket
+                'status' => $faker->randomElement(['Unpaid', 'Paid',]), // Status tiket
             ]);
         }
     }

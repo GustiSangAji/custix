@@ -44,10 +44,6 @@ const routes: Array<RouteRecordRaw> = [
         props: true,
     },
     {
-        path: "/tiket/:id/orders",
-        component: () => import("@/pages/Orders.vue"), // Halaman untuk pemesanan tiket
-    },
-    {
         path: "/waiting-room",
         name: 'waitingroom',
         component: () => import("@/pages/WaitingRoom.vue"),
@@ -135,7 +131,7 @@ const routes: Array<RouteRecordRaw> = [
                 path: "/laporan/export/excel",
                 name: "dashboard.laporan.export",
                 component: defineAsyncComponent(() => {
-                    window.open('http://localhost:8000/api/laporan/export/excel'); // Ganti dengan URL yang sesuai
+                    window.open('http://192.168.61.123:8000/api/laporan/export/excel'); // Ganti dengan URL yang sesuai
                     return Promise.resolve({ render() { return null; } });
                 }),
             },

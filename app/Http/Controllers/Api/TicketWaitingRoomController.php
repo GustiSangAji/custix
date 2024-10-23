@@ -14,7 +14,7 @@ use Illuminate\Support\Str;
 
 class TicketWaitingRoomController extends Controller
 {
-    protected $limit = 99; // Limit akses ke halaman pembayaran (2 pengguna)
+    protected $limit = 1; // Limit akses ke halaman pembayaran (2 pengguna)
 
     public function status()
     {

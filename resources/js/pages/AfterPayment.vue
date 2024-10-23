@@ -110,13 +110,13 @@ export default {
 
     getOrderDetails() {
       axios
-        .get(`http://localhost:8000/api/order/${this.orderId}`)
+        .get(`http://192.168.61.123:8000/api/order/${this.orderId}`)
         .then((response) => {
           this.orderDetail = response.data;
 
           // Ambil detail tiket berdasarkan ticket_id dari orderDetail
           return axios.get(
-            `http://localhost:8000/api/tickets/${response.data.ticket_id}`
+            `http://192.168.61.123:8000/api/tickets/${response.data.ticket_id}`
           );
         })
         .then((ticketResponse) => {
@@ -137,7 +137,7 @@ export default {
         const qrCodeValue = this.orderDetail.order_id; // Menggunakan order_id sebagai nilai QR code
 
         axios
-          .post(`http://localhost:8000/api/save-qr-code`, {
+          .post(`http://192.168.61.123:8000/api/save-qr-code`, {
             order_id: this.orderDetail.order_id, // Kirim order_id
             qr_code: qrCodeValue, // Nilai QR code
           })
@@ -159,7 +159,7 @@ export default {
     
     removeUserAccess() {
       axios
-        .post(`http://localhost:8000/api/remove-access`, {
+        .post(`http://192.168.61.123:8000/api/remove-access`, {
           user_id: this.user.id,
         })
         .then((response) => {

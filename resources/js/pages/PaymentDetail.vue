@@ -166,14 +166,14 @@ export default {
     },
     getOrderDetails() {
       axios
-        .get(`http://localhost:8000/api/order/${this.orderId}`)
+        .get(`http://192.168.61.123:8000/api/order/${this.orderId}`)
         .then((response) => {
           console.log("Response Data:", response.data);
           this.orderDetail = response.data;
 
           // Ambil detail tiket menggunakan ticket_id dari orderDetail
           return axios.get(
-            `http://localhost:8000/api/tickets/${response.data.ticket_id}`
+            `http://192.168.61.123:8000/api/tickets/${response.data.ticket_id}`
           );
         })
         .then((ticketResponse) => {
@@ -189,7 +189,7 @@ export default {
     },
     pay() {
   axios
-    .post(`http://localhost:8000/api/payment/${this.orderId}`, {
+    .post(`http://192.168.61.123:8000/api/payment/${this.orderId}`, {
       orderId: this.orderId,
     })
     .then((response) => {
