@@ -30,11 +30,9 @@ class CartSeeder extends Seeder
                 'order_id' => $faker->unique()->uuid, // UUID unik untuk order_id
                 'user_id' => $faker->numberBetween(1, 50), // Asumsi ada 50 user
                 'ticket_id' => $faker->numberBetween(1, 50), // Asumsi ada 50 tiket
-                'jumlah_pemesanan' => $faker->numberBetween(1, 3), // Jumlah tiket yang dipesan (1 sampai 3)
-                'total_harga' => $faker->numberBetween(100000, 1000000), // Total harga tiket dalam rentang tertentu
-                'status' => $faker->randomElement(['Unpaid', 'Paid', 'Used']), // Status tiket acak
-                'created_at' => $randomDate, // Tanggal acak berdasarkan bulan dan hari acak
-                'updated_at' => now(), // Set updated_at ke waktu saat ini
+                'jumlah_pemesanan' => $faker->numberBetween(1, 3), // Jumlah tiket yang dipesan
+                'total_harga' => $faker->numberBetween(100000, 1000000), // Harga tiket dalam rentang tertentu
+                'status' => $faker->randomElement(['Unpaid', 'Paid',]), // Status tiket
             ]);
         }
     }

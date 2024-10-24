@@ -39,7 +39,7 @@ export default {
   methods: {
     async checkStatus() {
       try {
-        const response = await axios.get("http://192.168.61.123:8000/api/waiting-room-status");
+        const response = await axios.get("http://localhost:8000/api/waiting-room-status");
         console.log("Response dari waiting-room-status:", response.data);
         this.accessGranted = response.data.accessGranted;
         this.queuePosition = response.data.queuePosition;

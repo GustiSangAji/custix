@@ -39,18 +39,5 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'confirmed' => true,
         ])->assignRole('user');
-
-        // Faker untuk menambahkan 50 user acak
-        for ($i = 0; $i < 50; $i++) {
-            User::create([
-                'uuid' => Str::uuid(),
-                'nama' => $faker->name,
-                'email' => $faker->unique()->safeEmail,
-                'password' => bcrypt('password'), // password default
-                'phone' => $faker->unique()->phoneNumber,
-                'email_verified_at' => now(),
-                'confirmed' => $faker->boolean,
-            ])->assignRole('user');
-        }
     }
 }

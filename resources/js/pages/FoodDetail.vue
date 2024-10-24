@@ -278,27 +278,25 @@ export default {
   },
   mounted() {
     axios
-      .get("http://192.168.61.123:8000/api/tickets/" + this.$route.params.id)
+      .get("http://localhost:8000/api/tickets/" + this.$route.params.id)
       .then((response) => this.setProduct(response.data))
       .catch((error) => console.log(error));
-
-    // Listener untuk tombol back browser
-    window.addEventListener("popstate", (event) => {
-      console.log("popstate event fired", event);
-      this.removeAccess();
-    });
   },
   beforeRouteLeave(to, from, next) {
-    // Panggil removeAccess setiap kali pengguna berpindah halaman
-    if (to.name !== "ticketDetail") {
-      this.removeAccess(); // Panggil removeAccess
+  // Tampilkan konfirmasi hanya jika pengguna meninggalkan halaman "ticketDetail"
+  if (to.name !== "ticketDetail") {
+    const answer = window.confirm('Jika Anda keluar, kemungkinan Anda akan antri kembali. Apakah Anda yakin ingin keluar?');
+    
+    if (answer) {
+      this.removeAccess(); // Panggil removeAccess jika user mengonfirmasi
+      next(); // Lanjutkan navigasi
+    } else {
+      next(false); // Batalkan navigasi jika user membatalkan
     }
-    next();
-  },
-  beforeDestroy() {
-    // Menghapus listener ketika komponen dihancurkan
-    window.removeEventListener("popstate", this.removeAccess);
-  },
+  } else {
+    next(); // Jika tetap di halaman ticketDetail, lanjutkan navigasi tanpa alert
+  }
+},
 };
 </script>
 

@@ -145,11 +145,17 @@ export default {
 
     getOrderDetails() {
       axios
-        .get(`http://192.168.61.123/:8000/api/order-detail/${this.orderId}`)
+        .get(`http://localhost:8000/api/order/${this.orderId}`)
         .then((response) => {
-          this.orderDetail = response.data.order; // Ambil data order
-          this.ticketDetail = response.data.ticket; // Ambil data tiket
-          this.user = response.data.user; // Ambil data pengguna
+          this.orderDetail = response.data;
+
+          // Ambil detail tiket berdasarkan ticket_id dari orderDetail
+          return axios.get(
+            `http://localhost:8000/api/tickets/${response.data.ticket_id}`
+          );
+        })
+        .then((ticketResponse) => {
+          this.ticketDetail = ticketResponse.data;
 
           // Panggil fungsi untuk menyimpan QR code di sini
           if (
@@ -176,9 +182,9 @@ export default {
         const orderId = this.orderDetail.id; // Ambil order_id yang benar
 
         axios
-          .post(`http://192.168.61.123:8000/api/save-qr-code`, {
-            order_id: orderId, // Kirim order_id yang benar
-            qr_code: qrCodeValue, // Nilai QR code, yang merupakan order_id
+          .post(`http://localhost:8000/api/save-qr-code`, {
+            order_id: this.orderDetail.order_id, // Kirim order_id
+            qr_code: qrCodeValue, // Nilai QR code
           })
           .then((response) => {
             console.log(
@@ -204,7 +210,7 @@ export default {
 
     removeUserAccess() {
       axios
-        .post(`http://192.168.61.123:8000/api/remove-access`, {
+        .post(`http://localhost:8000/api/remove-access`, {
           user_id: this.user.id,
         })
         .then((response) => {
@@ -226,5 +232,5 @@ export default {
 </script>
 
 <style scoped>
-/* Tambahkan gaya CSS jika diperlukan */
+
 </style>
