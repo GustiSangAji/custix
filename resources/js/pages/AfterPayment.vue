@@ -5,16 +5,28 @@
         <h5 class="text-center mb-4">Status Pembayaran</h5>
 
         <!-- Menampilkan pesan berdasarkan status pembayaran -->
-        <div v-if="paymentStatus === 'settlement'" class="alert alert-success text-center">
+        <div
+          v-if="paymentStatus === 'settlement'"
+          class="alert alert-success text-center"
+        >
           Pembayaran berhasil! E-tiket telah dikirim ke email Anda.
         </div>
-        <div v-if="paymentStatus === 'capture'" class="alert alert-success text-center">
+        <div
+          v-if="paymentStatus === 'capture'"
+          class="alert alert-success text-center"
+        >
           Pembayaran berhasil! E-tiket telah dikirim ke email Anda.
         </div>
-        <div v-if="paymentStatus === 'pending'" class="alert alert-danger text-center">
+        <div
+          v-if="paymentStatus === 'pending'"
+          class="alert alert-danger text-center"
+        >
           Pembayaran gagal. Silakan coba lagi atau hubungi layanan pelanggan.
         </div>
-        <div v-if="paymentStatus === 'unpaid'" class="alert alert-danger text-center">
+        <div
+          v-if="paymentStatus === 'Unpaid'"
+          class="alert alert-danger text-center"
+        >
           Pembayaran gagal. Silakan coba lagi atau hubungi layanan pelanggan.
         </div>
 
@@ -27,26 +39,38 @@
                 <p class="card-text">
                   <strong>Order ID:</strong> {{ orderDetail.order_id }}<br />
                   <strong>Nama Tiket:</strong> {{ ticketDetail.name }}<br />
-                  <strong>Jumlah:</strong> {{ orderDetail.jumlah_pemesanan }}<br />
+                  <strong>Jumlah:</strong> {{ orderDetail.jumlah_pemesanan
+                  }}<br />
                   <strong>Nama Pemesan:</strong> {{ user.nama }}<br />
                   <strong>Nomor Ponsel:</strong> {{ user.phone }}<br />
                   <strong>Email:</strong> {{ user.email }}<br />
-                  <strong>Tanggal Pemesanan:</strong> {{ formatDate(orderDetail.created_at) }}
+                  <strong>Tanggal Pemesanan:</strong>
+                  {{ formatDate(orderDetail.created_at) }}
                 </p>
 
-                <div class="d-flex justify-content-between align-items-center mt-3">
+                <div
+                  class="d-flex justify-content-between align-items-center mt-3"
+                >
                   <h6>Total Pembayaran</h6>
-                  <p class="fw-bold">{{ formatPrice(orderDetail.total_harga) }}</p>
+                  <p class="fw-bold">
+                    {{ formatPrice(orderDetail.total_harga) }}
+                  </p>
                 </div>
                 <!-- Menampilkan QR Code berdasarkan Order ID -->
                 <h5 class="text-center mt-4">QR Code Tiket Masuk</h5>
                 <div class="d-flex justify-content-center bg-white">
-                  <qrcode-vue :value="`https://2037-118-99-113-12.ngrok-free.app/verify?order_id=${orderDetail.order_id}`" :size="200" />
+                  <qrcode-vue
+                    :value="`https://2037-118-99-113-12.ngrok-free.app/verify?order_id=${orderDetail.order_id}`"
+                    :size="200"
+                  />
                 </div>
 
                 <!-- Tombol Selesai di Tengah -->
                 <div class="text-center mt-6">
-                  <button @click="handleBackToHome" class="btn btn-primary block-btn">
+                  <button
+                    @click="handleBackToHome"
+                    class="btn btn-primary block-btn"
+                  >
                     Selesai
                   </button>
                 </div>
@@ -68,7 +92,7 @@ import axios from "axios";
 import LayoutLanding from "@/layouts/LayoutLanding.vue";
 import { computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
-import QrcodeVue from 'qrcode.vue'; // Import QrcodeVue
+import QrcodeVue from "qrcode.vue"; // Import QrcodeVue
 
 export default {
   name: "AfterPayment",
@@ -104,7 +128,7 @@ export default {
 
     getPaymentStatus() {
       const queryParams = new URLSearchParams(window.location.search);
-      this.paymentStatus = queryParams.get("transaction_status") || 'unpaid'; // Default ke 'unpaid'
+      this.paymentStatus = queryParams.get("transaction_status") || "unpaid"; // Default ke 'unpaid'
       console.log("Payment status dari URL:", this.paymentStatus);
     },
 
@@ -123,12 +147,18 @@ export default {
           this.ticketDetail = ticketResponse.data;
 
           // Panggil fungsi untuk menyimpan QR code di sini
-          if (this.paymentStatus === 'settlement' || this.paymentStatus === 'capture') {
+          if (
+            this.paymentStatus === "settlement" ||
+            this.paymentStatus === "capture"
+          ) {
             this.saveQrCodeToDatabase();
           }
         })
         .catch((error) => {
-          console.error("Terjadi kesalahan saat mengambil detail pesanan:", error);
+          console.error(
+            "Terjadi kesalahan saat mengambil detail pesanan:",
+            error
+          );
         });
     },
 
@@ -142,13 +172,16 @@ export default {
             qr_code: qrCodeValue, // Nilai QR code
           })
           .then((response) => {
-            console.log('QR code berhasil disimpan ke database:', response.data);
+            console.log(
+              "QR code berhasil disimpan ke database:",
+              response.data
+            );
           })
           .catch((error) => {
-            console.error('Gagal menyimpan QR code ke database:', error);
+            console.error("Gagal menyimpan QR code ke database:", error);
           });
       } else {
-        console.error('orderDetail tidak tersedia saat menyimpan QR code');
+        console.error("orderDetail tidak tersedia saat menyimpan QR code");
       }
     },
 
@@ -156,7 +189,7 @@ export default {
       this.removeUserAccess(); // Panggil metode untuk menghapus akses
       this.$router.push("/"); // Redirect ke beranda
     },
-    
+
     removeUserAccess() {
       axios
         .post(`http://192.168.61.123:8000/api/remove-access`, {
@@ -175,7 +208,7 @@ export default {
         style: "currency",
         currency: "IDR",
       });
-    }
+    },
   },
 };
 </script>

@@ -283,20 +283,22 @@ export default {
       .catch((error) => console.log(error));
   },
   beforeRouteLeave(to, from, next) {
-  // Tampilkan konfirmasi hanya jika pengguna meninggalkan halaman "ticketDetail"
-  if (to.name !== "ticketDetail") {
-    const answer = window.confirm('Jika Anda keluar, kemungkinan Anda akan antri kembali. Apakah Anda yakin ingin keluar?');
-    
-    if (answer) {
-      this.removeAccess(); // Panggil removeAccess jika user mengonfirmasi
-      next(); // Lanjutkan navigasi
+    // Tampilkan konfirmasi hanya jika pengguna meninggalkan halaman "ticketDetail"
+    if (to.name !== "ticketDetail") {
+      const answer = window.confirm(
+        "Jika Anda keluar, kemungkinan Anda akan antri kembali. Apakah Anda yakin ingin keluar?"
+      );
+
+      if (answer) {
+        this.removeAccess(); // Panggil removeAccess jika user mengonfirmasi
+        next(); // Lanjutkan navigasi
+      } else {
+        next(false); // Batalkan navigasi jika user membatalkan
+      }
     } else {
-      next(false); // Batalkan navigasi jika user membatalkan
+      next(); // Jika tetap di halaman ticketDetail, lanjutkan navigasi tanpa alert
     }
-  } else {
-    next(); // Jika tetap di halaman ticketDetail, lanjutkan navigasi tanpa alert
-  }
-},
+  },
 };
 </script>
 

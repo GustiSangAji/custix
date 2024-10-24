@@ -188,53 +188,52 @@ export default {
         });
     },
     pay() {
-  axios
-    .post(`http://192.168.61.123:8000/api/payment/${this.orderId}`, {
-      orderId: this.orderId,
-    })
-    .then((response) => {
-      let snapToken = response.data.snap_token;
+      axios
+        .post(`http://192.168.61.123:8000/api/payment/${this.orderId}`, {
+          orderId: this.orderId,
+        })
+        .then((response) => {
+          let snapToken = response.data.snap_token;
 
-      if (!snapToken) {
-        console.error("Snap Token is undefined or null.");
-        return;
-      }
+          if (!snapToken) {
+            console.error("Snap Token is undefined or null.");
+            return;
+          }
 
-      window.snap.pay(snapToken, {
-        onSuccess: (result) => {
-          console.log("Payment Success:", result);
-          this.$router.push({
-            name: "afterpayment",
-            params: { orderId: this.orderId },
-            query: { transaction_status: result.transaction_status }, // Tambahkan status transaksi
+          window.snap.pay(snapToken, {
+            onSuccess: (result) => {
+              console.log("Payment Success:", result);
+              this.$router.push({
+                name: "afterpayment",
+                params: { orderId: this.orderId },
+                query: { transaction_status: result.transaction_status }, // Tambahkan status transaksi
+              });
+            },
+            onPending: (result) => {
+              console.log("Payment Pending:", result);
+              this.$router.push({
+                name: "afterpayment",
+                params: { orderId: this.orderId },
+                query: { transaction_status: "pending" }, // Status pending
+              });
+            },
+            onError: (result) => {
+              console.log("Payment Pending:", result);
+              this.$router.push({
+                name: "afterpayment",
+                params: { orderId: this.orderId },
+                query: { transaction_status: "Unpaid" }, // Status pending
+              });
+            },
+            onClose: () => {
+              console.log("Payment popup closed");
+            },
           });
-        },
-        onPending: (result) => {
-          console.log("Payment Pending:", result);
-          this.$router.push({
-            name: "afterpayment",
-            params: { orderId: this.orderId },
-            query: { transaction_status: 'pending' }, // Status pending
-          });
-        },
-        onError: (result) => {
-          console.log("Payment Pending:", result);
-          this.$router.push({
-            name: "afterpayment",
-            params: { orderId: this.orderId },
-            query: { transaction_status: 'Unpaid' }, // Status pending
-          });
-        },
-        onClose: () => {
-          console.log("Payment popup closed");
-        },
-      });
-    })
-    .catch((error) => {
-      console.error("Error fetching payment data:", error);
-    });
-},
-
+        })
+        .catch((error) => {
+          console.error("Error fetching payment data:", error);
+        });
+    },
   },
 };
 </script>

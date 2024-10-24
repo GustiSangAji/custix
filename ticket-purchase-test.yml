@@ -1,21 +1,21 @@
 config:
-  target: 'http://localhost:8000' # Ganti dengan URL aplikasi Laravel kamu
+  target: "http://192.168.61.123" # Ganti dengan URL aplikasi Laravel kamu
   phases:
-    - duration: 5     # Durasi tes dalam detik (misal 60 detik)
-      arrivalRate: 10   # 100 user per detik (sampai total 1000 user)
+    - duration: 5 # Durasi tes dalam detik (misal 60 detik)
+      arrivalRate: 10 # 100 user per detik (sampai total 1000 user)
   payload:
-    path: 'users.csv'     # File CSV untuk data user, jika ingin simulasi user berbeda
+    path: "users.csv" # File CSV untuk data user, jika ingin simulasi user berbeda
     fields:
       - email
       - password
   defaults:
     headers:
-      content-type: 'application/json'
+      content-type: "application/json"
 scenarios:
   - flow:
       - post:
-          url: "/api/order"  # Ganti dengan endpoint pembelian tiket
+          url: "/api/order" # Ganti dengan endpoint pembelian tiket
           json:
-            user_id: "{{ email }}"   # Ambil user_id dari payload atau buat random
-            ticket_id: 1             # ID tiket yang akan dibeli
-            quantity: 1              # Jumlah tiket yang dibeli
+            user_id: "{{ email }}" # Ambil user_id dari payload atau buat random
+            ticket_id: 1 # ID tiket yang akan dibeli
+            quantity: 1 # Jumlah tiket yang dibeli
