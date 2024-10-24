@@ -21,7 +21,11 @@
 
         <!-- Menampilkan skeleton jika loading -->
         <div v-if="loading" class="row mb-4">
-          <div v-for="n in skeletonCount" :key="`skeleton-${n}`" class="col-md-4 mt-4">
+          <div
+            v-for="n in skeletonCount"
+            :key="`skeleton-${n}`"
+            class="col-md-4 mt-4"
+          >
             <div class="skeleton-item"></div>
           </div>
           <div class="text-center spinner-container">
@@ -96,7 +100,11 @@ export default {
       const documentHeight = document.documentElement.scrollHeight;
 
       // Menentukan apakah scroll mencapai bagian bawah
-      if (scrollTop + windowHeight >= documentHeight - 5 && !this.loading && this.currentPage < this.totalPages) {
+      if (
+        scrollTop + windowHeight >= documentHeight - 5 &&
+        !this.loading &&
+        this.currentPage < this.totalPages
+      ) {
         this.currentPage++;
         this.fetchTickets(this.currentPage);
       }
@@ -134,7 +142,8 @@ export default {
 }
 
 /* Animasi Fade */
-.fade-enter-active, .fade-leave-active {
+.fade-enter-active,
+.fade-leave-active {
   transition: opacity 0.5s;
 }
 .fade-enter, .fade-leave-to /* .fade-leave-active di versi <2.1.8 */ {

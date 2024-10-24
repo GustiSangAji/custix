@@ -1,6 +1,9 @@
 <template>
   <div class="d-flex justify-content-center align-items-center vh-100 bg-light">
-    <div class="card text-center shadow p-9" style="max-width: 400px; width: 100%;">
+    <div
+      class="card text-center shadow p-9"
+      style="max-width: 400px; width: 100%"
+    >
       <h1 class="card-title mb-1">Waiting Room...</h1>
 
       <div v-if="accessGranted" class="card-body">
@@ -68,7 +71,10 @@ export default {
           });
           console.log("User removed from ticket queue:", response.data);
         } catch (error) {
-          console.error("Terjadi kesalahan saat menghapus dari antrian:", error);
+          console.error(
+            "Terjadi kesalahan saat menghapus dari antrian:",
+            error
+          );
         }
       } else {
         console.error("User ID tidak ditemukan di localStorage.");

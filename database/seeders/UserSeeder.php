@@ -39,5 +39,35 @@ class UserSeeder extends Seeder
             'email_verified_at' => now(),
             'confirmed' => true,
         ])->assignRole('user');
+
+        User::create([
+            'uuid' => Str::uuid(),
+            'nama' => 'Gilarism',
+            'email' => 'gilarism@gmail.com',
+            'password' => bcrypt('12345678'),
+            'phone' => '08121276212',
+            'email_verified_at' => now(),
+            'confirmed' => true,
+        ])->assignRole('user');
+
+        User::create([
+            'uuid' => Str::uuid(),
+            'nama' => 'Kairos',
+            'email' => 'kairo@gmail.com',
+            'password' => bcrypt('12345678'),
+            'phone' => '08249696969',
+            'email_verified_at' => now(),
+            'confirmed' => true,
+        ])->assignRole('user');
+
+        User::create([
+            'uuid' => Str::uuid(),
+            'nama' => 'Gusti dajjal',
+            'email' => 'gusti@gmail.com',
+            'password' => bcrypt('12345678'),
+            'phone' => '082666666666',
+            'email_verified_at' => now(),
+            'confirmed' => true,
+        ])->assignRole('user');
     }
 }

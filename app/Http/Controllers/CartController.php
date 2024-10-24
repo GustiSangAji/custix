@@ -59,6 +59,12 @@ class CartController extends Controller
         return response()->json(['message' => 'Tiket berhasil ditambahkan ke keranjang', 'cart' => $cart], 201);
     }
 
+    public function show($id)
+    {
+        $cart = Cart::findOrFail($id);
+        return response()->json($cart);
+    }
+
     public function checkout($id)
     {
         $cart = Cart::with('user', 'ticket')->findOrFail($id);

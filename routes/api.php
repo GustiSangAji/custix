@@ -113,6 +113,7 @@ Route::prefix('laporan')->group(function () {
 Route::post('/order', [CartController::class, 'store']);
 Route::get('/order', [CartController::class, 'index']);
 Route::get('/order-detail/{id}', [CartController::class, 'getOrderDetail']);
+Route::get('/order/{id}', [CartController::class, 'show']);
 Route::post('/payment/{id}', [CartController::class, 'checkout']);
 Route::post('/afterpayment', [CartController::class, 'callback']);
 Route::post('/afterpay', [CartController::class, 'afterpayment']);
@@ -125,6 +126,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/grant-access', [TicketWaitingRoomController::class, 'grantAccess']);
     Route::post('/terminate-access', [TicketWaitingRoomController::class, 'terminateAccess']);
     Route::post('/remove-access', [CartController::class, 'removeAccess']);
+    Route::post('/api/remove-access/{id}', [TicketWaitingRoomController::class, 'terminateAccess']);
+
 });
 
 Route::get('/user/orders', [CartController::class, 'getUserOrders']);

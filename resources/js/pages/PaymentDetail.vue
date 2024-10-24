@@ -27,9 +27,7 @@
 
                   <!-- Nomor Ponsel -->
                   <div class="mb-3">
-                    <label for="nomorPonsel" class="form-label"
-                      >Nomor Ponsel</label
-                    >
+                    <label for="nomorPonsel" class="form-label">Nomor Ponsel</label>
                     <input
                       type="text"
                       class="form-control"
@@ -120,12 +118,12 @@
   </LayoutLanding>
 </template>
 
-
 <script>
 import axios from "axios";
 import LayoutLanding from "@/layouts/LayoutLanding.vue";
 import { computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import Swal from "sweetalert2"; // SweetAlert untuk konfirmasi
 
 export default {
   name: "PaymentDetail",
@@ -134,12 +132,8 @@ export default {
   },
   setup() {
     const authStore = useAuthStore();
-
     const user = computed(() => authStore.user);
-
-    return {
-      user,
-    };
+    return { user };
   },
   data() {
     return {
@@ -148,10 +142,8 @@ export default {
       ticketDetail: null, // Data tiket
     };
   },
-
   mounted() {
-    console.log("Order ID:", this.orderId); // Log ID pesanan
-    this.getOrderDetails(); // Panggil API untuk mendapatkan detail pesanan
+    this.getOrderDetails();
   },
   methods: {
     formatPrice(value) {
@@ -168,32 +160,25 @@ export default {
       axios
         .get(`http://localhost:8000/api/order/${this.orderId}`)
         .then((response) => {
-          console.log("Response Data:", response.data);
           this.orderDetail = response.data;
-
-          // Ambil detail tiket menggunakan ticket_id dari orderDetail
           return axios.get(
             `http://localhost:8000/api/tickets/${response.data.ticket_id}`
           );
         })
         .then((ticketResponse) => {
-          console.log("Ticket Data:", ticketResponse.data); // Cek respons detail tiket
-          this.ticketDetail = ticketResponse.data; // Simpan detail tiket
+          this.ticketDetail = ticketResponse.data;
         })
         .catch((error) => {
-          console.error(
-            "Terjadi kesalahan saat mengambil detail pesanan:",
-            error
-          );
+          console.error("Terjadi kesalahan saat mengambil detail pesanan:", error);
         });
     },
     pay() {
-  axios
-    .post(`http://localhost:8000/api/payment/${this.orderId}`, {
-      orderId: this.orderId,
-    })
-    .then((response) => {
-      let snapToken = response.data.snap_token;
+      axios
+        .post(`http://localhost:8000/api/payment/${this.orderId}`, {
+          orderId: this.orderId,
+        })
+        .then((response) => {
+          let snapToken = response.data.snap_token;
 
           if (!snapToken) {
             console.error("Snap Token is undefined or null.");
@@ -202,26 +187,24 @@ export default {
 
           window.snap.pay(snapToken, {
             onSuccess: (result) => {
-              console.log("Payment Success:", result);
+              this.removeAccess(); // Hapus akses setelah pembayaran sukses
               this.$router.push({
                 name: "afterpayment",
-                params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
+                params: { orderId: this.orderDetail.id },
                 query: { transaction_status: result.transaction_status },
               });
             },
             onPending: (result) => {
-              console.log("Payment Pending:", result);
               this.$router.push({
                 name: "afterpayment",
-                params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
+                params: { orderId: this.orderDetail.id },
                 query: { transaction_status: "pending" },
               });
             },
             onError: (result) => {
-              console.log("Payment Error:", result);
               this.$router.push({
                 name: "afterpayment",
-                params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
+                params: { orderId: this.orderDetail.id },
                 query: { transaction_status: "Unpaid" },
               });
             },
@@ -234,7 +217,40 @@ export default {
           console.error("Error fetching payment data:", error);
         });
     },
+    removeAccess() {
+  axios
+    .post(`http://localhost:8000/api/remove-access/${this.orderDetail.id}`)
+    .then((response) => {
+      console.log("Access removed:", response.data);
+    })
+    .catch((error) => {
+      console.error("Error removing access:", error);
+    });
+}
+
   },
+  beforeRouteLeave(to, from, next) {
+  if (to.name !== "afterpayment") {
+    Swal.fire({
+      title: "Apakah Anda yakin ingin keluar?",
+      text: "Jika Anda keluar, proses pembayaran mungkin terganggu.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, keluar",
+      cancelButtonText: "Tidak",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.removeAccess(); // Pastikan ini dipanggil
+        next(); // Lanjutkan navigasi jika pengguna memilih "Ya"
+      } else {
+        next(false); // Batalkan navigasi jika pengguna memilih "Tidak"
+      }
+    });
+  } else {
+    next(); // Lanjutkan navigasi ke halaman afterpayment tanpa konfirmasi
+  }
+}
+
 };
 </script>
 

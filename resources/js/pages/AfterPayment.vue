@@ -27,7 +27,7 @@
           Pembayaran gagal. Silakan coba lagi atau hubungi layanan pelanggan.
         </div>
         <div
-          v-if="paymentStatus === 'unpaid'"
+          v-if="paymentStatus === 'Unpaid'"
           class="alert alert-danger text-center"
         >
           Pembayaran gagal. Silakan coba lagi atau hubungi layanan pelanggan.
@@ -42,7 +42,8 @@
                 <p class="card-text">
                   <strong>Order ID:</strong> {{ orderDetail.id }}<br />
                   <strong>Nama Tiket:</strong> {{ ticketDetail.name }}<br />
-                  <strong>Jumlah:</strong> {{ orderDetail.jumlah_pemesanan }}<br />
+                  <strong>Jumlah:</strong> {{ orderDetail.jumlah_pemesanan
+                  }}<br />
                   <strong>Nama Pemesan:</strong> {{ user.nama }}<br />
                   <strong>Nomor Ponsel:</strong> {{ user.phone }}<br />
                   <strong>Email:</strong> {{ user.email }}<br />
@@ -50,7 +51,9 @@
                   {{ formatDate(orderDetail.created_at) }}
                 </p>
 
-                <div class="d-flex justify-content-between align-items-center mt-3">
+                <div
+                  class="d-flex justify-content-between align-items-center mt-3"
+                >
                   <h6>Total Pembayaran</h6>
                   <p class="fw-bold">
                     {{ formatPrice(orderDetail.total_harga) }}
@@ -61,7 +64,7 @@
                 <h5 class="text-center mt-4">QR Code Tiket Masuk</h5>
                 <div class="d-flex justify-content-center bg-white">
                   <qrcode-vue
-                    :value="`https://2037-118-99-113-12.ngrok-free.app/verify?order_id=${orderDetail.id}`"
+                    :value="`https://2037-118-99-113-12.ngrok-free.app/verify?order_id=${orderDetail.order_id}`"
                     :size="200"
                   />
                 </div>
@@ -170,9 +173,6 @@ export default {
             "Terjadi kesalahan saat mengambil detail pesanan:",
             error
           );
-        })
-        .finally(() => {
-          this.isLoading = false; // Set loading ke false setelah selesai
         });
     },
 
@@ -193,10 +193,7 @@ export default {
             );
           })
           .catch((error) => {
-            console.error(
-              "Gagal menyimpan QR code ke database:",
-              error.response ? error.response.data : error
-            );
+            console.error("Gagal menyimpan QR code ke database:", error);
           });
       } else {
         console.error("orderDetail tidak tersedia saat menyimpan QR code");

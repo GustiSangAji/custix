@@ -27,18 +27,24 @@
               </div>
               <hr />
               <p class="mb-1 text-muted">Kode Pesanan</p>
-              <p class="fw-bold fs-6">{{ order?.order_id }}</p> <!-- Menampilkan kode pesanan dari order -->
+              <p class="fw-bold fs-6">{{ order?.order_id }}</p>
+              <!-- Menampilkan kode pesanan dari order -->
               <p class="mb-1 text-muted">Total Pembayaran</p>
-              <p class="fw-bold fs-6">{{ formatPrice(order?.total_harga) }}</p> <!-- Menampilkan total pembayaran dari order -->
+              <p class="fw-bold fs-6">{{ formatPrice(order?.total_harga) }}</p>
+              <!-- Menampilkan total pembayaran dari order -->
             </div>
           </div>
-          <div class="card-footer text-center" style="margin-top: -30px;">
-            <div class="card card-body bg-white d-flex flex-column align-items-center">
+          <div class="card-footer text-center" style="margin-top: -30px">
+            <div
+              class="card card-body bg-white d-flex flex-column align-items-center"
+            >
               <!-- Menampilkan QR Code menggunakan qrcode-vue -->
-              <h4 class="fw-bold fs-6 mb-3 text-dark">Scan kode QR di bawah ini</h4>
-              <qrcode-vue 
-                :value="`https://2037-118-99-113-12.ngrok-free.app/verify?order_id=${order?.order_id}`" 
-                :size="200" 
+              <h4 class="fw-bold fs-6 mb-3 text-dark">
+                Scan kode QR di bawah ini
+              </h4>
+              <qrcode-vue
+                :value="`https://2037-118-99-113-12.ngrok-free.app/verify?order_id=${order?.order_id}`"
+                :size="200"
               />
             </div>
           </div>
@@ -70,7 +76,7 @@
 
 <script>
 import axios from "axios";
-import QrcodeVue from 'qrcode.vue'; // Import qrcode-vue
+import QrcodeVue from "qrcode.vue"; // Import qrcode-vue
 
 export default {
   name: "OrderDetail",
@@ -100,9 +106,9 @@ export default {
     },
     // Fungsi formatPrice untuk format harga
     formatPrice(price) {
-      return new Intl.NumberFormat('id-ID', {
-        style: 'currency',
-        currency: 'IDR',
+      return new Intl.NumberFormat("id-ID", {
+        style: "currency",
+        currency: "IDR",
       }).format(price);
     },
   },
