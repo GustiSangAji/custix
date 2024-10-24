@@ -74,7 +74,7 @@
                 <p class="card-text">
                   <strong>Tiket: {{ ticketDetail.kode_tiket }}</strong>
                   <br />
-                  1 Tiket - Id Pesanan {{ orderDetail.id }}<br />
+                  {{ orderDetail.jumlah_pemesanan }} Tiket - Order ID {{ orderDetail.order_id }}<br />
                   <span class="text-muted">
                     Tanggal Dipilih: {{ formatDate(orderDetail.created_at) }}
                   </span>
