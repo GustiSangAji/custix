@@ -236,8 +236,10 @@ export default {
 
   beforeRouteLeave(to, from, next) {
   // Tampilkan SweetAlert sebelum pengguna meninggalkan halaman detail tiket
-  // Kecualikan halaman afterpayment dari pengecekan
-  if (to.name !== "afterpayment" && to.name !== "foodDetail") {
+  // Kecualikan halaman afterpayment dan foodDetail dari pengecekan
+  const exemptRoutes = ["afterpayment", "ticket-detail"];
+
+  if (!exemptRoutes.includes(to.name)) {
     Swal.fire({
       title: "Apakah Anda yakin ingin keluar?",
       text: "Jika Anda keluar, kemungkinan Anda akan antri kembali.",
@@ -247,16 +249,19 @@ export default {
       cancelButtonText: "Tidak",
     }).then((result) => {
       if (result.isConfirmed) {
-        this.removeAccess(); // Panggil removeAccess jika pengguna memilih "Ya"
+        this.removeAccess(); // Hanya panggil removeAccess jika pengguna memilih "Ya" dan bukan menuju foodDetail
         next(); // Lanjutkan navigasi
       } else {
         next(false); // Batalkan navigasi jika pengguna memilih "Tidak"
       }
     });
   } else {
-    next(); // Lanjutkan navigasi ke halaman afterpayment tanpa konfirmasi
+    // Jika navigasi ke foodDetail, jangan panggil removeAccess
+    next(); // Lanjutkan navigasi ke halaman afterpayment atau foodDetail tanpa konfirmasi
   }
 },
+
+
 };
 
 
