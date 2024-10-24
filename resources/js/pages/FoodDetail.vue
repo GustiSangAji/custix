@@ -231,7 +231,14 @@ export default {
 
       if (!this.product || !this.product.id) {
         console.error("Produk belum tersedia atau tidak ada ID produk.");
-        return;
+        Swal.fire({
+          icon: 'error',
+          title: 'Kesalahan',
+          text: 'Produk belum tersedia atau tidak ada ID produk.',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        return; // Hentikan eksekusi fungsi
       }
 
       const payload = {
@@ -258,6 +265,11 @@ export default {
         })
         .catch((error) => {
           console.error("Terjadi kesalahan:", error);
+          Swal.fire({
+            icon: 'error',
+            title: 'Kesalahan',
+            text: 'Terjadi kesalahan dalam pemesanan.',
+          });
         });
     },
     removeAccess() {

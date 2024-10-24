@@ -39,12 +39,10 @@
               class="card card-body bg-white d-flex flex-column align-items-center"
             >
               <!-- Menampilkan QR Code menggunakan qrcode-vue -->
-              <h4 class="fw-bold fs-6 mb-3 text-dark">
-                Scan kode QR di bawah ini
-              </h4>
-              <qrcode-vue
-                :value="`https://2037-118-99-113-12.ngrok-free.app/verify?order_id=${order?.order_id}`"
-                :size="200"
+              <h4 class="fw-bold fs-6 mb-3 text-dark">Scan kode QR di bawah ini</h4>
+              <qrcode-vue 
+                :value="`https://104a-118-99-113-12.ngrok-free.app/verify?order_id=${order?.order_id}`" 
+                :size="200" 
               />
             </div>
           </div>

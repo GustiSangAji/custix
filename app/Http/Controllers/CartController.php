@@ -119,11 +119,9 @@ class CartController extends Controller
     }
 
 
-    public function callback(Request $request)
-    {  
+        public function callback(Request $request)
+    {
         $notification = $request->all();
-
-        // Contoh bagaimana menangani notifikasi status pembayaran
         $transactionStatus = $notification['transaction_status'];
         $orderId = $notification['order_id'];
 
@@ -140,7 +138,7 @@ class CartController extends Controller
         // Perbarui status berdasarkan status transaksi dari Midtrans
         if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
             $order->status = 'Paid';
-
+            
             // Kurangi stok tiket jika status adalah 'capture' atau 'settlement'
             if ($ticket && $ticket->quantity >= $order->jumlah_pemesanan) {
                 $ticket->quantity -= $order->jumlah_pemesanan;
@@ -148,16 +146,21 @@ class CartController extends Controller
             } else {
                 return response()->json(['message' => 'Not enough tickets available'], 400);
             }
-        } elseif ($transactionStatus == 'pending') {
+
+        } elseif ($transactionStatus == 'deny' || $transactionStatus == 'cancel' || $transactionStatus == 'failure' || $transactionStatus == 'pending') {
             $order->status = 'Unpaid';
-        } elseif ($transactionStatus == 'deny' || $transactionStatus == 'expire' || $transactionStatus == 'cancel') {
-            $order->status = 'Unpaid';
+
+        } elseif ($transactionStatus == 'expire') {
+            $order->status = 'Gagal';
         }
 
+        // Simpan perubahan pada status pesanan
         $order->save();
 
-        return response()->json(['message' => 'Payment notification handled']);
+        return response()->json(['message' => 'Transaction processed', 'status' => $order->status]);
     }
+
+
 
     public function afterpayment(Request $request)
     {
@@ -285,11 +288,15 @@ class CartController extends Controller
                 'id' => $order->id,
                 'order_id' => $order->order_id,
                 'total_harga' => $order->total_harga,
+                'jumlah_pemesanan'=> $order->jumlah_pemesanan,
                 'created_at' => $order->created_at,
             ],
             'ticket' => [
                 'kode_tiket' => $order->ticket->kode_tiket,
                 'name' => $order->ticket->name,
+                'place' => $order->ticket->place, 
+                'datetime' => $order->ticket->datetime, 
+                'description' => $order->ticket->description, 
                 'image' => $order->ticket->image,
             ],
             'user' => [

@@ -72,7 +72,7 @@
                 <p class="card-text">
                   <strong>Tiket: {{ ticketDetail.kode_tiket }}</strong>
                   <br />
-                  1 Tiket - Id Pesanan {{ orderDetail.id }}<br />
+                  {{ orderDetail.jumlah_pemesanan }} Tiket - Order ID  {{ orderDetail.order_id }}<br />
                   <span class="text-muted">
                     Tanggal Dipilih: {{ formatDate(orderDetail.created_at) }}
                   </span>
@@ -197,15 +197,15 @@ export default {
             onPending: (result) => {
               this.$router.push({
                 name: "afterpayment",
-                params: { orderId: this.orderDetail.id },
-                query: { transaction_status: "pending" },
+                params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
+                query: { transaction_status: result.transaction_status },
               });
             },
             onError: (result) => {
               this.$router.push({
                 name: "afterpayment",
-                params: { orderId: this.orderDetail.id },
-                query: { transaction_status: "Unpaid" },
+                params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
+                query: { transaction_status: result.transaction_status },
               });
             },
             onClose: () => {

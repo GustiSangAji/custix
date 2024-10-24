@@ -49,7 +49,7 @@ export default {
     verifyTicket() {
       this.loading = true;
       axios
-        .post("https://2037-118-99-113-12.ngrok-free.app/api/verify-ticket", { order_id: this.order_id })
+        .post("https://104a-118-99-113-12.ngrok-free.app/api/verify-ticket", { order_id: this.order_id })
         .then((response) => {
           this.loading = false;
           if (response.data.message === 'Tiket valid dan berhasil diverifikasi') {
