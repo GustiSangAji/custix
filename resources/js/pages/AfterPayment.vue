@@ -264,6 +264,7 @@ export default {
             this.paymentStatus === "capture"
           ) {
             this.saveQrCodeToDatabase();
+            this.removeUserAccess();
           }
         })
         .catch((error) => console.error("Kesalahan:", error))

@@ -1,5 +1,12 @@
 <template>
-  <div class="card shadow-sm rounded overflow-hidden">
+  <div class="card shadow-sm rounded overflow-hidden position-relative">
+    <!-- Badge Habis -->
+    <span 
+      v-if="ticket.status === 'unavailable'" 
+      class="badge badge-light-dark text-white position-absolute p-2 top-0 start-0 m-2">
+      Habis
+    </span>
+    
     <!-- Gambar Tiket -->
     <img
       :src="imageUrl"
@@ -41,7 +48,7 @@
 
 <script>
 import axios from "axios";
-import { useRouter } from "vue-router"; // Vue Router untuk redirect
+import { useRouter } from "vue-router";
 import Swal from "sweetalert2";
 
 export default {
@@ -53,7 +60,7 @@ export default {
     },
   },
   setup() {
-    const router = useRouter(); // Inisialisasi router
+    const router = useRouter();
     return { router };
   },
   computed: {
@@ -61,7 +68,7 @@ export default {
       if (this.ticket.image && typeof this.ticket.image === "string") {
         return `/storage/${this.ticket.image}`;
       }
-      return "/images/default-ticket.jpg"; // Gambar default jika tidak ada gambar
+      return "/images/default-ticket.jpg";
     },
   },
   methods: {
@@ -87,17 +94,16 @@ export default {
           reverseButtons: true,
         }).then((result) => {
           if (result.isConfirmed) {
-            this.$router.push({ name: "sign-in" }); // Ganti dengan nama route yang sesuai
+            this.$router.push({ name: "sign-in" });
           }
         });
       } else {
-        // Jika pengguna sudah login, arahkan ke halaman detail tiket
         try {
           const response = await axios.get("/waiting-room-status");
           const { accessGranted } = response.data;
 
           if (accessGranted) {
-            this.router.push(`/tiket/${this.ticket.id}`); // Arahkan ke halaman tiket jika ada akses
+            this.router.push(`/tiket/${this.ticket.id}`);
           } else {
             Swal.fire({
               title: "Menunggu Giliran",
@@ -108,7 +114,7 @@ export default {
             this.router.push({
               path: "/waiting-room",
               query: { id: this.ticket.id },
-            }); // Kirim ID tiket melalui query parameter
+            });
           }
         } catch (error) {
           console.error("Error checking access:", error);
@@ -125,3 +131,6 @@ export default {
 };
 </script>
 
+<style scoped>
+
+</style>
