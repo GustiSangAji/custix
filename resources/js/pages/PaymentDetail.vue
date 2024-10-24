@@ -218,40 +218,47 @@ export default {
         });
     },
     removeAccess() {
-  axios
-    .post(`http://localhost:8000/api/remove-access/${this.orderDetail.id}`)
-    .then((response) => {
-      console.log("Access removed:", response.data);
-    })
-    .catch((error) => {
-      console.error("Error removing access:", error);
-    });
-}
-
-  },
-  beforeRouteLeave(to, from, next) {
-  if (to.name !== "afterpayment") {
-    Swal.fire({
-      title: "Apakah Anda yakin ingin keluar?",
-      text: "Jika Anda keluar, proses pembayaran mungkin terganggu.",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "Ya, keluar",
-      cancelButtonText: "Tidak",
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.removeAccess(); // Pastikan ini dipanggil
-        next(); // Lanjutkan navigasi jika pengguna memilih "Ya"
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        axios
+          .post("/remove-access", { user_id: userId })
+          .then((response) => {
+            console.log("Akses dihentikan:", response.data);
+          })
+          .catch((error) => {
+            console.error("Terjadi kesalahan saat menghentikan akses:", error);
+          });
       } else {
-        next(false); // Batalkan navigasi jika pengguna memilih "Tidak"
+        console.error("User ID tidak ditemukan di localStorage.");
       }
-    });
-  } else {
-    next(); // Lanjutkan navigasi ke halaman afterpayment tanpa konfirmasi
-  }
-}
+    },
+  },
 
+  beforeRouteLeave(to, from, next) {
+    // Tampilkan SweetAlert sebelum pengguna meninggalkan halaman detail tiket
+    if (to.name !== "paymentDetail") {
+      Swal.fire({
+        title: "Apakah Anda yakin ingin keluar?",
+        text: "Jika Anda keluar, kemungkinan Anda akan antri kembali.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Ya, keluar",
+        cancelButtonText: "Tidak",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.removeAccess(); // Panggil removeAccess jika pengguna memilih "Ya"
+          next(); // Lanjutkan navigasi
+        } else {
+          next(false); // Batalkan navigasi jika pengguna memilih "Tidak"
+        }
+      });
+    } else {
+      next(); // Lanjutkan navigasi ke halaman pembayaran tanpa konfirmasi
+    }
+  },
 };
+
+
 </script>
 
 <style scoped>

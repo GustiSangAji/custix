@@ -252,7 +252,7 @@ export default {
     },
     getOrderDetails() {
       axios
-        .get(`http://localhost:8000/api/order/${this.orderId}`)
+        .get(`http://localhost:8000/api/order-detail/${this.orderId}`)
         .then((response) => {
           this.orderDetail = response.data.order;
           this.ticketDetail = response.data.ticket;
@@ -264,6 +264,7 @@ export default {
             this.paymentStatus === "capture"
           ) {
             this.saveQrCodeToDatabase();
+            this.removeUserAccess();
           }
         })
         .catch((error) => console.error("Kesalahan:", error))
@@ -278,8 +279,8 @@ export default {
 
         axios
           .post(`http://localhost:8000/api/save-qr-code`, {
-            order_id: this.orderDetail.order_id, // Kirim order_id
-            qr_code: qrCodeValue, // Nilai QR code
+            order_id: orderId, // Kirim order_id yang benar
+            qr_code: qrCodeValue, // Nilai QR code, yang merupakan order_id
           })
           .then((response) => {
             console.log(
@@ -288,7 +289,10 @@ export default {
             );
           })
           .catch((error) => {
-            console.error("Gagal menyimpan QR code ke database:", error);
+            console.error(
+              "Gagal menyimpan QR code ke database:",
+              error.response ? error.response.data : error
+            );
           });
       } else {
         console.error("orderDetail tidak tersedia saat menyimpan QR code");
