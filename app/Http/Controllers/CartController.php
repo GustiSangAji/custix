@@ -119,46 +119,69 @@ class CartController extends Controller
     }
 
 
-        public function callback(Request $request)
+    public function callback(Request $request)
     {
         $notification = $request->all();
         $transactionStatus = $notification['transaction_status'];
         $orderId = $notification['order_id'];
-
+    
         // Cari pesanan berdasarkan order_id
         $order = Cart::where('order_id', $orderId)->first();
-
+    
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
-
+    
         // Ambil tiket terkait pesanan
         $ticket = Tiket::find($order->ticket_id);
-
-        // Perbarui status berdasarkan status transaksi dari Midtrans
-        if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
-            $order->status = 'Paid';
-            
-            // Kurangi stok tiket jika status adalah 'capture' atau 'settlement'
-            if ($ticket && $ticket->quantity >= $order->jumlah_pemesanan) {
-                $ticket->quantity -= $order->jumlah_pemesanan;
-                $ticket->save();
-            } else {
-                return response()->json(['message' => 'Not enough tickets available'], 400);
+    
+        // Gunakan transaksi database untuk memastikan atomicity
+        DB::beginTransaction();
+    
+        try {
+            // Perbarui status berdasarkan status transaksi dari Midtrans
+            if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
+                $order->status = 'Paid';
+                
+                // Kurangi stok tiket jika status adalah 'capture' atau 'settlement'
+                if ($ticket && $ticket->quantity >= $order->jumlah_pemesanan) {
+                    // Mengunci tiket selama transaksi
+                    $ticket = Tiket::where('id', $ticket->id)->lockForUpdate()->first();
+    
+                    if ($ticket->quantity < $order->jumlah_pemesanan) {
+                        // Batalkan transaksi jika stok tidak mencukupi
+                        DB::rollBack();
+                        return response()->json(['message' => 'Not enough tickets available'], 400);
+                    }
+    
+                    $ticket->quantity -= $order->jumlah_pemesanan;
+                    $ticket->save();
+                } else {
+                    DB::rollBack();
+                    return response()->json(['message' => 'Not enough tickets available'], 400);
+                }
+    
+            } elseif ($transactionStatus == 'deny' || $transactionStatus == 'cancel' || $transactionStatus == 'failure' || $transactionStatus == 'pending') {
+                $order->status = 'Unpaid';
+    
+            } elseif ($transactionStatus == 'expire') {
+                $order->status = 'Gagal';
             }
-
-        } elseif ($transactionStatus == 'deny' || $transactionStatus == 'cancel' || $transactionStatus == 'failure' || $transactionStatus == 'pending') {
-            $order->status = 'Unpaid';
-
-        } elseif ($transactionStatus == 'expire') {
-            $order->status = 'Gagal';
+    
+            // Simpan perubahan pada status pesanan
+            $order->save();
+    
+            // Commit transaksi jika semua berjalan lancar
+            DB::commit();
+            return response()->json(['message' => 'Transaction processed', 'status' => $order->status]);
+    
+        } catch (\Exception $e) {
+            // Rollback transaksi jika ada kesalahan
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        // Simpan perubahan pada status pesanan
-        $order->save();
-
-        return response()->json(['message' => 'Transaction processed', 'status' => $order->status]);
     }
+    
 
 
 

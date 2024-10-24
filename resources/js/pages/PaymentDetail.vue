@@ -235,27 +235,28 @@ export default {
   },
 
   beforeRouteLeave(to, from, next) {
-    // Tampilkan SweetAlert sebelum pengguna meninggalkan halaman detail tiket
-    if (to.name !== "paymentDetail") {
-      Swal.fire({
-        title: "Apakah Anda yakin ingin keluar?",
-        text: "Jika Anda keluar, kemungkinan Anda akan antri kembali.",
-        icon: "warning",
-        showCancelButton: true,
-        confirmButtonText: "Ya, keluar",
-        cancelButtonText: "Tidak",
-      }).then((result) => {
-        if (result.isConfirmed) {
-          this.removeAccess(); // Panggil removeAccess jika pengguna memilih "Ya"
-          next(); // Lanjutkan navigasi
-        } else {
-          next(false); // Batalkan navigasi jika pengguna memilih "Tidak"
-        }
-      });
-    } else {
-      next(); // Lanjutkan navigasi ke halaman pembayaran tanpa konfirmasi
-    }
-  },
+  // Tampilkan SweetAlert sebelum pengguna meninggalkan halaman detail tiket
+  // Kecualikan halaman afterpayment dari pengecekan
+  if (to.name !== "afterpayment" && to.name !== "foodDetail") {
+    Swal.fire({
+      title: "Apakah Anda yakin ingin keluar?",
+      text: "Jika Anda keluar, kemungkinan Anda akan antri kembali.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, keluar",
+      cancelButtonText: "Tidak",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.removeAccess(); // Panggil removeAccess jika pengguna memilih "Ya"
+        next(); // Lanjutkan navigasi
+      } else {
+        next(false); // Batalkan navigasi jika pengguna memilih "Tidak"
+      }
+    });
+  } else {
+    next(); // Lanjutkan navigasi ke halaman afterpayment tanpa konfirmasi
+  }
+},
 };
 
 

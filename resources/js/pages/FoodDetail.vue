@@ -111,54 +111,47 @@
             </div>
 
             <!-- Ticket Quantity Selection -->
-            <div class="card border-0 shadow-sm p-4 rounded mb-4">
-              <h6>Jumlah Tiket</h6>
-              <div class="d-flex align-items-center mb-2">
-                <span class="text-danger me-2">IDR {{ product.price }}</span>
-                <!-- Input for quantity -->
-                <div class="input-group">
-                  <button
-                    type="button"
-                    class="btn btn-outline-danger"
-                    @click="kurangiJumlah"
-                  >
-                    -
-                  </button>
-                  <input
-                    type="number"
-                    class="form-control text-center mx-2 no-arrows"
-                    v-model="pesan.jumlah_pemesanan"
-                    @input="periksaJumlah"
-                    min="1"
-                    style="width: 100px; padding: 0.375rem; font-size: 1rem"
-                    aria-label="Jumlah Pesan"
-                  />
-                  <button
-                    type="button"
-                    class="btn btn-outline-danger"
-                    @click="tambahJumlah"
-                  >
-                    +
-                  </button>
-                </div>
-              </div>
-            </div>
+<div v-if="product.status !== 'unavailable'" class="card border-0 shadow-sm p-4 rounded mb-4">
+  <h6>Jumlah Tiket</h6>
+  <div class="d-flex align-items-center mb-2">
+    <span class="text-danger me-2">IDR {{ product.price }}</span>
+    <!-- Input for quantity -->
+    <div class="input-group">
+      <button type="button" class="btn btn-outline-danger" @click="kurangiJumlah">-</button>
+      <input
+        type="number"
+        class="form-control text-center mx-2 no-arrows"
+        v-model="pesan.jumlah_pemesanan"
+        @input="periksaJumlah"
+        min="1"
+        style="width: 100px; padding: 0.375rem; font-size: 1rem"
+        aria-label="Jumlah Pesan"
+      />
+      <button type="button" class="btn btn-outline-danger" @click="tambahJumlah">+</button>
+    </div>
+  </div>
+</div>
 
-            <!-- Total Price -->
-            <div class="card border-0 shadow-sm p-4 rounded mb-4">
-              <h6>Total ({{ this.pesan.jumlah_pemesanan }} pax):</h6>
-              <p class="fs-5">
-                IDR
-                {{ formatPrice(this.pesan.jumlah_pemesanan * product.price) }}
-              </p>
-              <button
-                type="submit"
-                class="btn btn-primary block-btn w-100"
-                @click="pemesanan"
-              >
-                Pesan
-              </button>
-            </div>
+<!-- Total Price -->
+<div v-if="product.status !== 'unavailable'" class="card border-0 shadow-sm p-4 rounded mb-4">
+  <h6>Total ({{ this.pesan.jumlah_pemesanan }} pax):</h6>
+  <p class="fs-5">
+    IDR {{ formatPrice(this.pesan.jumlah_pemesanan * product.price) }}
+  </p>
+  <button
+    type="submit"
+    class="btn btn-primary block-btn w-100"
+    @click="pemesanan"
+  >
+    Pesan
+  </button>
+</div>
+
+<!-- Message for Unavailable Tickets -->
+<div v-else class="alert alert-danger text-center" role="alert">
+  Tiket tidak tersedia.
+</div>
+
           </div>
         </div>
       </div>
@@ -227,20 +220,19 @@ export default {
       }
     },
     pemesanan() {
+
+      if (this.product.status === 'unavailable') {
+    Swal.fire({
+      icon: 'error',
+      title: 'Tiket Tidak Tersedia',
+      text: 'Maaf, tiket ini sudah tidak tersedia.',
+      timer: 2000,
+      showConfirmButton: false,
+    });
+    return;
+  }
+
       const userId = localStorage.getItem("userId");
-
-      if (!this.product || !this.product.id) {
-        console.error("Produk belum tersedia atau tidak ada ID produk.");
-        Swal.fire({
-          icon: 'error',
-          title: 'Kesalahan',
-          text: 'Produk belum tersedia atau tidak ada ID produk.',
-          timer: 2000,
-          showConfirmButton: false,
-        });
-        return; // Hentikan eksekusi fungsi
-      }
-
       const payload = {
         jumlah_pemesanan: this.pesan.jumlah_pemesanan,
         product: {

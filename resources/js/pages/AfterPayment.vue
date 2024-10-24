@@ -251,27 +251,30 @@ export default {
       }, 1000);
     },
     getOrderDetails() {
-      axios
-        .get(`http://localhost:8000/api/order-detail/${this.orderId}`)
-        .then((response) => {
-          this.orderDetail = response.data.order;
-          this.ticketDetail = response.data.ticket;
-          this.user = response.data.user;
+  axios
+    .get(`http://localhost:8000/api/order-detail/${this.orderId}`)
+    .then((response) => {
+      this.orderDetail = response.data.order;
+      this.ticketDetail = response.data.ticket;
+      this.user = response.data.user;
 
-          // Hanya simpan QR code jika pembayaran berhasil
-          if (
-            this.paymentStatus === "settlement" ||
-            this.paymentStatus === "capture"
-          ) {
-            this.saveQrCodeToDatabase();
-            this.removeUserAccess();
-          }
-        })
-        .catch((error) => console.error("Kesalahan:", error))
-        .finally(() => {
-          this.isLoading = false; // Pastikan isLoading diatur ke false setelah data dimuat
-        });
-    },
+      // Hanya simpan QR code jika pembayaran berhasil
+      if (
+        this.paymentStatus === "settlement" ||
+        this.paymentStatus === "capture"
+      ) {
+        this.saveQrCodeToDatabase();
+      }
+      
+      // Akses pengguna dihapus, baik transaksi berhasil atau gagal
+      this.removeUserAccess();
+    })
+    .catch((error) => console.error("Kesalahan:", error))
+    .finally(() => {
+      this.isLoading = false; // Pastikan isLoading diatur ke false setelah data dimuat
+    });
+},
+
     saveQrCodeToDatabase() {
       if (this.orderDetail) {
         const qrCodeValue = this.orderDetail.order_id; // Ambil order_id untuk QR code

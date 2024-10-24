@@ -11,19 +11,20 @@ class TicketController extends Controller
     public function index(Request $request)
     {
         $perPage = $request->input('per_page', 6);
-        $tickets = Tiket::where('status', 'available')
-            ->paginate($perPage, ['id', 'kode_tiket', 'name', 'place', 'datetime', 'quantity', 'price', 'description', 'banner', 'image']);
+        $tickets = Tiket::paginate($perPage, [
+            'id', 'kode_tiket', 'name', 'place', 'datetime', 'quantity', 'price', 'description', 'banner', 'image', 'status'
+        ]);
     
         return response()->json($tickets);
     }
 
-
     public function limited()
     {
-        // Mengambil hanya dua tiket pertama yang tersedia untuk halaman utama
-        $tickets = Tiket::where('status', 'available')
-            ->limit(2)
-            ->get(['id', 'name', 'kode_tiket', 'place', 'datetime', 'quantity', 'price', 'image']);
+        // Mengambil hanya dua tiket untuk halaman utama, termasuk yang tidak tersedia
+        $tickets = Tiket::limit(2)->get([
+            'id', 'name', 'kode_tiket', 'place', 'datetime', 'quantity', 'price', 'image', 'status'
+        ]);
+        
         return response()->json($tickets);
     }
 
@@ -34,3 +35,4 @@ class TicketController extends Controller
         return response()->json($ticket);
     }
 }
+
