@@ -93,21 +93,24 @@ class LaporanController extends Controller
         return Excel::download(new ExportLaporan($carts), 'Laporan.xlsx');
     }
 
+    
+
     public function generatePdf()
 {
-    \Log::info('generatePdf method called'); // Menambahkan log untuk memastikan method ini dipanggil
-    
-    $laporan = Cart::with(['ticket'])->get();  // Ambil data dari model
-    
-    // Jika tidak ada data, kembalikan response error
-    if ($laporan->isEmpty()) {
-        return response()->json(['error' => 'Data tidak ditemukan'], 404);
+    // Ambil data dari model Cart dengan status 'paid'
+    $carts = Cart::with(['ticket'])->where('status', 'paid')->get();
+
+    // Cek apakah ada data
+    if ($carts->isEmpty()) {
+        return response()->json(['error' => 'Tidak ada data yang ditemukan'], 404);
     }
 
-    $pdf = Pdf::loadView('laporan.pdf', ['laporan' => $laporan]);
+    // Generate PDF dengan view
+    $pdf = Pdf::loadView('laporan.pdf', ['laporan' => $carts]);
 
     return $pdf->download('laporan.pdf');
 }
+
 
 
 

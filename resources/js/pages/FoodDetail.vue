@@ -111,7 +111,10 @@
             </div>
 
             <!-- Ticket Quantity Selection -->
-            <div class="card border-0 shadow-sm p-4 rounded mb-4">
+            <div
+              v-if="product.status !== 'unavailable'"
+              class="card border-0 shadow-sm p-4 rounded mb-4"
+            >
               <h6>Jumlah Tiket</h6>
               <div class="d-flex align-items-center mb-2">
                 <span class="text-danger me-2">IDR {{ product.price }}</span>
@@ -145,7 +148,10 @@
             </div>
 
             <!-- Total Price -->
-            <div class="card border-0 shadow-sm p-4 rounded mb-4">
+            <div
+              v-if="product.status !== 'unavailable'"
+              class="card border-0 shadow-sm p-4 rounded mb-4"
+            >
               <h6>Total ({{ this.pesan.jumlah_pemesanan }} pax):</h6>
               <p class="fs-5">
                 IDR
@@ -158,6 +164,11 @@
               >
                 Pesan
               </button>
+            </div>
+
+            <!-- Message for Unavailable Tickets -->
+            <div v-else class="alert alert-danger text-center" role="alert">
+              Tiket tidak tersedia.
             </div>
           </div>
         </div>
@@ -227,13 +238,18 @@ export default {
       }
     },
     pemesanan() {
-      const userId = localStorage.getItem("userId");
-
-      if (!this.product || !this.product.id) {
-        console.error("Produk belum tersedia atau tidak ada ID produk.");
+      if (this.product.status === "unavailable") {
+        Swal.fire({
+          icon: "error",
+          title: "Tiket Tidak Tersedia",
+          text: "Maaf, tiket ini sudah tidak tersedia.",
+          timer: 2000,
+          showConfirmButton: false,
+        });
         return;
       }
 
+      const userId = localStorage.getItem("userId");
       const payload = {
         jumlah_pemesanan: this.pesan.jumlah_pemesanan,
         product: {
@@ -258,6 +274,11 @@ export default {
         })
         .catch((error) => {
           console.error("Terjadi kesalahan:", error);
+          Swal.fire({
+            icon: "error",
+            title: "Kesalahan",
+            text: "Terjadi kesalahan dalam pemesanan.",
+          });
         });
     },
     removeAccess() {
@@ -278,7 +299,7 @@ export default {
   },
   mounted() {
     axios
-      .get("http://192.168.61.123:8000/api/tickets/" + this.$route.params.id)
+      .get("http://192.168.61.123/api/tickets/" + this.$route.params.id)
       .then((response) => this.setProduct(response.data))
       .catch((error) => console.log(error));
   },

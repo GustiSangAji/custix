@@ -1,5 +1,5 @@
 <template>
-  <div class="card shadow-sm rounded overflow-hidden">
+  <div class="card shadow-sm rounded overflow-hidden position-relative">
     <!-- Gambar Produk -->
     <img
       :src="imageUrl"
@@ -8,6 +8,10 @@
       v-if="imageUrl"
       @error="onImageError"
     />
+    <span v-if="isUnavailable" class="badge badge-light-dark text-white position-absolute p-2 top-0 start-0 m-2">
+      Habis
+    </span>
+
     <div class="card-body p-4">
       <!-- Nama Produk -->
       <h5 class="card-title fw-bold text-uppercase mb-3">
@@ -62,6 +66,10 @@ export default {
         return `/storage/${this.product.image}`;
       }
       return "/images/default-ticket.jpg"; // Gambar default jika tidak ada gambar
+    },
+    isUnavailable() {
+      // Cek apakah tiket tidak tersedia
+      return this.product.status !== 'available'; // Sesuaikan dengan nilai status yang tepat
     },
   },
   methods: {
@@ -124,3 +132,8 @@ export default {
   },
 };
 </script>
+
+<style scoped>
+/* Gaya untuk badge */
+
+</style>

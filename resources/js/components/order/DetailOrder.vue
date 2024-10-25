@@ -1,6 +1,9 @@
 <template>
   <div class="col-md-8 col-lg-9">
-    <div class="row justify-content-center">
+    <div class="row justify-content-start">
+      <!-- Menggunakan justify-content-start untuk merapikan ke kiri -->
+
+      <!-- Card Kiri -->
       <div class="col-12 col-md-5 mb-4">
         <div class="card card-flush text-start">
           <div class="card-header">
@@ -41,9 +44,33 @@
                 Scan kode QR di bawah ini
               </h4>
               <qrcode-vue
-                :value="`https://2037-118-99-113-12.ngrok-free.app/verify?order_id=${order?.order_id}`"
+                :value="`https://104a-118-99-113-12.ngrok-free.app/verify?order_id=${order?.order_id}`"
                 :size="200"
               />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Card Kanan -->
+      <div class="col-12 col-md-7 mb-4">
+        <div class="card card-flush text-start">
+          <div class="card-body">
+            <h5 class="fw-bold">Detail Pesanan</h5>
+            <hr />
+            <div class="card card-dashed p-6">
+              <p class="mb-1 text-muted">Nama Event</p>
+              <p class="fw-bold fs-6">{{ order?.ticket?.name }}</p>
+              <!-- Nama Event -->
+              <p class="mb-1 text-muted">Masa Berlaku</p>
+              <p class="fw-bold fs-6">{{ order?.ticket?.expiry_date }}</p>
+              <!-- Tanggal Event -->
+              <p class="mb-1 text-muted">Nama Pemesan</p>
+              <p class="fw-bold fs-6">{{ order?.ticket?.event_time }}</p>
+              <!-- Waktu Event -->
+              <p class="mb-1 text-muted">Lokasi</p>
+              <p class="fw-bold fs-6">{{ order?.ticket?.event_location }}</p>
+              <!-- Lokasi Event -->
             </div>
           </div>
         </div>
@@ -74,7 +101,7 @@ export default {
     getOrderDetail() {
       const orderId = this.id; // Ambil ID dari props
       axios
-        .get(`http://192.168.61.123:8000/api/user/orders/${orderId}`) // Memperbaiki URL dengan backticks
+        .get(`http://api/user/orders/${orderId}`) // Memperbaiki URL dengan backticks
         .then((response) => {
           this.order = response.data;
         })

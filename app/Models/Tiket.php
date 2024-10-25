@@ -21,8 +21,8 @@ class Tiket extends Model
         'price',
         'image',
         'expiry_date',
-        'description', // Menambahkan kolom deskripsi
-        'banner', // Menambahkan kolom banner
+        'description',
+        'banner',
     ];
 
     // Menambahkan UUID saat membuat model
@@ -32,6 +32,13 @@ class Tiket extends Model
 
         static::creating(function ($tiket) {
             $tiket->uuid = Str::uuid();
+        });
+
+        // Tambahan logika untuk mengubah status menjadi 'unavailable'
+        static::saving(function ($tiket) {
+            if ($tiket->quantity == 0) {
+                $tiket->status = 'unavailable';
+            }
         });
     }
 }

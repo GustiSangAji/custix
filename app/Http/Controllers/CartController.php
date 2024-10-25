@@ -59,13 +59,6 @@ class CartController extends Controller
         return response()->json(['message' => 'Tiket berhasil ditambahkan ke keranjang', 'cart' => $cart], 201);
     }
 
-
-    public function show($id)
-    {
-        $cart = Cart::findOrFail($id);
-        return response()->json($cart);
-    }
-
     public function checkout($id)
     {
         $cart = Cart::with('user', 'ticket')->findOrFail($id);
@@ -121,44 +114,70 @@ class CartController extends Controller
 
 
     public function callback(Request $request)
-    {  
+    {
         $notification = $request->all();
-
-        // Contoh bagaimana menangani notifikasi status pembayaran
         $transactionStatus = $notification['transaction_status'];
         $orderId = $notification['order_id'];
-
+    
         // Cari pesanan berdasarkan order_id
         $order = Cart::where('order_id', $orderId)->first();
-
+    
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
-
+    
         // Ambil tiket terkait pesanan
         $ticket = Tiket::find($order->ticket_id);
-
-        // Perbarui status berdasarkan status transaksi dari Midtrans
-        if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
-            $order->status = 'Paid';
-
-            // Kurangi stok tiket jika status adalah 'capture' atau 'settlement'
-            if ($ticket && $ticket->quantity >= $order->jumlah_pemesanan) {
-                $ticket->quantity -= $order->jumlah_pemesanan;
-                $ticket->save();
-            } else {
-                return response()->json(['message' => 'Not enough tickets available'], 400);
+    
+        // Gunakan transaksi database untuk memastikan atomicity
+        DB::beginTransaction();
+    
+        try {
+            // Perbarui status berdasarkan status transaksi dari Midtrans
+            if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
+                $order->status = 'Paid';
+                
+                // Kurangi stok tiket jika status adalah 'capture' atau 'settlement'
+                if ($ticket && $ticket->quantity >= $order->jumlah_pemesanan) {
+                    // Mengunci tiket selama transaksi
+                    $ticket = Tiket::where('id', $ticket->id)->lockForUpdate()->first();
+    
+                    if ($ticket->quantity < $order->jumlah_pemesanan) {
+                        // Batalkan transaksi jika stok tidak mencukupi
+                        DB::rollBack();
+                        return response()->json(['message' => 'Not enough tickets available'], 400);
+                    }
+    
+                    $ticket->quantity -= $order->jumlah_pemesanan;
+                    $ticket->save();
+                } else {
+                    DB::rollBack();
+                    return response()->json(['message' => 'Not enough tickets available'], 400);
+                }
+    
+            } elseif ($transactionStatus == 'deny' || $transactionStatus == 'cancel' || $transactionStatus == 'failure' || $transactionStatus == 'pending') {
+                $order->status = 'Unpaid';
+    
+            } elseif ($transactionStatus == 'expire') {
+                $order->status = 'Gagal';
             }
-        } elseif ($transactionStatus == 'pending') {
-            $order->status = 'Unpaid';
-        } elseif ($transactionStatus == 'deny' || $transactionStatus == 'expire' || $transactionStatus == 'cancel') {
-            $order->status = 'Unpaid';
+    
+            // Simpan perubahan pada status pesanan
+            $order->save();
+    
+            // Commit transaksi jika semua berjalan lancar
+            DB::commit();
+            return response()->json(['message' => 'Transaction processed', 'status' => $order->status]);
+    
+        } catch (\Exception $e) {
+            // Rollback transaksi jika ada kesalahan
+            DB::rollBack();
+            return response()->json(['error' => $e->getMessage()], 500);
         }
-
-        $order->save();
-
-        return response()->json(['message' => 'Payment notification handled']);
     }
+    
+
+
 
     public function afterpayment(Request $request)
     {
@@ -203,24 +222,30 @@ class CartController extends Controller
 
     public function getUserOrders()
     {
-        // Ambil semua pesanan untuk pengguna yang sedang login
-        $orders = Cart::where('user_id', auth()->id())->with('ticket')->get();
+        
+        $orders = Cart::where('user_id', auth()->id())
+                    ->where('status', 'Paid')
+                    ->with('ticket')
+                    ->get();
 
         return response()->json($orders);
     }
 
+
     public function getOrderById($id)
     {
+        
         $order = Cart::where('id', $id)
-            ->where('user_id', auth()->id())
-            ->with('ticket')
-            ->first();
+                    ->where('user_id', auth()->id()) 
+                    ->where('status', 'Paid')    
+                    ->with('ticket')
+                    ->first();
 
         if (!$order) {
-            return response()->json(['message' => 'Order not found'], 404);
+            return response()->json(['message' => 'Order not found or not paid'], 404);
         }
 
-        return response()->json($order); // Ambil data order beserta qr_code
+        return response()->json($order);
     }
 
     public function saveQrCode(Request $request)
@@ -263,5 +288,43 @@ class CartController extends Controller
     
         return response()->json(['message' => 'Tiket valid dan berhasil diverifikasi'],200);
     }
+
+
+    public function getOrderDetail($id)
+    {
+        // Mengambil order berdasarkan ID dan memuat relasi pengguna dan tiket
+        $order = Cart::with(['ticket', 'user'])->where('id', $id)->first();
+    
+        if (!$order) {
+            return response()->json(['message' => 'Order not found'], 404);
+        }
+    
+        // Ambil hanya data yang diperlukan untuk halaman pembayaran
+        return response()->json([
+            'order' => [
+                'id' => $order->id,
+                'order_id' => $order->order_id,
+                'total_harga' => $order->total_harga,
+                'jumlah_pemesanan'=> $order->jumlah_pemesanan,
+                'created_at' => $order->created_at,
+            ],
+            'ticket' => [
+                'kode_tiket' => $order->ticket->kode_tiket,
+                'name' => $order->ticket->name,
+                'place' => $order->ticket->place, 
+                'datetime' => $order->ticket->datetime, 
+                'description' => $order->ticket->description, 
+                'image' => $order->ticket->image,
+            ],
+            'user' => [
+                'id' => $order->user->id,
+                'nama' => $order->user->nama,
+                'email' => $order->user->email,
+                'phone' => $order->user->phone,
+            ],
+        ]);
+    }
+    
+
 }
 

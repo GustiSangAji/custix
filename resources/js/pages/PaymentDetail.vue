@@ -74,7 +74,8 @@
                 <p class="card-text">
                   <strong>Tiket: {{ ticketDetail.kode_tiket }}</strong>
                   <br />
-                  1 Tiket - Id Pesanan {{ orderDetail.id }}<br />
+                  {{ orderDetail.jumlah_pemesanan }} Tiket - Order ID
+                  {{ orderDetail.order_id }}<br />
                   <span class="text-muted">
                     Tanggal Dipilih: {{ formatDate(orderDetail.created_at) }}
                   </span>
@@ -166,19 +167,12 @@ export default {
     },
     getOrderDetails() {
       axios
-        .get(`http://192.168.61.123:8000/api/order/${this.orderId}`)
+        .get(`http://192.168.61.123:8000/api/order-detail/${this.orderId}`)
         .then((response) => {
           console.log("Response Data:", response.data);
-          this.orderDetail = response.data;
-
-          // Ambil detail tiket menggunakan ticket_id dari orderDetail
-          return axios.get(
-            `http://192.168.61.123:8000/api/tickets/${response.data.ticket_id}`
-          );
-        })
-        .then((ticketResponse) => {
-          console.log("Ticket Data:", ticketResponse.data); // Cek respons detail tiket
-          this.ticketDetail = ticketResponse.data; // Simpan detail tiket
+          this.orderDetail = response.data.order; // Ambil data order
+          this.ticketDetail = response.data.ticket; // Ambil data tiket
+          this.user = response.data.user;
         })
         .catch((error) => {
           console.error(
@@ -188,9 +182,10 @@ export default {
         });
     },
     pay() {
+      // Gunakan this.orderDetail.id untuk mengambil order_id
       axios
-        .post(`http://192.168.61.123:8000/api/payment/${this.orderId}`, {
-          orderId: this.orderId,
+        .post(`http://192.168.61.123:8000/api/payment/${this.orderDetail.id}`, {
+          orderId: this.orderDetail.id, // Menggunakan order_id dari orderDetail
         })
         .then((response) => {
           let snapToken = response.data.snap_token;
@@ -205,24 +200,24 @@ export default {
               console.log("Payment Success:", result);
               this.$router.push({
                 name: "afterpayment",
-                params: { orderId: this.orderId },
-                query: { transaction_status: result.transaction_status }, // Tambahkan status transaksi
+                params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
+                query: { transaction_status: result.transaction_status },
               });
             },
             onPending: (result) => {
               console.log("Payment Pending:", result);
               this.$router.push({
                 name: "afterpayment",
-                params: { orderId: this.orderId },
-                query: { transaction_status: "pending" }, // Status pending
+                params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
+                query: { transaction_status: result.transaction_status },
               });
             },
             onError: (result) => {
-              console.log("Payment Pending:", result);
+              console.log("Payment Error:", result);
               this.$router.push({
                 name: "afterpayment",
-                params: { orderId: this.orderId },
-                query: { transaction_status: "Unpaid" }, // Status pending
+                params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
+                query: { transaction_status: result.transaction_status },
               });
             },
             onClose: () => {
