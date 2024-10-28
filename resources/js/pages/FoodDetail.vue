@@ -111,46 +111,46 @@
             </div>
 
             <!-- Ticket Quantity Selection -->
-<div v-if="product.status !== 'unavailable'" class="card border-0 shadow-sm p-4 rounded mb-4">
-  <h6>Jumlah Tiket</h6>
-  <div class="d-flex align-items-center mb-2">
-    <span class="text-danger me-2">IDR {{ product.price }}</span>
-    <!-- Input for quantity -->
-    <div class="input-group">
-      <button type="button" class="btn btn-outline-danger" @click="kurangiJumlah">-</button>
-      <input
-        type="number"
-        class="form-control text-center mx-2 no-arrows"
-        v-model="pesan.jumlah_pemesanan"
-        @input="periksaJumlah"
-        min="1"
-        style="width: 100px; padding: 0.375rem; font-size: 1rem"
-        aria-label="Jumlah Pesan"
-      />
-      <button type="button" class="btn btn-outline-danger" @click="tambahJumlah">+</button>
-    </div>
-  </div>
-</div>
+            <div v-if="product.status !== 'unavailable'" class="card border-0 shadow-sm p-4 rounded mb-4">
+              <h6>Jumlah Tiket</h6>
+              <div class="d-flex align-items-center mb-2">
+                <span class="text-danger me-2">IDR {{ product.price }}</span>
+                <!-- Input for quantity -->
+                <div class="input-group">
+                  <button type="button" class="btn btn-outline-danger" @click="kurangiJumlah">-</button>
+                  <input
+                    type="number"
+                    class="form-control text-center mx-2 no-arrows"
+                    v-model="pesan.jumlah_pemesanan"
+                    @input="periksaJumlah"
+                    min="1"
+                    style="width: 100px; padding: 0.375rem; font-size: 1rem"
+                    aria-label="Jumlah Pesan"
+                  />
+                  <button type="button" class="btn btn-outline-danger" @click="tambahJumlah">+</button>
+                </div>
+              </div>
+            </div>
 
-<!-- Total Price -->
-<div v-if="product.status !== 'unavailable'" class="card border-0 shadow-sm p-4 rounded mb-4">
-  <h6>Total ({{ this.pesan.jumlah_pemesanan }} pax):</h6>
-  <p class="fs-5">
-    IDR {{ formatPrice(this.pesan.jumlah_pemesanan * product.price) }}
-  </p>
-  <button
-    type="submit"
-    class="btn btn-primary block-btn w-100"
-    @click="pemesanan"
-  >
-    Pesan
-  </button>
-</div>
+            <!-- Total Price -->
+            <div v-if="product.status !== 'unavailable'" class="card border-0 shadow-sm p-4 rounded mb-4">
+              <h6>Total ({{ this.pesan.jumlah_pemesanan }} pax):</h6>
+              <p class="fs-5">
+                IDR {{ formatPrice(this.pesan.jumlah_pemesanan * product.price) }}
+              </p>
+              <button
+                type="submit"
+                class="btn btn-primary block-btn w-100"
+                @click="pemesanan"
+              >
+                Pesan
+              </button>
+            </div>
 
-<!-- Message for Unavailable Tickets -->
-<div v-else class="alert alert-danger text-center" role="alert">
-  Tiket tidak tersedia.
-</div>
+            <!-- Message for Unavailable Tickets -->
+            <div v-else class="alert alert-danger text-center" role="alert">
+              Tiket tidak tersedia.
+            </div>
 
           </div>
         </div>
@@ -220,17 +220,16 @@ export default {
       }
     },
     pemesanan() {
-
       if (this.product.status === 'unavailable') {
-    Swal.fire({
-      icon: 'error',
-      title: 'Tiket Tidak Tersedia',
-      text: 'Maaf, tiket ini sudah tidak tersedia.',
-      timer: 2000,
-      showConfirmButton: false,
-    });
-    return;
-  }
+        Swal.fire({
+          icon: 'error',
+          title: 'Tiket Tidak Tersedia',
+          text: 'Maaf, tiket ini sudah tidak tersedia.',
+          timer: 2000,
+          showConfirmButton: false,
+        });
+        return;
+      }
 
       const userId = localStorage.getItem("userId");
       const payload = {
@@ -281,13 +280,13 @@ export default {
     },
   },
   mounted() {
+    // Menggunakan name sebagai parameter untuk mendapatkan data tiket
     axios
-      .get("http://localhost:8000/api/tickets/" + this.$route.params.id)
+      .get(`http://localhost:8000/api/tickets/name/${this.$route.params.name}`)
       .then((response) => this.setProduct(response.data))
       .catch((error) => console.log(error));
   },
   beforeRouteLeave(to, from, next) {
-    // Tampilkan SweetAlert sebelum pengguna meninggalkan halaman detail tiket
     if (to.name !== "paymentDetail") {
       Swal.fire({
         title: "Apakah Anda yakin ingin keluar?",
@@ -298,19 +297,19 @@ export default {
         cancelButtonText: "Tidak",
       }).then((result) => {
         if (result.isConfirmed) {
-          this.removeAccess(); // Panggil removeAccess jika pengguna memilih "Ya"
-          next(); // Lanjutkan navigasi
+          this.removeAccess();
+          next();
         } else {
-          next(false); // Batalkan navigasi jika pengguna memilih "Tidak"
+          next(false);
         }
       });
     } else {
-      next(); // Lanjutkan navigasi ke halaman pembayaran tanpa konfirmasi
+      next();
     }
   },
 };
-
 </script>
+
 
 <style scoped>
 .ticket-detail {

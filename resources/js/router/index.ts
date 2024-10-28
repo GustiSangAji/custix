@@ -33,9 +33,10 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/Foods.vue"), // Halaman untuk daftar tiket
     },
     {
-        path: "/tiket/:id",
+        path: "/:name",
         name: "ticket-detail",
         component: () => import("@/pages/FoodDetail.vue"), // Halaman detail tiket
+        props: true,
     },
     {
         path: '/payment/:orderId',
@@ -45,7 +46,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: "/waiting-room",
-        name: 'waitingroom',
+        name: 'waiting-room',
         component: () => import("@/pages/WaitingRoom.vue"),
 
     },

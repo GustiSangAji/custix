@@ -34,5 +34,19 @@ class TicketController extends Controller
         $ticket = Tiket::findOrFail($id);
         return response()->json($ticket);
     }
+
+    public function showByName($name)
+    {
+        // Ubah dash menjadi spasi jika menggunakan spasi di database
+    $ticketName = str_replace('-', ' ', $name);
+    $ticket = Tiket::where('name', $ticketName)->first();
+    
+    if (!$ticket) {
+        return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
+    }
+    
+    return response()->json($ticket);
+    }
+
 }
 

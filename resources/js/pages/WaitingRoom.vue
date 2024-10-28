@@ -48,13 +48,21 @@ export default {
         this.queuePosition = response.data.queuePosition;
 
         if (this.accessGranted) {
+          clearInterval(this.interval); // Hentikan polling begitu akses diberikan
           await this.removeFromQueue(); // Tunggu hingga proses penghapusan selesai
 
-          const ticketId = this.$route.query.id;
-          if (ticketId) {
-            this.$router.push(`/tiket/${ticketId}`);
+          const ticketName = this.$route.query.name.replace(/\s+/g, '-'); // Mengambil 'name' tiket dari query
+          
+          if (ticketName) {
+
+            console.log("Navigating to ticket detail..."); // Debug log
+
+            this.$router.push({
+              name: "ticket-detail",
+              params: { name: ticketName }, // Menggunakan parameter 'name' untuk rute
+            });
           } else {
-            console.error("Ticket ID not found in query parameters.");
+            console.error("Ticket name not found in query parameters.");
           }
         }
       } catch (error) {
@@ -69,7 +77,7 @@ export default {
           const response = await axios.post("/clear-access", {
             user_id: userId,
           });
-          console.log("User removed from ticket queue:", response.data);
+          console.log("User removed from ticket queue:", response.data.message); // Debug log
         } catch (error) {
           console.error(
             "Terjadi kesalahan saat menghapus dari antrian:",
@@ -94,3 +102,4 @@ export default {
   },
 };
 </script>
+

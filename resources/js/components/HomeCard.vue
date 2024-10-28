@@ -42,7 +42,7 @@
           Beli Tiket
         </button>
       </div>
-    </div>
+    </div> 
   </div>
 </template>
 
@@ -81,52 +81,59 @@ export default {
     },
 
     async checkAccessAndRedirect() {
-      const userId = localStorage.getItem("userId");
+  const userId = localStorage.getItem("userId");
 
-      if (!userId) {
-        Swal.fire({
-          title: "Anda harus login",
-          text: "Silakan login untuk memesan tiket.",
-          icon: "warning",
-          confirmButtonText: "Login",
-          cancelButtonText: "Batal",
-          showCancelButton: true,
-          reverseButtons: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.$router.push({ name: "sign-in" });
-          }
+  if (!userId) {
+    Swal.fire({
+      title: "Anda harus login",
+      text: "Silakan login untuk memesan tiket.",
+      icon: "warning",
+      confirmButtonText: "Login",
+      cancelButtonText: "Batal",
+      showCancelButton: true,
+      reverseButtons: true,
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.router.push({ name: "sign-in" });
+      }
+    });
+  } else {
+    try {
+      const response = await axios.get("/waiting-room-status");
+      const { accessGranted } = response.data;
+
+      if (accessGranted) {
+        // Sanitasi nama tiket untuk URL
+        const ticketName = this.ticket.name.replace(/\s+/g, '-');
+        const sanitizedTicketName = encodeURIComponent(ticketName); // Encode untuk URL
+
+        this.router.push({
+          name: "ticket-detail",
+          params: { name: sanitizedTicketName }, // Pastikan 'name' sesuai dengan parameter di rute.
         });
       } else {
-        try {
-          const response = await axios.get("/waiting-room-status");
-          const { accessGranted } = response.data;
-
-          if (accessGranted) {
-            this.router.push(`/tiket/${this.ticket.id}`);
-          } else {
-            Swal.fire({
-              title: "Menunggu Giliran",
-              text: "Kamu sedang berada dalam waiting room. Harap menunggu sampai giliranmu tiba.",
-              icon: "info",
-              confirmButtonText: "OK",
-            });
-            this.router.push({
-              path: "/waiting-room",
-              query: { id: this.ticket.id },
-            });
-          }
-        } catch (error) {
-          console.error("Error checking access:", error);
-          Swal.fire({
-            title: "Kesalahan",
-            text: "Terjadi kesalahan saat mengecek akses. Silakan coba lagi nanti.",
-            icon: "error",
-            confirmButtonText: "OK",
-          });
-        }
+        Swal.fire({
+          title: "Menunggu Giliran",
+          text: "Kamu sedang berada dalam waiting room. Harap menunggu sampai giliranmu tiba.",
+          icon: "info",
+          confirmButtonText: "OK",
+        });
+        this.router.push({
+          name: "waiting-room", // Pastikan ada rute 'waiting-room'.
+          query: { name: this.ticket.name },
+        });
       }
-    },
+    } catch (error) {
+      console.error("Error checking access:", error);
+      Swal.fire({
+        title: "Kesalahan",
+        text: "Terjadi kesalahan saat mengecek akses. Silakan coba lagi nanti.",
+        icon: "error",
+        confirmButtonText: "OK",
+      });
+    }
+  }
+},
   },
 };
 </script>
