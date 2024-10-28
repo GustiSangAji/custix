@@ -44,10 +44,6 @@ const routes: Array<RouteRecordRaw> = [
         props: true,
     },
     {
-        path: "/tiket/:id/orders",
-        component: () => import("@/pages/Order.vue"), // Halaman untuk pemesanan tiket
-    },
-    {
         path: "/waiting-room",
         name: 'waitingroom',
         component: () => import("@/pages/WaitingRoom.vue"),

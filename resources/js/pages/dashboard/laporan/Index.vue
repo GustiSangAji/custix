@@ -53,19 +53,7 @@ const columns = [
                     cell.getValue() === "Paid" ? "Sudah Dibayar" : "Belum Dibayar" // Status pembayaran
                 ),
         }),
-        columnHelper.accessor("id", {
-            header: "Aksi",
-            cell: (cell) =>
-                h("div", { class: "d-flex gap-2" }, [
-                    h("button", {
-                        class: "btn btn-sm btn-icon btn-info",
-                        onClick: () => {
-                            selected.value = cell.getValue();
-                            openForm.value = true;
-                        },
-                    }, h("i", { class: "la la-eye fs-2" })), // Tombol untuk melihat detail
-                ]),
-        }),
+     
     ];
 
     const refresh = () => paginateRef.value.refetch();

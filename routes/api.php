@@ -48,42 +48,42 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
     Route::prefix('setting')->middleware('can:setting')->group(function () {
         Route::post('', [SettingController::class, 'update']);
     });
-    
+
     Route::prefix('master')->group(function () {
         Route::middleware('can:master-user')->group(function () {
             Route::get('users', [UserController::class, 'get']);
             Route::post('users', [UserController::class, 'index']);
             Route::post('users/store', [UserController::class, 'store']);
             Route::apiResource('users', UserController::class)
-            ->except(['index', 'store'])->scoped(['user' => 'uuid']);
+                ->except(['index', 'store'])->scoped(['user' => 'uuid']);
         });
-        
+
         Route::middleware('can:master-role')->group(function () {
             Route::get('roles', [RoleController::class, 'get'])->withoutMiddleware('can:master-role');
             Route::post('roles', [RoleController::class, 'index']);
             Route::post('roles/store', [RoleController::class, 'store']);
             Route::apiResource('roles', RoleController::class)
-            ->except(['index', 'store']);
+                ->except(['index', 'store']);
         });
     });
-    
+
     Route::middleware(['auth', 'verified', 'admin'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index']);
     });
-    
+
     // Tiket Routes
     Route::middleware('can:event')->group(function () {
         Route::get('tiket', [TiketController::class, 'get']);
         Route::post('tiket', [TiketController::class, 'index']);
         Route::post('tiket/store', [TiketController::class, 'store']);
         Route::apiResource('tiket', TiketController::class)
-        ->except(['index', 'store'])
-        ->scoped(['tiket' => 'uuid']);
-        
+            ->except(['index', 'store'])
+            ->scoped(['tiket' => 'uuid']);
+
         // Route untuk mengupdate stok tiket
         Route::put('tiket/{id}/stok', [TiketController::class, 'updateStok']);
     });
-    
+
     // Stockin Routes
     Route::prefix('stockin')->group(function () {
         Route::post('/', [StockinController::class, 'index']);
@@ -98,6 +98,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 Route::get('/tickets', [TicketController::class, 'index']); // Untuk semua tiket
 Route::get('/tickets/limited', [TicketController::class, 'limited']); // Untuk tiket terbatas di halaman utama
 Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
+Route::post('/tickets/search', [TicketController::class, 'search']);
 
 // Laporan Routes
 Route::prefix('laporan')->group(function () {
@@ -113,6 +114,7 @@ Route::prefix('laporan')->group(function () {
 Route::post('/order', [CartController::class, 'store']);
 Route::get('/order', [CartController::class, 'index']);
 Route::get('/order-detail/{id}', [CartController::class, 'getOrderDetail']);
+Route::get('/order/{id}', [CartController::class, 'show']);
 Route::post('/payment/{id}', [CartController::class, 'checkout']);
 Route::post('/afterpayment', [CartController::class, 'callback']);
 Route::post('/afterpay', [CartController::class, 'afterpayment']);
@@ -125,6 +127,8 @@ Route::middleware('auth')->group(function () {
     Route::post('/grant-access', [TicketWaitingRoomController::class, 'grantAccess']);
     Route::post('/terminate-access', [TicketWaitingRoomController::class, 'terminateAccess']);
     Route::post('/remove-access', [CartController::class, 'removeAccess']);
+    Route::post('/api/remove-access/{id}', [TicketWaitingRoomController::class, 'terminateAccess']);
+
 });
 
 Route::get('/user/orders', [CartController::class, 'getUserOrders']);
@@ -133,4 +137,4 @@ Route::post('/save-qr-code', [CartController::class, 'saveQrCode']);
 Route::post('/verify-ticket', [CartController::class, 'verifyTicket']);
 
 // routes/api.php
-route::get('/dashboard', [DashboardController::class, 'index']);
+Route::get('/dashboard', [DashboardController::class, 'index']);

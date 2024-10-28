@@ -251,34 +251,37 @@ export default {
       }, 1000);
     },
     getOrderDetails() {
-      axios
-        .get(`http://192.168.61.123:8000/api/order-detail/${this.orderId}`)
-        .then((response) => {
-          this.orderDetail = response.data.order;
-          this.ticketDetail = response.data.ticket;
-          this.user = response.data.user;
+  axios
+    .get(`order-detail/${this.orderId}`)
+    .then((response) => {
+      this.orderDetail = response.data.order;
+      this.ticketDetail = response.data.ticket;
+      this.user = response.data.user;
 
-          // Hanya simpan QR code jika pembayaran berhasil
-          if (
-            this.paymentStatus === "settlement" ||
-            this.paymentStatus === "capture"
-          ) {
-            this.saveQrCodeToDatabase();
-            this.removeUserAccess();
-          }
-        })
-        .catch((error) => console.error("Kesalahan:", error))
-        .finally(() => {
-          this.isLoading = false; // Pastikan isLoading diatur ke false setelah data dimuat
-        });
-    },
+      // Hanya simpan QR code jika pembayaran berhasil
+      if (
+        this.paymentStatus === "settlement" ||
+        this.paymentStatus === "capture"
+      ) {
+        this.saveQrCodeToDatabase();
+      }
+      
+      // Akses pengguna dihapus, baik transaksi berhasil atau gagal
+      this.removeUserAccess();
+    })
+    .catch((error) => console.error("Kesalahan:", error))
+    .finally(() => {
+      this.isLoading = false; // Pastikan isLoading diatur ke false setelah data dimuat
+    });
+},
+
     saveQrCodeToDatabase() {
       if (this.orderDetail) {
         const qrCodeValue = this.orderDetail.order_id; // Ambil order_id untuk QR code
         const orderId = this.orderDetail.order_id; // Ambil order_id yang benar
 
         axios
-          .post(`http://192.168.61.123:8000/api/save-qr-code`, {
+          .post(`save-qr-code`, {
             order_id: orderId, // Kirim order_id yang benar
             qr_code: qrCodeValue, // Nilai QR code, yang merupakan order_id
           })
@@ -300,7 +303,7 @@ export default {
     },
     removeUserAccess() {
       axios
-        .post(`http://192.168.61.123:8000/api/remove-access`, {
+        .post(`remove-access/`, {
           user_id: this.user.id,
         })
         .then((response) => {

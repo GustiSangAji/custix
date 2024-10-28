@@ -74,7 +74,7 @@ export default {
     fetchTickets(page = this.currentPage) {
       this.loading = true;
       axios
-        .get(`http://192.168.61.123:8000/api/tickets?page=${page}`)
+        .get(`tickets?page=${page}`)
         .then((response) => {
           // Menunggu 1 detik sebelum menambahkan produk
           setTimeout(() => {

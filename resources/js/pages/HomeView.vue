@@ -41,7 +41,7 @@ export default {
   methods: {
     fetchTickets() {
       axios
-        .get("http://192.168.61.123:8000/api/tickets/limited")
+        .get("tickets/limited")
         .then((response) => {
           this.tickets = response.data;
         })

@@ -180,7 +180,7 @@
 <script>
 import LayoutLanding from "@/layouts/LayoutLanding.vue";
 import axios from "axios";
-import Swal from "sweetalert2"; // Pastikan Anda telah menginstal SweetAlert2
+import Swal from "sweetalert2"; // Pastikan SweetAlert2 sudah diinstal
 
 export default {
   name: "TicketDetail",
@@ -299,28 +299,34 @@ export default {
   },
   mounted() {
     axios
-      .get("http://192.168.61.123/api/tickets/" + this.$route.params.id)
+      .get("tickets/" + this.$route.params.id)
       .then((response) => this.setProduct(response.data))
       .catch((error) => console.log(error));
   },
   beforeRouteLeave(to, from, next) {
-    // Tampilkan konfirmasi hanya jika pengguna meninggalkan halaman "ticketDetail"
-    if (to.name !== "ticketDetail") {
-      const answer = window.confirm(
-        "Jika Anda keluar, kemungkinan Anda akan antri kembali. Apakah Anda yakin ingin keluar?"
-      );
-
-      if (answer) {
-        this.removeAccess(); // Panggil removeAccess jika user mengonfirmasi
-        next(); // Lanjutkan navigasi
-      } else {
-        next(false); // Batalkan navigasi jika user membatalkan
-      }
+    // Tampilkan SweetAlert sebelum pengguna meninggalkan halaman detail tiket
+    if (to.name !== "paymentDetail") {
+      Swal.fire({
+        title: "Apakah Anda yakin ingin keluar?",
+        text: "Jika Anda keluar, kemungkinan Anda akan antri kembali.",
+        icon: "warning",
+        showCancelButton: true,
+        confirmButtonText: "Ya, keluar",
+        cancelButtonText: "Tidak",
+      }).then((result) => {
+        if (result.isConfirmed) {
+          this.removeAccess(); // Panggil removeAccess jika pengguna memilih "Ya"
+          next(); // Lanjutkan navigasi
+        } else {
+          next(false); // Batalkan navigasi jika pengguna memilih "Tidak"
+        }
+      });
     } else {
-      next(); // Jika tetap di halaman ticketDetail, lanjutkan navigasi tanpa alert
+      next(); // Lanjutkan navigasi ke halaman pembayaran tanpa konfirmasi
     }
   },
 };
+
 </script>
 
 <style scoped>

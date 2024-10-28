@@ -27,9 +27,7 @@
 
                   <!-- Nomor Ponsel -->
                   <div class="mb-3">
-                    <label for="nomorPonsel" class="form-label"
-                      >Nomor Ponsel</label
-                    >
+                    <label for="nomorPonsel" class="form-label">Nomor Ponsel</label>
                     <input
                       type="text"
                       class="form-control"
@@ -121,12 +119,12 @@
   </LayoutLanding>
 </template>
 
-
 <script>
 import axios from "axios";
 import LayoutLanding from "@/layouts/LayoutLanding.vue";
 import { computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
+import Swal from "sweetalert2"; // SweetAlert untuk konfirmasi
 
 export default {
   name: "PaymentDetail",
@@ -135,12 +133,8 @@ export default {
   },
   setup() {
     const authStore = useAuthStore();
-
     const user = computed(() => authStore.user);
-
-    return {
-      user,
-    };
+    return { user };
   },
   data() {
     return {
@@ -149,10 +143,8 @@ export default {
       ticketDetail: null, // Data tiket
     };
   },
-
   mounted() {
-    console.log("Order ID:", this.orderId); // Log ID pesanan
-    this.getOrderDetails(); // Panggil API untuk mendapatkan detail pesanan
+    this.getOrderDetails();
   },
   methods: {
     formatPrice(value) {
@@ -167,24 +159,24 @@ export default {
     },
     getOrderDetails() {
       axios
-        .get(`http://192.168.61.123:8000/api/order-detail/${this.orderId}`)
+        .get(`order/${this.orderId}`)
         .then((response) => {
-          console.log("Response Data:", response.data);
-          this.orderDetail = response.data.order; // Ambil data order
-          this.ticketDetail = response.data.ticket; // Ambil data tiket
-          this.user = response.data.user;
+          this.orderDetail = response.data;
+          return axios.get(
+            `tickets/${response.data.ticket_id}`
+          );
+        })
+        .then((ticketResponse) => {
+          this.ticketDetail = ticketResponse.data;
         })
         .catch((error) => {
-          console.error(
-            "Terjadi kesalahan saat mengambil detail pesanan:",
-            error
-          );
+          console.error("Terjadi kesalahan saat mengambil detail pesanan:", error);
         });
     },
     pay() {
       // Gunakan this.orderDetail.id untuk mengambil order_id
       axios
-        .post(`http://192.168.61.123:8000/api/payment/${this.orderDetail.id}`, {
+        .post(`payment/${this.orderDetail.id}`, {
           orderId: this.orderDetail.id, // Menggunakan order_id dari orderDetail
         })
         .then((response) => {
@@ -197,7 +189,7 @@ export default {
 
           window.snap.pay(snapToken, {
             onSuccess: (result) => {
-              console.log("Payment Success:", result);
+              this.removeAccess(); // Hapus akses setelah pembayaran sukses
               this.$router.push({
                 name: "afterpayment",
                 params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
@@ -205,7 +197,6 @@ export default {
               });
             },
             onPending: (result) => {
-              console.log("Payment Pending:", result);
               this.$router.push({
                 name: "afterpayment",
                 params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
@@ -213,7 +204,6 @@ export default {
               });
             },
             onError: (result) => {
-              console.log("Payment Error:", result);
               this.$router.push({
                 name: "afterpayment",
                 params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
@@ -229,8 +219,54 @@ export default {
           console.error("Error fetching payment data:", error);
         });
     },
+    removeAccess() {
+      const userId = localStorage.getItem("userId");
+      if (userId) {
+        axios
+          .post("/remove-access", { user_id: userId })
+          .then((response) => {
+            console.log("Akses dihentikan:", response.data);
+          })
+          .catch((error) => {
+            console.error("Terjadi kesalahan saat menghentikan akses:", error);
+          });
+      } else {
+        console.error("User ID tidak ditemukan di localStorage.");
+      }
+    },
   },
+
+  beforeRouteLeave(to, from, next) {
+  // Tampilkan SweetAlert sebelum pengguna meninggalkan halaman detail tiket
+  // Kecualikan halaman afterpayment dan foodDetail dari pengecekan
+  const exemptRoutes = ["afterpayment", "ticket-detail"];
+
+  if (!exemptRoutes.includes(to.name)) {
+    Swal.fire({
+      title: "Apakah Anda yakin ingin keluar?",
+      text: "Jika Anda keluar, kemungkinan Anda akan antri kembali.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, keluar",
+      cancelButtonText: "Tidak",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.removeAccess(); // Hanya panggil removeAccess jika pengguna memilih "Ya" dan bukan menuju foodDetail
+        next(); // Lanjutkan navigasi
+      } else {
+        next(false); // Batalkan navigasi jika pengguna memilih "Tidak"
+      }
+    });
+  } else {
+    // Jika navigasi ke foodDetail, jangan panggil removeAccess
+    next(); // Lanjutkan navigasi ke halaman afterpayment atau foodDetail tanpa konfirmasi
+  }
+},
+
+
 };
+
+
 </script>
 
 <style scoped>

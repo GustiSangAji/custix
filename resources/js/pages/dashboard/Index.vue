@@ -17,7 +17,6 @@
                 <span class="text-muted">Total Pelanggan</span>
               </div>
             </div>
-            <!-- Ubah warna teks jumlah pelanggan menjadi biru -->
             <span class="text-primary fw-bold fs-2">{{ pelanggan }}</span>
           </div>
         </div>
@@ -64,7 +63,7 @@
       </div>
     </div>
 
-    <!-- Grafik Pendapatan Bulanan -->
+    <!-- Grafik Pendapatan Bulanan dengan Bar dan Area -->
     <div class="card mt-4 shadow-sm">
       <div class="card-header">
         <h3 class="card-title">Pendapatan Bulanan</h3>
@@ -98,12 +97,18 @@ export default defineComponent({
     const chart = ref<ApexOptions>({});
     const store = useThemeStore();
 
+    // Menambahkan dua seri, satu untuk bar dan satu untuk area
     const series = [
       {
-        name: "Pendapatan",
+        name: "Pendapatan Bar",
         type: "bar",
         stacked: true,
         data: Array(12).fill(0), // Data dummy untuk 12 bulan
+      },
+      {
+        name: "Pendapatan Area",
+        type: "area",
+        data: Array(12).fill(0), // Data dummy untuk area chart
       },
     ];
 
@@ -116,13 +121,17 @@ export default defineComponent({
 
         if (response.data.pendapatan_bulanan && Array.isArray(response.data.pendapatan_bulanan)) {
           const bulanData = Array(12).fill(0); // Inisialisasi array untuk 12 bulan
+          const areaData = Array(12).fill(0); // Inisialisasi array untuk grafik area
+
           response.data.pendapatan_bulanan.forEach((item: any) => {
             const bulanIndex = convertMonthToNumber(item.bulan); // Konversi nama bulan ke angka
             if (bulanIndex >= 1 && bulanIndex <= 12) {
               bulanData[bulanIndex - 1] = item.total_pendapatan;
+              areaData[bulanIndex - 1] = item.total_pendapatan; // Sama dengan bar untuk sekarang
             }
           });
-          series[0].data = bulanData; // Update data pendapatan
+          series[0].data = bulanData; // Update data pendapatan untuk bar
+          series[1].data = areaData; // Update data pendapatan untuk area
         }
 
         if (chartRef.value) {
@@ -136,13 +145,14 @@ export default defineComponent({
     const chartOptions = (): ApexOptions => {
       const labelColor = getCSSVariableValue("--bs-gray-500");
       const baseColor = getCSSVariableValue("--bs-primary");
+      const areaColor = getCSSVariableValue("--bs-warning"); // Warna untuk area chart
       const darkMode = store.isDarkMode; // Asumsikan kamu punya flag mode gelap di theme store
 
       return {
         chart: {
           type: "bar",
           height: 450,
-          stacked: true,
+          stacked: false, // Tidak stacked untuk memisahkan bar dan area
           toolbar: { show: false },
         },
         plotOptions: {
@@ -150,12 +160,16 @@ export default defineComponent({
             borderRadius: 5, // Membuat ujung batang lebih rounded
             columnWidth: "25%",
             dataLabels: {
-              enabled: false, // Menghilangkan data labels di batang
+              enabled: false,
             },
           },
         },
         dataLabels: {
-          enabled: false, // Ini juga untuk memastikan data labels dinonaktifkan secara global
+          enabled: false,
+        },
+        stroke: {
+          curve: "smooth", // Area chart membutuhkan curve
+          width: [0, 2], // Set the width for bar and area
         },
         xaxis: {
           categories: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
@@ -180,17 +194,21 @@ export default defineComponent({
           },
         },
         tooltip: {
-          enabled: true, // Aktifkan tooltip jika ingin menampilkan informasi saat hover
+          enabled: true,
           y: {
             formatter: (val: number) => formatRupiah(val),
           },
-          style: {
-            fontSize: "12px",
-            color: "#fff",
-            background: darkMode ? "#333" : "#fff",
+        },
+        colors: [baseColor, areaColor], // Warna bar dan area
+        fill: {
+          type: ["solid", "gradient"], // Bar menggunakan solid, area menggunakan gradient
+          gradient: {
+            shadeIntensity: 1,
+            opacityFrom: 0.7,
+            opacityTo: 0.3,
+            stops: [0, 90, 100],
           },
         },
-        colors: [baseColor],
         grid: {
           borderColor: darkMode ? "#444" : "#e0e0e0",
         },
