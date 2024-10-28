@@ -39,9 +39,9 @@ const routes: Array<RouteRecordRaw> = [
         props: true,
     },
     {
-        path: '/payment/:orderId',
-        name: 'paymentDetail',
-        component: () => import('@/pages/PaymentDetail.vue'), // Halaman detail pembayaran
+        path: "/payment",
+        name: "paymentDetail",
+        component: () => import("@/pages/PaymentDetail.vue"), // Halaman detail pembayaran
         props: true,
     },
     {
@@ -51,8 +51,7 @@ const routes: Array<RouteRecordRaw> = [
 
     },
     {
-
-        path: "/afterpayment/:orderId",
+        path: "/afterpayment",
         name: "afterpayment", 
         component: () => import("@/pages/AfterPayment.vue"),
     },

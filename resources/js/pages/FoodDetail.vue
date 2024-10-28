@@ -247,6 +247,8 @@ export default {
         .post("/order", payload)
         .then((response) => {
           console.log("Pemesanan Berhasil:", response.data);
+          const orderId = response.data.cart.id;
+          sessionStorage.setItem('orderId', orderId);
           this.$router.push({
             name: "paymentDetail",
             params: {

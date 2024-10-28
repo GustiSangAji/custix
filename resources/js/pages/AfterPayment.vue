@@ -220,7 +220,7 @@ export default {
   },
   data() {
     return {
-      orderId: this.$route.params.orderId,
+      orderId: null,
       orderDetail: null,
       ticketDetail: null,
       paymentStatus: null,
@@ -229,8 +229,14 @@ export default {
     };
   },
   mounted() {
-    this.getPaymentStatus();
-    this.getOrderDetails(); // Pastikan detail pesanan diambil juga
+    this.orderId = sessionStorage.getItem('orderId'); // Ambil orderId dari sessionStorage
+    if (this.orderId) {
+      this.getPaymentStatus();
+      this.getOrderDetails(); // Ambil detail pesanan juga
+      sessionStorage.removeItem('orderId'); // Hapus orderId dari sessionStorage setelah digunakan
+    } else {
+      this.$router.push("/"); // Redirect jika orderId tidak ditemukan
+    }
   },
   methods: {
     formatDate(date) {
