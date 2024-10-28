@@ -94,7 +94,7 @@ export default {
     getOrderDetail() {
       const orderId = this.id; // Ambil ID dari props
       axios
-        .get(`http://localhost:8000/api/user/orders/${orderId}`) // Memperbaiki URL dengan backticks
+        .get(`/user/orders/${orderId}`) // Memperbaiki URL dengan backticks
         .then((response) => {
           this.order = response.data;
         })

@@ -282,7 +282,7 @@ export default {
   },
   mounted() {
     axios
-      .get("http://localhost:8000/api/tickets/" + this.$route.params.id)
+      .get("/tickets/" + this.$route.params.id)
       .then((response) => this.setProduct(response.data))
       .catch((error) => console.log(error));
   },

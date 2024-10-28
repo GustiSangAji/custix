@@ -82,7 +82,7 @@ export default {
   methods: {
     getOrders() {
       axios
-        .get(`http://localhost:8000/api/user/orders`) 
+        .get(`/user/orders`) 
         .then((response) => {
           this.orders = response.data;
         })

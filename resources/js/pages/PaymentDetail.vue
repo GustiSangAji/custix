@@ -158,11 +158,11 @@ export default {
     },
     getOrderDetails() {
       axios
-        .get(`http://localhost:8000/api/order/${this.orderId}`)
+        .get(`/order/${this.orderId}`)
         .then((response) => {
           this.orderDetail = response.data;
           return axios.get(
-            `http://localhost:8000/api/tickets/${response.data.ticket_id}`
+            `/tickets/${response.data.ticket_id}`
           );
         })
         .then((ticketResponse) => {
@@ -174,7 +174,7 @@ export default {
     },
     pay() {
       axios
-        .post(`http://localhost:8000/api/payment/${this.orderId}`, {
+        .post(`/payment/${this.orderId}`, {
           orderId: this.orderId,
         })
         .then((response) => {
