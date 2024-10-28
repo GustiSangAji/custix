@@ -284,7 +284,7 @@ export default {
   mounted() {
     // Menggunakan name sebagai parameter untuk mendapatkan data tiket
     axios
-      .get(`http://localhost:8000/api/tickets/name/${this.$route.params.name}`)
+      .get(`/tickets/name/${this.$route.params.name}`)
       .then((response) => this.setProduct(response.data))
       .catch((error) => console.log(error));
   },
