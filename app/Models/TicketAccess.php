@@ -6,8 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 
 class TicketAccess extends Model
 {
+    protected $table = 'ticket_access';
     use HasFactory;
-    protected $fillable = ['user_id'];
+    protected $fillable = ['user_id', 'ticket_id', 'active'];
 }
-
-
