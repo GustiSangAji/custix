@@ -258,7 +258,7 @@ export default {
     },
     getOrderDetails() {
   axios
-    .get(`/order-detail/${this.orderId}`)
+    .get(`order-detail/${this.orderId}`)
     .then((response) => {
       this.orderDetail = response.data.order;
       this.ticketDetail = response.data.ticket;
@@ -287,7 +287,7 @@ export default {
         const orderId = this.orderDetail.order_id; // Ambil order_id yang benar
 
         axios
-          .post(`/save-qr-code`, {
+          .post(`save-qr-code`, {
             order_id: orderId, // Kirim order_id yang benar
             qr_code: qrCodeValue, // Nilai QR code, yang merupakan order_id
           })
@@ -309,7 +309,7 @@ export default {
     },
     removeUserAccess() {
       axios
-        .post(`/remove-access`, {
+        .post(`remove-access/`, {
           user_id: this.user.id,
         })
         .then((response) => {
