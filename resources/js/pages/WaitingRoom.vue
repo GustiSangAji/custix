@@ -42,28 +42,20 @@ export default {
   methods: {
     async checkStatus() {
       try {
-        const response = await axios.get("/waiting-room-status");
-        console.log("Response dari waiting-room-status:", response.data);
+        const response = await axios.get("/waiting-room-status", {
+          params: { ticket_id: this.$route.query.id },
+        });
         this.accessGranted = response.data.accessGranted;
         this.queuePosition = response.data.queuePosition;
 
         if (this.accessGranted) {
-          clearInterval(this.interval); // Hentikan polling begitu akses diberikan
-          await this.removeFromQueue(); // Tunggu hingga proses penghapusan selesai
-
-          const ticketName = this.$route.query.name.replace(/\s+/g, '-'); // Mengambil 'name' tiket dari query
-          
-          if (ticketName) {
-
-            console.log("Navigating to ticket detail..."); // Debug log
-
-            this.$router.push({
-              name: "ticket-detail",
-              params: { name: ticketName }, // Menggunakan parameter 'name' untuk rute
-            });
-          } else {
-            console.error("Ticket name not found in query parameters.");
-          }
+          clearInterval(this.interval);
+          await this.removeFromQueue();
+          const ticketName = this.$route.query.name.replace(/\s+/g, "-");
+          this.$router.push({
+            name: "ticket-detail",
+            params: { name: ticketName },
+          });
         }
       } catch (error) {
         console.error("Terjadi kesalahan saat memeriksa status:", error);

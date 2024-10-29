@@ -62,6 +62,7 @@ export default {
   },
   computed: {
     imageUrl() {
+      // Menghasilkan URL gambar
       if (this.product.image && typeof this.product.image === "string") {
         return `/storage/${this.product.image}`;
       }
@@ -74,13 +75,14 @@ export default {
   },
   methods: {
     onImageError(event) {
+      // Mengatur gambar default saat terjadi error
       event.target.src = "/images/default-ticket.jpg";
     },
     formatDate(date) {
+      // Memformat tanggal ke format lokal
       const options = { year: "numeric", month: "long", day: "numeric" };
       return new Date(date).toLocaleDateString("id-ID", options);
     },
-
     async checkAccessAndRedirect() {
   const userId = localStorage.getItem("userId");
 
@@ -100,17 +102,18 @@ export default {
     });
   } else {
     try {
-      const response = await axios.get("/waiting-room-status");
+      const response = await axios.get("/waiting-room-status", {
+        params: { ticket_id: this.product.id }, // Sesuaikan di sini
+      });
       const { accessGranted } = response.data;
 
       if (accessGranted) {
-        // Sanitasi nama tiket untuk URL
-        const ticketName = this.ticket.name.replace(/\s+/g, '-');
-        const sanitizedTicketName = encodeURIComponent(ticketName); // Encode untuk URL
+        const ticketName = this.product.name.replace(/\s+/g, "-");
+        const sanitizedTicketName = encodeURIComponent(ticketName);
 
         this.router.push({
           name: "ticket-detail",
-          params: { name: sanitizedTicketName }, // Pastikan 'name' sesuai dengan parameter di rute.
+          params: { name: sanitizedTicketName },
         });
       } else {
         Swal.fire({
@@ -120,8 +123,8 @@ export default {
           confirmButtonText: "OK",
         });
         this.router.push({
-          name: "waiting-room", // Pastikan ada rute 'waiting-room'.
-          query: { name: this.product.name },
+          path: "/waiting-room",
+          query: { id: this.product.id, name: this.product.name }, // Sesuaikan di sini
         });
       }
     } catch (error) {
@@ -135,11 +138,7 @@ export default {
     }
   }
 },
+
   },
 };
 </script>
-
-<style scoped>
-/* Gaya untuk badge */
-
-</style>
