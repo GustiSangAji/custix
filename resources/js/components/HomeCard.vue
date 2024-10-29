@@ -123,7 +123,7 @@ export default {
                         });
                     }
                 } catch (error) {
-                    console.error("Error checking access:", error);
+                    console.error("Error checking access:", error); 
                     Swal.fire({
                         title: "Kesalahan",
                         text: "Terjadi kesalahan saat mengecek akses. Silakan coba lagi nanti.",
