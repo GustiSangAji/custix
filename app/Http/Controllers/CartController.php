@@ -255,25 +255,26 @@ class CartController extends Controller
     }
 
     public function saveQrCode(Request $request)
-    {
-        // Validasi input
-        $request->validate([
-            'order_id' => 'required|exists:carts,order_id',
-            'qr_code' => 'required',
-        ]);
+{
+    // Validasi input
+    $request->validate([
+        'order_id' => 'required|exists:carts,order_id',
+        'qr_code' => 'required',
+    ]);
 
-        // Cari cart berdasarkan order_id
-        $cart = Cart::where('order_id', $request->order_id)->first();
+    // Cari cart berdasarkan order_id
+    $cart = Cart::where('order_id', $request->order_id)->first();
 
-        if ($cart) {
-            $cart->qr_code = $request->qr_code; // Simpan QR code ke kolom qr_code
-            $cart->save();
+    if ($cart) {
+        $cart->qr_code = $request->qr_code; // Simpan QR code ke kolom qr_code
+        $cart->save();
 
-            return response()->json(['message' => 'QR code berhasil disimpan'], 200);
-        }
-
-        return response()->json(['message' => 'Order tidak ditemukan'], 404);
+        return response()->json(['message' => 'QR code berhasil disimpan'], 200);
     }
+
+    return response()->json(['message' => 'Order tidak ditemukan'], 404);
+}
+
 
     public function verifyTicket(Request $request) {
         $request->validate(['order_id' => 'required|exists:carts,order_id']);
