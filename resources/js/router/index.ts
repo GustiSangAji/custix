@@ -33,7 +33,7 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/Foods.vue"), // Halaman untuk daftar tiket
     },
     {
-        path: "/:name/:id",
+        path: "/:name",
         name: "ticket-detail",
         component: () => import("@/pages/FoodDetail.vue"), // Halaman detail tiket
         props: true,

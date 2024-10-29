@@ -47,7 +47,7 @@
         <div v-if="tickets.length > 0" class="search-results">
           <ul>
             <li v-for="ticket in tickets" :key="ticket.id">
-              <router-link :to="`/${ticket.name}/${ticket.id}`">
+              <router-link :to="{ name: 'ticket-detail', params: { name: ticket.name.replace(/\s+/g, '-') }}">
                 <img
                   :src="ticket.image"
                   alt="ticket image"
