@@ -220,7 +220,7 @@ export default {
   },
   data() {
     return {
-      orderId: this.$route.params.orderId,
+      orderId: null,
       orderDetail: null,
       ticketDetail: null,
       paymentStatus: null,
@@ -229,8 +229,14 @@ export default {
     };
   },
   mounted() {
-    this.getPaymentStatus();
-    this.getOrderDetails(); // Pastikan detail pesanan diambil juga
+    this.orderId = sessionStorage.getItem('orderId'); // Ambil orderId dari sessionStorage
+    if (this.orderId) {
+      this.getPaymentStatus();
+      this.getOrderDetails(); // Ambil detail pesanan juga
+      sessionStorage.removeItem('orderId'); // Hapus orderId dari sessionStorage setelah digunakan
+    } else {
+      this.$router.push("/"); // Redirect jika orderId tidak ditemukan
+    }
   },
   methods: {
     formatDate(date) {
@@ -252,7 +258,7 @@ export default {
     },
     getOrderDetails() {
   axios
-    .get(`/order-detail/${this.orderId}`)
+    .get(`order-detail/${this.orderId}`)
     .then((response) => {
       this.orderDetail = response.data.order;
       this.ticketDetail = response.data.ticket;
@@ -281,7 +287,7 @@ export default {
         const orderId = this.orderDetail.order_id; // Ambil order_id yang benar
 
         axios
-          .post(`/save-qr-code`, {
+          .post(`save-qr-code`, {
             order_id: orderId, // Kirim order_id yang benar
             qr_code: qrCodeValue, // Nilai QR code, yang merupakan order_id
           })
@@ -303,7 +309,7 @@ export default {
     },
     removeUserAccess() {
       axios
-        .post(`/remove-access`, {
+        .post(`remove-access/`, {
           user_id: this.user.id,
         })
         .then((response) => {

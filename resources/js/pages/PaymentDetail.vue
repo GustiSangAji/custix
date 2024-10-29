@@ -72,7 +72,8 @@
                 <p class="card-text">
                   <strong>Tiket: {{ ticketDetail.kode_tiket }}</strong>
                   <br />
-                  {{ orderDetail.jumlah_pemesanan }} Tiket - Order ID  {{ orderDetail.order_id }}<br />
+                  {{ orderDetail.jumlah_pemesanan }} Tiket - Order ID
+                  {{ orderDetail.order_id }}<br />
                   <span class="text-muted">
                     Tanggal Dipilih: {{ formatDate(orderDetail.created_at) }}
                   </span>
@@ -143,7 +144,13 @@ export default {
     };
   },
   mounted() {
-    this.getOrderDetails();
+    this.orderId = sessionStorage.getItem('orderId'); // Ambil orderId dari sessionStorage
+    if (this.orderId) {
+      this.getOrderDetails();
+    } else {
+      // Redirect atau handle jika orderId tidak ditemukan
+      this.$router.push("/"); // Kembali ke halaman utama atau tampilan lain
+    }
   },
   methods: {
     formatPrice(value) {
@@ -158,11 +165,11 @@ export default {
     },
     getOrderDetails() {
       axios
-        .get(`/order/${this.orderId}`)
+        .get(`order/${this.orderId}`)
         .then((response) => {
           this.orderDetail = response.data;
           return axios.get(
-            `/tickets/${response.data.ticket_id}`
+            `tickets/${response.data.ticket_id}`
           );
         })
         .then((ticketResponse) => {
@@ -173,6 +180,7 @@ export default {
         });
     },
     pay() {
+      // Gunakan this.orderDetail.id untuk mengambil order_id
       axios
         .post(`/payment/${this.orderId}`, {
           orderId: this.orderId,
@@ -190,7 +198,7 @@ export default {
               this.removeAccess(); // Hapus akses setelah pembayaran sukses
               this.$router.push({
                 name: "afterpayment",
-                params: { orderId: this.orderDetail.id },
+                params: { orderId: this.orderDetail.id }, // Menggunakan order_id dari orderDetail
                 query: { transaction_status: result.transaction_status },
               });
             },

@@ -33,25 +33,25 @@ const routes: Array<RouteRecordRaw> = [
         component: () => import("@/pages/Foods.vue"), // Halaman untuk daftar tiket
     },
     {
-        path: "/tiket/:id",
+        path: "/:name",
         name: "ticket-detail",
         component: () => import("@/pages/FoodDetail.vue"), // Halaman detail tiket
+        props: true,
     },
     {
-        path: '/payment/:orderId',
-        name: 'paymentDetail',
-        component: () => import('@/pages/PaymentDetail.vue'), // Halaman detail pembayaran
+        path: "/payment",
+        name: "paymentDetail",
+        component: () => import("@/pages/PaymentDetail.vue"), // Halaman detail pembayaran
         props: true,
     },
     {
         path: "/waiting-room",
-        name: 'waitingroom',
+        name: 'waiting-room',
         component: () => import("@/pages/WaitingRoom.vue"),
 
     },
     {
-
-        path: "/afterpayment/:orderId",
+        path: "/afterpayment",
         name: "afterpayment", 
         component: () => import("@/pages/AfterPayment.vue"),
     },
@@ -131,7 +131,7 @@ const routes: Array<RouteRecordRaw> = [
                 path: "/laporan/export/excel",
                 name: "dashboard.laporan.export",
                 component: defineAsyncComponent(() => {
-                    window.open('http://192.168.61.123:8000/api/laporan/export/excel'); // Ganti dengan URL yang sesuai
+                    window.open('http://api/laporan/export/excel'); // Ganti dengan URL yang sesuai
                     return Promise.resolve({ render() { return null; } });
                 }),
             },
