@@ -281,32 +281,36 @@ export default {
     });
 },
 
-    saveQrCodeToDatabase() {
-      if (this.orderDetail) {
-        const qrCodeValue = this.orderDetail.order_id; // Ambil order_id untuk QR code
+saveQrCodeToDatabase() {
+    if (this.orderDetail) {
         const orderId = this.orderDetail.order_id; // Ambil order_id yang benar
+        const jumlahPesanan = this.orderDetail.jumlah_pemesanan; // Ambil jumlah pesanan
+
+        // Array untuk menyimpan QR Code
+        const qrCodes = [];
+
+        // Loop untuk menyimpan QR Code sesuai jumlah pesanan
+        for (let i = 0; i < jumlahPesanan; i++) {
+            const qrCodeValue = `${orderId}#${i + 1}`; // Format QR Code: order_id#nomor_tiket
+            qrCodes.push(qrCodeValue); // Tambahkan QR Code ke array
+        }
 
         axios
-          .post(`save-qr-code`, {
-            order_id: orderId, // Kirim order_id yang benar
-            qr_code: qrCodeValue, // Nilai QR code, yang merupakan order_id
-          })
-          .then((response) => {
-            console.log(
-              "QR code berhasil disimpan ke database:",
-              response.data
-            );
-          })
-          .catch((error) => {
-            console.error(
-              "Gagal menyimpan QR code ke database:",
-              error.response ? error.response.data : error
-            );
-          });
-      } else {
+            .post(`save-qr-code`, {
+                order_id: orderId, // Kirim order_id yang benar
+                qr_codes: qrCodes, // Kirim QR Codes sebagai array
+            })
+            .then((response) => {
+                console.log('QR code berhasil disimpan ke database:', response.data);
+            })
+            .catch((error) => {
+                console.error('Gagal menyimpan QR code ke database:', error.response ? error.response.data : error);
+            });
+    } else {
         console.error("orderDetail tidak tersedia saat menyimpan QR code");
-      }
-    },
+    }
+},
+
     removeUserAccess() {
       axios
         .post(`remove-access/`, {
