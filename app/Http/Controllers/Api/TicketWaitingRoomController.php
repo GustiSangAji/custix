@@ -16,51 +16,37 @@ class TicketWaitingRoomController extends Controller
 {
     protected $limit = 1; // Limit akses ke halaman pembayaran (2 pengguna)
 
-    public function status()
+    public function status(Request $request)
     {
-        $userId = Auth::id(); // Mendapatkan ID pengguna yang sedang login
-
-        // Cek jumlah pengguna yang sedang mengakses tiket (hanya yang active)
-        $currentAccessCount = DB::table('ticket_access')
+        $userId = Auth::id();
+        $ticketId = $request->ticket_id;
+    
+        $currentAccessCount = TicketAccess::where('ticket_id', $ticketId)
             ->where('active', true)
-            ->count(); // Menghitung berapa pengguna yang aktif membeli tiket
-
-        // Jika slot masih tersedia (kurang dari limit)
+            ->count();
+    
         if ($currentAccessCount < $this->limit) {
-            DB::table('ticket_access')->insert([
+            TicketAccess::create([
                 'user_id' => $userId,
+                'ticket_id' => $ticketId,
                 'active' => true,
-                'created_at' => now(),
             ]);
-            return response()->json([
-                'accessGranted' => true,
-                'queuePosition' => null
-            ]);
+            return response()->json(['accessGranted' => true, 'queuePosition' => null]);
         }
-
-        // Jika tidak ada slot yang tersedia, tambahkan ke antrian
-        $queuePosition = DB::table('ticket_queue')
+    
+        $queuePosition = TicketQueue::where('ticket_id', $ticketId)
             ->where('user_id', $userId)
             ->value('position');
-
-        // Jika pengguna belum dalam antrian, tambahkan ke antrian
+    
         if (!$queuePosition) {
-            $maxPosition = DB::table('ticket_queue')->max('position');
-            DB::table('ticket_queue')->insert([
-                'user_id' => $userId,
-                'position' => $maxPosition + 1,
-                'created_at' => now(),
-            ]);
+            $maxPosition = TicketQueue::where('ticket_id', $ticketId)->max('position') ?? 0;
+            TicketQueue::create(['user_id' => $userId, 'ticket_id' => $ticketId, 'position' => $maxPosition + 1]);
             $queuePosition = $maxPosition + 1;
         }
-
-        // Kirimkan informasi tentang posisi antrian pengguna
-        return response()->json([
-            'accessGranted' => false,
-            'queuePosition' => $queuePosition
-        ]);
+    
+        return response()->json(['accessGranted' => false, 'queuePosition' => $queuePosition]);
     }
-
+    
     public function grantAccess(Request $request)
     {
         $userId = $request->input('user_id');

@@ -82,7 +82,7 @@ export default {
   methods: {
     getOrders() {
       axios
-        .get(`http:/192.168.61.123/api/user/orders`)
+        .get(`/user/orders`) 
         .then((response) => {
           this.orders = response.data;
         })

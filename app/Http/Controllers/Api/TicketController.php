@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api;
 use App\Http\Controllers\Controller;
 use App\Models\Tiket;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class TicketController extends Controller
 {
@@ -55,18 +56,18 @@ class TicketController extends Controller
 
     public function search(Request $request)
     {
-        // Mendapatkan input pencarian dari request
         $query = $request->input('query');
 
-        // Mencari tiket berdasarkan nama atau lokasi dengan status 'available'
-        $tickets = Tiket::where(function ($q) use ($query) {
-            $q->where('name', 'LIKE', "%{$query}%");
-        })
-            ->where('status', 'available') // Kondisi status available
-            ->get(['id', 'name', 'place', 'datetime', 'image']); // Kolom yang diambil
+        // Filter tiket berdasarkan nama yang sesuai dengan query
+        $tickets = Tiket::where('name', 'LIKE', "%{$query}%")
+            ->where('status', 'available')
+            ->get(['id', 'name', 'place', 'datetime', 'image'])
+            ->map(function ($ticket) {
+                $ticket->image = Storage::url($ticket->image); // Menambahkan path storage
+                return $ticket;
+            });
 
         return response()->json($tickets);
     }
-
 }
 

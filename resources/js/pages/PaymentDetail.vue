@@ -176,8 +176,8 @@ export default {
     pay() {
       // Gunakan this.orderDetail.id untuk mengambil order_id
       axios
-        .post(`payment/${this.orderDetail.id}`, {
-          orderId: this.orderDetail.id, // Menggunakan order_id dari orderDetail
+        .post(`/payment/${this.orderId}`, {
+          orderId: this.orderId,
         })
         .then((response) => {
           let snapToken = response.data.snap_token;
