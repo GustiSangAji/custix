@@ -109,7 +109,7 @@ export default {
     };
 
     const onInput = async () => {
-      if (searchQuery.value.length >= 10) {
+      if (searchQuery.value.length >= 2) {
         await searchTickets();
       } else {
         tickets.value = [];
