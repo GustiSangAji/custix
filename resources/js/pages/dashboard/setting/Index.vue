@@ -1,4 +1,4 @@
-    <template>
+<template>
   <VForm class="card mb-10" @submit="submit" :validation-schema="formSchema">
     <div class="card-header align-items-center">
       <h2 class="mb-0">Konfigurasi Website</h2>
@@ -8,9 +8,7 @@
         <div class="col-md-6">
           <!--begin::Input group-->
           <div class="fv-row mb-8">
-            <label class="form-label fw-bold fs-6 required"
-              >Nama Aplikasi</label
-            >
+            <label class="form-label fw-bold fs-6 required">Nama Aplikasi</label>
             <Field
               class="form-control form-control-lg form-control-solid"
               type="text"
@@ -46,7 +44,7 @@
 
           <!--begin::Input group-->
           <div class="fv-row mb-8">
-            <label class="form-label fw-bold fs-6 required">Misale</label>
+            <label class="form-label fw-bold fs-6 required">Pemerintah</label>
             <Field
               class="form-control form-control-lg form-control-solid"
               type="text"
@@ -61,60 +59,6 @@
             </div>
           </div>
           <!--end::Input group-->
-
-          <!--begin::Input group-->
-          <div class="fv-row mb-8">
-            <label class="form-label fw-bold fs-6 required">Alamat</label>
-            <Field
-              class="form-control form-control-lg form-control-solid"
-              type="text"
-              name="alamat"
-              autocomplete="off"
-              v-model="formData.alamat"
-            />
-            <div class="fv-plugins-message-container">
-              <div class="fv-help-block">
-                <ErrorMessage name="alamat" />
-              </div>
-            </div>
-          </div>
-          <!--end::Input group-->
-
-          <!--begin::Input group-->
-          <div class="fv-row mb-8">
-            <label class="form-label fw-bold fs-6 required">Telepon</label>
-            <Field
-              class="form-control form-control-lg form-control-solid"
-              type="text"
-              name="telepon"
-              autocomplete="off"
-              v-model="formData.telepon"
-            />
-            <div class="fv-plugins-message-container">
-              <div class="fv-help-block">
-                <ErrorMessage name="telepon" />
-              </div>
-            </div>
-          </div>
-          <!--end::Input group-->
-
-          <!--begin::Input group-->
-          <div class="fv-row mb-8">
-            <label class="form-label fw-bold fs-6 required">Email</label>
-            <Field
-              class="form-control form-control-lg form-control-solid"
-              type="text"
-              name="email"
-              autocomplete="off"
-              v-model="formData.email"
-            />
-            <div class="fv-plugins-message-container">
-              <div class="fv-help-block">
-                <ErrorMessage name="email" />
-              </div>
-            </div>
-          </div>
-          <!--end::Input group-->
         </div>
 
         <div class="col-12 d-md-none">
@@ -123,33 +67,23 @@
 
         <div class="col-md-6">
           <div class="fv-row mb-8">
-            <!--begin::Label-->
             <label class="form-label fw-bold required">Logo</label>
-            <!--end::Label-->
-
-            <!--begin::Input-->
             <file-upload
               v-bind:files="files.logo"
               :accepted-file-types="fileTypes"
               required
               v-on:updatefiles="(file) => (files.logo = file)"
             ></file-upload>
-            <!--end::Input-->
           </div>
 
           <div class="fv-row mb-8">
-            <!--begin::Label-->
             <label class="form-label fw-bold required">Background Login</label>
-            <!--end::Label-->
-
-            <!--begin::Input-->
             <file-upload
               v-bind:files="files.bgAuth"
               :accepted-file-types="fileTypes"
               required
               v-on:updatefiles="(file) => (files.bgAuth = file)"
             ></file-upload>
-            <!--end::Input-->
           </div>
 
           <div class="fv-row mb-8">
@@ -201,12 +135,9 @@ export default defineComponent({
     });
 
     const formSchema = Yup.object().shape({
-      alamat: Yup.string().required("Alamat wajib diisi"),
       app: Yup.string().required("Nama aplikasi wajib diisi"),
       description: Yup.string().required("Deskripsi wajib diisi"),
-      email: Yup.string().required("Email wajib diisi"),
       pemerintah: Yup.string().required("Nama pemerintah wajib diisi"),
-      telepon: Yup.string().required("Telepon wajib diisi"),
     });
 
     return {
@@ -224,9 +155,6 @@ export default defineComponent({
       data.append("app", this.formData.app);
       data.append("description", this.formData.description);
       data.append("pemerintah", this.formData.pemerintah);
-      data.append("alamat", this.formData.alamat);
-      data.append("telepon", this.formData.telepon);
-      data.append("email", this.formData.email);
 
       data.append("logo", this.files.logo[0]?.file || "");
       data.append("bg_auth", this.files.bgAuth[0]?.file || "");
