@@ -53,11 +53,18 @@ export default {
                 this.queuePosition = response.data.queuePosition;
 
                 if (this.accessGranted) {
+                    clearInterval(this.interval);
                     await this.removeFromQueue();
-                    const ticketId = this.$route.query.id;
-                    if (ticketId) {
-                        this.$router.push(`/tiket/${ticketId}`);
-                    }
+                    const ticketName = this.$route.query.name.replace(
+                        /\s+/g,
+                        "-"
+                    );
+
+                    // Gunakan replace agar waiting room tidak tersimpan di riwayat navigasi
+                    this.$router.replace({
+                        name: "ticket-detail",
+                        params: { name: ticketName },
+                    });
                 }
             } catch (error) {
                 console.error(
@@ -76,8 +83,8 @@ export default {
                     });
                     console.log(
                         "User removed from ticket queue:",
-                        response.data
-                    );
+                        response.data.message
+                    ); // Debug log
                 } catch (error) {
                     console.error(
                         "Terjadi kesalahan saat menghapus dari antrian:",

@@ -72,7 +72,7 @@ class Kernel extends HttpKernel
         'permission' => \Spatie\Permission\Middlewares\PermissionMiddleware::class,
         'role_or_permission' => \Spatie\Permission\Middlewares\RoleOrPermissionMiddleware::class,
         'json' => \App\Http\Middleware\EnsureApiJson::class,
-        
+        'check.ticket.access' => \App\Http\Middleware\CheckTicketAccess::class,
         // Tambahkan middleware baru untuk limit akses tiket
 
             // ...

@@ -83,59 +83,30 @@ export default {
       const options = { year: "numeric", month: "long", day: "numeric" };
       return new Date(date).toLocaleDateString("id-ID", options);
     },
-    async checkAccessAndRedirect() {
-      // Memeriksa akses pengguna dan mengarahkan
-      const userId = localStorage.getItem("userId");
-
-      if (!userId) {
-        Swal.fire({
-          title: "Anda harus login",
-          text: "Silakan login untuk memesan tiket.",
-          icon: "warning",
-          confirmButtonText: "Login",
-          cancelButtonText: "Batal",
-          showCancelButton: true,
-          reverseButtons: true,
-        }).then((result) => {
-          if (result.isConfirmed) {
-            this.router.push({ name: "sign-in" }); // Ganti dengan nama route yang sesuai
-          }
-        });
+    beforeRouteLeave(to, from, next) {
+  // Cek jika menuju ke halaman lain dan bukan dari paymentDetail
+  if (to.name !== "paymentDetail" && from.name !== "paymentDetail") {
+    Swal.fire({
+      title: "Apakah Anda yakin ingin keluar?",
+      text: "Jika Anda keluar, kemungkinan Anda akan antri kembali.",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "Ya, keluar",
+      cancelButtonText: "Tidak",
+    }).then((result) => {
+      if (result.isConfirmed) {
+        this.removeAccess();
+        next();
       } else {
-        try {
-          // Memeriksa status akses
-          const response = await axios.get("/waiting-room-status", {
-          params: { ticket_id: this.product.id },
-          });
-          const { accessGranted } = response.data;
-
-          if (accessGranted) {
-            // Jika akses diberikan
-            this.router.push(`/tiket/${this.product.id}`); // Arahkan ke halaman tiket
-          } else {
-            // Jika akses ditolak
-            Swal.fire({
-              title: "Menunggu Giliran",
-              text: "Kamu sedang berada dalam waiting room. Harap menunggu sampai giliranmu tiba.",
-              icon: "info",
-              confirmButtonText: "OK",
-            });
-            this.router.push({
-              path: "/waiting-room",
-              query: { id: this.product.id },
-            }); // Kirim ID tiket melalui query parameter
-          }
-        } catch (error) {
-          console.error("Error checking access:", error);
-          Swal.fire({
-            title: "Kesalahan",
-            text: "Terjadi kesalahan saat mengecek akses. Silakan coba lagi nanti.",
-            icon: "error",
-            confirmButtonText: "OK",
-          });
-        }
+        next(false);
       }
-    },
+    });
+  } else {
+    next();
+  }
+},
+
+
   },
 };
 </script>

@@ -99,6 +99,8 @@ Route::get('/tickets', [TicketController::class, 'index']); // Untuk semua tiket
 Route::get('/tickets/limited', [TicketController::class, 'limited']); // Untuk tiket terbatas di halaman utama
 Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
 Route::post('/tickets/search', [TicketController::class, 'search']);
+Route::get('/tickets/name/{name}', [TicketController::class, 'showByName']);
+
 
 // Laporan Routes
 Route::prefix('laporan')->group(function () {

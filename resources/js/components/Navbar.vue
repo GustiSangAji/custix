@@ -47,10 +47,9 @@
         <div v-if="tickets.length > 0" class="search-results">
           <ul>
             <li v-for="ticket in tickets" :key="ticket.id">
-              <router-link :to="`/tiket/${ticket.id}`">
+              <router-link :to="{ name: 'ticket-detail', params: { name: ticket.name.replace(/\s+/g, '-') }}">
                 <img
                   :src="ticket.image"
-                  alt="ticket image"
                   class="ticket-image"
                 />
                 <div class="ticket-info">
@@ -109,7 +108,7 @@ export default {
     };
 
     const onInput = async () => {
-      if (searchQuery.value.length >= 2) {
+      if (searchQuery.value.length >= 1) {
         await searchTickets();
       } else {
         tickets.value = [];

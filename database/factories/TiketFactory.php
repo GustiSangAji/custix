@@ -35,10 +35,14 @@ class TiketFactory extends Factory
         $image = 'images/' . $this->faker->randomElement($images);
         $banner = 'banners/' . $this->faker->randomElement($banners);
 
+        // Menghasilkan nama event dan menghapus titik (.)
+        $name = $this->faker->sentence(3);
+        $name = str_replace('.', '', $name); // Menghapus titik
+
         return [
             'uuid' => Str::uuid(),
             'kode_tiket' => strtoupper(Str::random(10)),
-            'name' => $this->faker->sentence(3), // Nama event
+            'name' => $name, // Nama event tanpa titik
             'place' => $this->faker->city, // Lokasi event
             'datetime' => $this->faker->dateTimeBetween('now', '+1 year'), // Tanggal event
             'status' => $this->faker->randomElement(['available']), // Status tiket
@@ -50,4 +54,5 @@ class TiketFactory extends Factory
             'expiry_date' => $this->faker->dateTimeBetween('+1 week', '+2 years'), // Masa berlaku tiket
         ];
     }
+
 }
