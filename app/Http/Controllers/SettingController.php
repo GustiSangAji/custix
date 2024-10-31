@@ -15,49 +15,35 @@ class SettingController extends Controller
 
     public function update(Request $request)
     {
-        if (request()->wantsJson()) {
+        if ($request->wantsJson()) {
             $request->validate([
                 'app' => 'required',
                 'description' => 'required',
                 'pemerintah' => 'required',
-                'alamat' => 'required',
-                //'dinas' => 'required',
-                'telepon' => 'required',
-                'email' => 'required',
                 'logo' => 'required|image|mimes:jpeg,png,jpg|max:2048',
                 'bg_auth' => 'required|image|mimes:jpeg,png,jpg|max:8192',
-                //'banner' => 'required|image|mimes:jpeg,png,jpg|max:8192',
+                'carousel.*' => 'image|mimes:jpeg,png,jpg|max:8192', // Validasi array gambar
             ]);
 
             $setting = Setting::first();
 
-            if ($setting->logo != null && $setting->logo != '') {
-                $old_photo = str_replace('/storage/', '', $setting->logo);
-                Storage::disk('public')->delete($old_photo);
-            }
-
-            if ($setting->bg_auth != null && $setting->bg_auth != '') {
-                $old_photo = str_replace('/storage/', '', $setting->bg_auth);
-                Storage::disk('public')->delete($old_photo);
-            }
-
-            if ($setting->banner != null && $setting->banner != '') {
-                $old_photo = str_replace('/storage/', '', $setting->banner);
-                Storage::disk('public')->delete($old_photo);
-            }
+            // Delete previous images if exist
+            $this->deleteImageIfExists($setting->logo);
+            $this->deleteImageIfExists($setting->bg_auth);
+            $this->deleteImageIfExists($setting->carousel1);
+            $this->deleteImageIfExists($setting->carousel2);
+            $this->deleteImageIfExists($setting->carousel3);
 
             $data = $request->all();
 
-            if ($request->hasFile('logo')) {
-                $data['logo'] = '/storage/' . $request->file('logo')->store('setting', 'public');
-            }
+            // Process single images
+            $data['logo'] = $this->storeImage($request->file('logo'), 'setting');
+            $data['bg_auth'] = $this->storeImage($request->file('bg_auth'), 'setting');
 
-            if ($request->hasFile('bg_auth')) {
-                $data['bg_auth'] = '/storage/' . $request->file('bg_auth')->store('setting', 'public');
-            }
-
-            if ($request->hasFile('banner')) {
-                $data['banner'] = '/storage/' . $request->file('banner')->store('setting', 'public');
+            // Process carousel images
+            $carousels = $request->file('carousel', []);
+            for ($i = 0; $i < 3; $i++) {
+                $data["carousel" . ($i + 1)] = isset($carousels[$i]) ? $this->storeImage($carousels[$i], 'setting') : null;
             }
 
             $setting->update($data);
@@ -69,5 +55,17 @@ class SettingController extends Controller
         } else {
             abort(404);
         }
+    }
+
+    private function deleteImageIfExists($path)
+    {
+        if ($path && Storage::disk('public')->exists($path)) {
+            Storage::disk('public')->delete($path);
+        }
+    }
+
+    private function storeImage($file, $path)
+    {
+        return $file ? '/storage/' . $file->store($path, 'public') : null;
     }
 }

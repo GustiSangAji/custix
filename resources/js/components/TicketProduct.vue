@@ -8,7 +8,10 @@
       v-if="imageUrl"
       @error="onImageError"
     />
-    <span v-if="isUnavailable" class="badge badge-light-dark text-white position-absolute p-2 top-0 start-0 m-2">
+    <span
+      v-if="isUnavailable"
+      class="badge badge-light-dark text-white position-absolute p-2 top-0 start-0 m-2"
+    >
       Habis
     </span>
 
@@ -70,7 +73,7 @@ export default {
     },
     isUnavailable() {
       // Cek apakah tiket tidak tersedia
-      return this.product.status !== 'available'; // Sesuaikan dengan nilai status yang tepat
+      return this.product.status !== "available"; // Sesuaikan dengan nilai status yang tepat
     },
   },
   methods: {
@@ -84,61 +87,60 @@ export default {
       return new Date(date).toLocaleDateString("id-ID", options);
     },
     async checkAccessAndRedirect() {
-  const userId = localStorage.getItem("userId");
+      const userId = localStorage.getItem("userId");
 
-  if (!userId) {
-    Swal.fire({
-      title: "Anda harus login",
-      text: "Silakan login untuk memesan tiket.",
-      icon: "warning",
-      confirmButtonText: "Login",
-      cancelButtonText: "Batal",
-      showCancelButton: true,
-      reverseButtons: true,
-    }).then((result) => {
-      if (result.isConfirmed) {
-        this.router.push({ name: "sign-in" });
-      }
-    });
-  } else {
-    try {
-      const response = await axios.get("/waiting-room-status", {
-        params: { ticket_id: this.product.id }, // Sesuaikan di sini
-      });
-      const { accessGranted } = response.data;
-
-      if (accessGranted) {
-        const ticketName = this.product.name.replace(/\s+/g, "-");
-        const sanitizedTicketName = encodeURIComponent(ticketName);
-
-        this.router.push({
-          name: "ticket-detail",
-          params: { name: sanitizedTicketName },
+      if (!userId) {
+        Swal.fire({
+          title: "Anda harus login",
+          text: "Silakan login untuk memesan tiket.",
+          icon: "warning",
+          confirmButtonText: "Login",
+          cancelButtonText: "Batal",
+          showCancelButton: true,
+          reverseButtons: true,
+        }).then((result) => {
+          if (result.isConfirmed) {
+            this.router.push({ name: "sign-in" });
+          }
         });
       } else {
-        Swal.fire({
-          title: "Menunggu Giliran",
-          text: "Kamu sedang berada dalam waiting room. Harap menunggu sampai giliranmu tiba.",
-          icon: "info",
-          confirmButtonText: "OK",
-        });
-        this.router.push({
-          path: "/waiting-room",
-          query: { id: this.product.id, name: this.product.name }, // Sesuaikan di sini
-        });
-      }
-    } catch (error) {
-      console.error("Error checking access:", error);
-      Swal.fire({
-        title: "Kesalahan",
-        text: "Terjadi kesalahan saat mengecek akses. Silakan coba lagi nanti.",
-        icon: "error",
-        confirmButtonText: "OK",
-      });
-    }
-  }
-},
+        try {
+          const response = await axios.get("/waiting-room-status", {
+            params: { ticket_id: this.product.id }, // Sesuaikan di sini
+          });
+          const { accessGranted } = response.data;
 
+          if (accessGranted) {
+            const ticketName = this.product.name.replace(/\s+/g, "-");
+            const sanitizedTicketName = encodeURIComponent(ticketName);
+
+            this.router.push({
+              name: "ticket-detail",
+              params: { name: sanitizedTicketName },
+            });
+          } else {
+            Swal.fire({
+              title: "Menunggu Giliran",
+              text: "Kamu sedang berada dalam waiting room. Harap menunggu sampai giliranmu tiba.",
+              icon: "info",
+              confirmButtonText: "OK",
+            });
+            this.router.push({
+              path: "/waiting-room",
+              query: { id: this.product.id, name: this.product.name }, // Sesuaikan di sini
+            });
+          }
+        } catch (error) {
+          console.error("Error checking access:", error);
+          Swal.fire({
+            title: "Kesalahan",
+            text: "Terjadi kesalahan saat mengecek akses. Silakan coba lagi nanti.",
+            icon: "error",
+            confirmButtonText: "OK",
+          });
+        }
+      }
+    },
   },
 };
 </script>

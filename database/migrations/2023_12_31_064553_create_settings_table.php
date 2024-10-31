@@ -19,6 +19,9 @@ return new class extends Migration
             $table->string('logo');
             $table->string('banner');
             $table->string('bg_auth');
+            $table->string('carousel1')->nullable();
+            $table->string('carousel2')->nullable();
+            $table->string('carousel3')->nullable();
 
             $table->string('dinas');
             $table->string('pemerintah');

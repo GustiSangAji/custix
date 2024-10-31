@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { nextTick, onBeforeMount, onMounted } from "vue";
-import { RouterView } from "vue-router";
+import { RouterView, useRoute } from "vue-router";
 import { useConfigStore } from "@/stores/config";
 import { useThemeStore } from "@/stores/theme";
 import { useBodyStore } from "@/stores/body";
@@ -10,32 +10,25 @@ import { initializeComponents } from "@/core/plugins/keenthemes";
 const configStore = useConfigStore();
 const themeStore = useThemeStore();
 const bodyStore = useBodyStore();
+const route = useRoute(); // Menggunakan useRoute untuk akses objek route
 
 onBeforeMount(() => {
-    /**
-     * Overrides the layout config using saved data from localStorage
-     * remove this to use static config (@/layouts/default-layout/config/DefaultLayoutConfig.ts)
-     */
     configStore.overrideLayoutConfig();
-
-    /**
-     *  Sets a mode from configuration
-     */
     themeStore.setThemeMode(themeConfigValue.value);
 });
 
 onMounted(() => {
     nextTick(() => {
         initializeComponents();
-
         bodyStore.removeBodyClassName("page-loading");
     });
 });
 </script>
 
 <template>
-    <RouterView />
+    <router-view :key="route.fullPath"></router-view> <!-- Gunakan route.fullPath sebagai key -->
 </template>
+
 
 <style lang="scss">
 @import "bootstrap-icons/font/bootstrap-icons.css";
