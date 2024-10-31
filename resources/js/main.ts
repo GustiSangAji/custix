@@ -10,9 +10,36 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import 'bootstrap';
 import App from "./App.vue";
 
-/*
-TIP: To get started with clean router change path to @/router/clean.ts.
- */
+// Import axios
+import axios from 'axios';
+
+// Setup base URL for axios if needed
+
+// Interceptor untuk menambahkan token ke header
+axios.interceptors.request.use(config => {
+    const token = localStorage.getItem('token');
+    if (token) {
+        config.headers['Authorization'] = `Bearer ${token}`;
+    }
+    return config;
+}, error => {
+    return Promise.reject(error);
+});
+
+// Interceptor untuk menangani 401 Unauthorized
+axios.interceptors.response.use(response => {
+    return response;
+}, error => {
+    if (error.response && error.response.status === 401) {
+        // Jika token tidak valid, lakukan logout
+        // Misalnya, Anda dapat memanggil fungsi logout di store Anda
+        // store.dispatch('logout'); // Uncomment jika Anda menggunakan Pinia untuk mengelola auth
+        window.location.href = "/auth/sign-in"; // Arahkan ke halaman login
+    }
+    return Promise.reject(error);
+});
+
+// Import router
 import router from "./router";
 import ElementPlus from "element-plus";
 import i18n from "@/core/plugins/i18n";
@@ -32,6 +59,7 @@ import Vue3Toastify, { type ToastContainerOptions } from "vue3-toastify";
 import "vue3-toastify/dist/index.css";
 
 import "@/core/plugins/prismjs";
+
 const app = createApp(App);
 
 app.use(createPinia());
@@ -44,6 +72,7 @@ app.directive("mask", (el, binding) => {
     Inputmask(binding.value).mask(el);
 });
 
+// Komponen lainnya
 import DatePicker from "@/components/DatePicker.vue";
 import FileUpload from "@/components/FileUpload.vue";
 import Select2 from "@/components/Select2.vue";
@@ -89,6 +118,7 @@ app.use(VueQueryPlugin, {
     queryClient,
 });
 
+// Konfigurasi Toastify
 app.use(Vue3Toastify, {
     newestOnTop: true,
     pauseOnFocusLoss: false,
@@ -96,10 +126,12 @@ app.use(Vue3Toastify, {
     theme: useThemeStore().mode,
 } as ToastContainerOptions);
 
+// CKEditor
 import CKEditor from "@ckeditor/ckeditor5-vue";
 import "ckeditor5-custom-build/build/ckeditor";
 app.use(CKEditor);
 
+// Vee Validate
 import { Form as VForm, Field, ErrorMessage } from "vee-validate";
 app.component("VForm", VForm);
 app.component("Field", Field);
@@ -117,10 +149,12 @@ app.directive("tooltip", (el) => {
     new Tooltip(el);
 });
 
+// Mount aplikasi
 app.mount("#app");
 
+// Debugging console log
 let cssRule =
-    "display:block;width:200px;border-radius: 3px 0 0 3px;padding:3px 15px;background:#108bc3;color:#FFF;font-size: 30px;font-family:Arial, Helvetica, sans-seriffont-weight: bold;";
+    "display:block;width:200px;border-radius: 3px 0 0 3px;padding:3px 15px;background:#108bc3;color:#FFF;font-size: 30px;font-family:Arial, Helvetica, sans-serif;font-weight: bold;";
 let cssRule2 =
     "display:block;border-radius: 0 3px 3px 0;padding:3px 15px;background:#fff;color:#666;font-size: 30px;font-family:Arial, Helvetica, sans-serif;";
 console.log(

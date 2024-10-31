@@ -19,11 +19,12 @@ class TicketWaitingRoomController extends Controller
     public function status(Request $request)
     {
         $userId = Auth::id();
+        Log::info('User ID:', ['user_id' => Auth::id()]);
         $ticketId = $request->ticket_id;
     
         $currentAccessCount = TicketAccess::where('ticket_id', $ticketId)
             ->where('active', true)
-            ->count();
+            ->count();  
     
         if ($currentAccessCount < $this->limit) {
             TicketAccess::create([

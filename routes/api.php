@@ -123,14 +123,13 @@ Route::post('/afterpay', [CartController::class, 'afterpayment']);
 
 
 // Waiting Room Status
-Route::middleware('auth')->group(function () {
+Route::middleware('auth:api')->group(function () {
     Route::get('/waiting-room-status', [TicketWaitingRoomController::class, 'status']);
     Route::post('/clear-access', [TicketWaitingRoomController::class, 'clearQueue']);
     Route::post('/grant-access', [TicketWaitingRoomController::class, 'grantAccess']);
     Route::post('/terminate-access', [TicketWaitingRoomController::class, 'terminateAccess']);
     Route::post('/remove-access', [CartController::class, 'removeAccess']);
     Route::post('/api/remove-access/{id}', [TicketWaitingRoomController::class, 'terminateAccess']);
-
 });
 
 Route::get('/user/orders', [CartController::class, 'getUserOrders']);

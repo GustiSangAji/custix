@@ -29,7 +29,7 @@ class AuthController extends Controller
 
     public function login(Request $request)
     {
-        $validator = Validator::make($request->all(), [
+        $validator = Validator::make($request->post(), [
             'email' => 'required|email',
             'password' => 'required',
         ]);
