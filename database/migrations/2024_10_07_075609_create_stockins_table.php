@@ -21,14 +21,16 @@ return new class extends Migration
 
         // Trigger untuk menambah stok setelah insert
         DB::unprepared('
-            CREATE TRIGGER trigger_tambah
-            AFTER INSERT ON stockins
-            FOR EACH ROW
-            BEGIN
-                UPDATE tikets SET quantity = quantity + NEW.jumlah
-                WHERE kode_tiket = NEW.kode_tiket;
-            END
-        ');
+        CREATE TRIGGER trigger_tambah
+        AFTER INSERT ON stockins
+        FOR EACH ROW
+        BEGIN
+            UPDATE tikets 
+            SET quantity = quantity + NEW.jumlah,
+                status = CASE WHEN quantity + NEW.jumlah > 0 THEN "available" ELSE status END
+            WHERE kode_tiket = NEW.kode_tiket;
+        END
+    ');
 
         // Trigger untuk mengurangi stok setelah delete
         DB::unprepared('

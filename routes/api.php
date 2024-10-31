@@ -73,9 +73,9 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
     // Tiket Routes
     Route::middleware('can:event')->group(function () {
-        Route::get('tiket', [TiketController::class, 'get']);
-        Route::post('tiket', [TiketController::class, 'index']);
-        Route::post('tiket/store', [TiketController::class, 'store']);
+    Route::get('tiket', [TiketController::class, 'get']);
+    Route::post('tiket', [TiketController::class, 'index']);
+    Route::post('tiket/store', [TiketController::class, 'store']);
         Route::apiResource('tiket', TiketController::class)
             ->except(['index', 'store'])
             ->scoped(['tiket' => 'uuid']);
@@ -123,7 +123,7 @@ Route::post('/afterpay', [CartController::class, 'afterpayment']);
 
 
 // Waiting Room Status
-Route::middleware('auth')->group(function () {
+Route::middleware('auth:api')->group(function () {
     Route::get('/waiting-room-status', [TicketWaitingRoomController::class, 'status']);
     Route::post('/clear-access', [TicketWaitingRoomController::class, 'clearQueue']);
     Route::post('/grant-access', [TicketWaitingRoomController::class, 'grantAccess']);

@@ -30,6 +30,7 @@ const routes: Array<RouteRecordRaw> = [
     },
     {
         path: "/tiket",
+        name: "semua",
         component: () => import("@/pages/Foods.vue"), // Halaman untuk daftar tiket
     },
     {

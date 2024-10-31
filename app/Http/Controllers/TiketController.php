@@ -82,36 +82,40 @@ class TiketController extends Controller
      * Update the specified resource in storage.
      */
     public function update(UpdateTiketRequest $request, Tiket $tiket)
-    {
-        $validatedData = $request->validated();
+{
+    // Validasi data yang diterima dari request
+    $validatedData = $request->validated();
 
-        // Jika ada file gambar, simpan dan perbarui path gambar
-        if ($request->hasFile('image')) {
-            // Hapus gambar lama jika ada
-            if ($tiket->image) {
-                Storage::disk('public')->delete($tiket->image);
-            }
-            $validatedData['image'] = $request->file('image')->store('tikets', 'public');
+    // Jika ada file gambar, simpan dan perbarui path gambar
+    if ($request->hasFile('image')) {
+        // Hapus gambar lama jika ada
+        if ($tiket->image) {
+            $oldImage = str_replace('/storage/', '', $tiket->image);
+            Storage::disk('public')->delete($oldImage);
         }
-
-        // Jika ada file banner, simpan dan perbarui path banner
-        if ($request->hasFile('banner')) {
-            // Hapus banner lama jika ada
-            if ($tiket->banner) {
-                Storage::disk('public')->delete($tiket->banner);
-            }
-            $validatedData['banner'] = $request->file('banner')->store('banners', 'public');
-        }
-
-        // Update data tiket
-        $tiket->update($validatedData);
-
-        return response()->json([
-            'success' => true,
-            'message' => 'Tiket berhasil diupdate',
-            'tiket' => $tiket
-        ]);
+        $validatedData['image'] = '/storage/' . $request->file('image')->store('imagess', 'public');
     }
+
+    // Jika ada file banner, simpan dan perbarui path banner
+    if ($request->hasFile('banner')) {
+        // Hapus banner lama jika ada
+        if ($tiket->banner) {
+            $oldBanner = str_replace('/storage/', '', $tiket->banner);
+            Storage::disk('public')->delete($oldBanner);
+        }
+        $validatedData['banner'] = '/storage/' . $request->file('banner')->store('banners', 'public');
+    }
+
+    // Update data tiket
+    $tiket->update($validatedData);
+
+    return response()->json([
+        'success' => true,
+        'message' => 'Tiket berhasil diupdate',
+        'tiket' => $tiket
+    ]);
+}
+
 
     /**
      * Update the stock of the specified resource.
