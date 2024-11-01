@@ -10,6 +10,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TiketController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Api\TicketWaitingRoomController;
 use Illuminate\Support\Facades\Route;
 
@@ -33,7 +34,7 @@ Route::middleware(['json'])->prefix('auth')->group(function () {
     Route::delete('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
 });
-
+Route::middleware('auth:api')->post('/profile/update', [ProfileController::class, 'update']);
 // routes/api.php
 
 
