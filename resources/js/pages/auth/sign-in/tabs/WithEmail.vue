@@ -150,24 +150,29 @@ export default defineComponent({
     submit() {
       blockBtn(this.submitButton);
 
-            axios.post("/auth/login", { ...this.data, type: "email" }).then(res => {
-                
-                this.store.setAuth(res.data.user, res.data.token);
-                
-               // Cek peran pengguna dan arahkan ke halaman yang sesuai
-                if (res.data.user.role?.name === 'admin') {
-                    this.router.push("/dashboard"); // Arahkan admin ke dashboard
-                } else {
-                    this.router.push("/home"); // Arahkan user biasa ke halaman home
-                }
-            }).catch(error => {
-                toast.error(error.response.data.message);
-            }).finally(() => {
-                unblockBtn(this.submitButton);
-            });
-        },
-        togglePassword(ev) {
-            const type = document.querySelector("[name=password]").type;
+      axios
+        .post("/auth/login", { ...this.data, type: "email" })
+        .then((res) => {
+          this.store.setAuth(res.data.user, res.data.token);
+          localStorage.setItem("token", res.data.token); // Menyimpan token di local storage
+
+          // Cek peran pengguna dan arahkan ke halaman yang sesuai
+          if (res.data.user.role?.name === "admin") {
+            this.router.push("/dashboard"); // Arahkan admin ke dashboard
+          } else {
+            this.router.push("/home"); // Arahkan user biasa ke halaman home
+          }
+        })
+        .catch((error) => {
+          toast.error(error.response.data.message);
+        })
+        .finally(() => {
+          unblockBtn(this.submitButton);
+        });
+    },
+
+    togglePassword(ev) {
+      const type = document.querySelector("[name=password]").type;
 
       if (type === "password") {
         document.querySelector("[name=password]").type = "text";

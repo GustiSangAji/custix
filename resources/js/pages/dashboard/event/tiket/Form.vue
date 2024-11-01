@@ -49,6 +49,13 @@ function getEdit() {
         .then(({ data }) => {
             if (data && data.tiket) {
                 ticket.value = data.tiket; // Pastikan response berisi data.tiket
+                // Memformat URL untuk gambar dan banner
+                if (ticket.value.image) {
+                    ticket.value.image = `/storage/${ticket.value.image}`;
+                }
+                if (ticket.value.banner) {
+                    ticket.value.banner = `/storage/${ticket.value.banner}`;
+                }
                 ticket.value.expiry_date = data.tiket.expiry_date;
             } else {
                 console.error("Response data format is incorrect", data);
@@ -61,6 +68,7 @@ function getEdit() {
             unblock(document.getElementById("form-ticket"));
         });
 }
+
 
 function submit() {
     const formData = new FormData();
@@ -123,7 +131,7 @@ watch(
                 kode_tiket: '', // Reset kode_tiket
                 name: '',
                 place: '',
-                datetime: '',
+                datetime: '',   
                 expiry_date: '',
                 status: 'available',
                 quantity: 0,

@@ -130,7 +130,6 @@ Route::middleware('auth:api')->group(function () {
     Route::post('/terminate-access', [TicketWaitingRoomController::class, 'terminateAccess']);
     Route::post('/remove-access', [CartController::class, 'removeAccess']);
     Route::post('/api/remove-access/{id}', [TicketWaitingRoomController::class, 'terminateAccess']);
-
 });
 
 Route::get('/user/orders', [CartController::class, 'getUserOrders']);
