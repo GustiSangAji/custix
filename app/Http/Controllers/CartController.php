@@ -10,6 +10,7 @@ use App\Models\Tiket; // Model tiket
 use Midtrans\Config;
 use Midtrans\Notification;
 use App\Models\User;
+use App\Models\TicketDetail;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -119,69 +120,91 @@ class CartController extends Controller
     }
 
 
-    public function callback(Request $request)
+     public function callback(Request $request)
     {
         $notification = $request->all();
         $transactionStatus = $notification['transaction_status'];
         $orderId = $notification['order_id'];
-    
+
         // Cari pesanan berdasarkan order_id
         $order = Cart::where('order_id', $orderId)->first();
-    
+
         if (!$order) {
             return response()->json(['message' => 'Order not found'], 404);
         }
-    
+
+        // Mengambil QR code yang disimpan dalam tabel cart
+        $qrCodeData = json_decode($order->qr_code, true);
+
+        // Pastikan format QR code mengandung 'tickets'
+        if (!isset($qrCodeData['tickets']) || !is_array($qrCodeData['tickets'])) {
+            return response()->json(['message' => 'Invalid QR code format'], 400);
+        }
+
         // Ambil tiket terkait pesanan
         $ticket = Tiket::find($order->ticket_id);
-    
+
         // Gunakan transaksi database untuk memastikan atomicity
         DB::beginTransaction();
-    
+
         try {
             // Perbarui status berdasarkan status transaksi dari Midtrans
             if ($transactionStatus == 'capture' || $transactionStatus == 'settlement') {
-                $order->status = 'Paid';
-                
                 // Kurangi stok tiket jika status adalah 'capture' atau 'settlement'
                 if ($ticket && $ticket->quantity >= $order->jumlah_pemesanan) {
                     // Mengunci tiket selama transaksi
                     $ticket = Tiket::where('id', $ticket->id)->lockForUpdate()->first();
-    
+
                     if ($ticket->quantity < $order->jumlah_pemesanan) {
                         // Batalkan transaksi jika stok tidak mencukupi
                         DB::rollBack();
                         return response()->json(['message' => 'Not enough tickets available'], 400);
                     }
-    
+
                     $ticket->quantity -= $order->jumlah_pemesanan;
-                    $ticket->save();
+                    $ticket->save(); // Simpan perubahan stok tiket
                 } else {
+                    // Batalkan transaksi jika tiket tidak ditemukan
                     DB::rollBack();
-                    return response()->json(['message' => 'Not enough tickets available'], 400);
+                    return response()->json(['message' => 'Ticket not found or insufficient quantity'], 404);
                 }
-    
+
+                // Ubah status pesanan yang baru menjadi paid
+                $order->status = 'Paid';
+
+                // Mengisi tabel ticket_details
+                foreach ($qrCodeData['tickets'] as $ticketInfo) {
+                    // Buat salinan dari data QR code untuk masing-masing tiket
+                    $individualQrCodeData = $qrCodeData;
+                    // Set hanya satu ticketNumber per entry
+                    $individualQrCodeData['tickets'] = [$ticketInfo]; // Hanya satu tiket per QR
+
+                    TicketDetail::create([
+                        'cart_id' => $order->id,
+                        'ticket_number' => $ticketInfo['ticketNumber'],
+                        'status' => 'Unused',
+                        'qr_code' => json_encode($individualQrCodeData), // Simpan QR untuk setiap tiket unik
+                    ]);
+                }
             } elseif ($transactionStatus == 'deny' || $transactionStatus == 'cancel' || $transactionStatus == 'failure' || $transactionStatus == 'pending') {
-                $order->status = 'Unpaid';
-    
+                // Biarkan status pesanan sebelumnya tidak berubah
             } elseif ($transactionStatus == 'expire') {
-                $order->status = 'Gagal';
+                $order->status = 'Expired';
             }
-    
+
             // Simpan perubahan pada status pesanan
             $order->save();
-    
+
             // Commit transaksi jika semua berjalan lancar
             DB::commit();
             return response()->json(['message' => 'Transaction processed', 'status' => $order->status]);
-    
+
         } catch (\Exception $e) {
             // Rollback transaksi jika ada kesalahan
             DB::rollBack();
             return response()->json(['error' => $e->getMessage()], 500);
         }
     }
-    
 
 
 
@@ -189,13 +212,12 @@ class CartController extends Controller
     {
         $userId = Auth::id();
 
-        // Logika pembayaran berhasil, ubah status tiket atau lainnya...
-
         // Hapus akses pengguna dari ticket_access setelah pembayaran selesai
         DB::table('ticket_access')->where('user_id', $userId)->delete();
 
         // Hapus pengguna dari antrian jika ada
         DB::table('ticket_queue')->where('user_id', $userId)->delete();
+
 
         // Berikan akses kepada pengguna berikutnya dalam antrian
         $nextInQueue = DB::table('ticket_queue')->orderBy('created_at', 'asc')->first();
@@ -225,89 +247,106 @@ class CartController extends Controller
         return response()->json(['message' => 'Akses pengguna berhasil dihapus']);
     }
 
-
     public function getUserOrders()
     {
-        
         $orders = Cart::where('user_id', auth()->id())
                     ->where('status', 'Paid')
-                    ->with('ticket')
+                    ->with(['ticket', 'ticketDetails' => function ($query) {
+                        $query->select('ticket_number', 'status', 'cart_id');
+                    }])
                     ->get();
-
+    
         return response()->json($orders);
     }
+    
 
 
     public function getOrderById($id)
-    {
-        
-        $order = Cart::where('id', $id)
-                    ->where('user_id', auth()->id()) 
-                    ->where('status', 'Paid')    
-                    ->with('ticket')
-                    ->first();
+{
+    $order = Cart::where('id', $id)
+                ->where('user_id', auth()->id()) 
+                ->where('status', 'Paid')    
+                ->with(['ticket', 'ticketDetails' => function ($query) {
+                    $query->select('ticket_number', 'status', 'cart_id');
+                }])
+                ->first();
 
-        if (!$order) {
-            return response()->json(['message' => 'Order not found or not paid'], 404);
-        }
-
-        return response()->json($order);
+    if (!$order) {
+        return response()->json(['message' => 'Order not found or not paid'], 404);
     }
 
+    // Tambahkan status tiket ke dalam order jika ada
+    $order->ticketDetails->map(function($ticketDetail) use ($order) {
+        $order->ticket->status = $ticketDetail->status;
+    });
+
+    return response()->json($order);
+}
+
+
     public function saveQrCode(Request $request)
+    
     {
-        // Validasi input
         $request->validate([
             'order_id' => 'required|exists:carts,order_id',
-            'qr_codes' => 'required|array', // Validasi bahwa qr_codes adalah array
-            'qr_codes.*' => 'string', // Validasi setiap elemen dalam array harus string
+            'qr_codes' => 'required|json', // Pastikan qr_codes dalam format JSON yang valid
         ]);
-    
-        // Cari cart berdasarkan order_id
+
         $cart = Cart::where('order_id', $request->order_id)->first();
-    
+
         if ($cart) {
-            // Menggabungkan QR Code menjadi string yang dipisahkan koma
-            $cart->qr_code = implode(',', $request->qr_codes);
+            $cart->qr_code = $request->qr_codes; // Simpan sebagai JSON objek
             $cart->save();
-    
+
             return response()->json([
                 'status' => 'success',
                 'data' => [
                     'order_id' => $request->order_id,
-                    'qr_codes' => $request->qr_codes, // Mengembalikan QR Codes sebagai array
+                    'qr_codes' => json_decode($request->qr_codes), // Kembalikan JSON objek
                     'message' => 'QR code berhasil disimpan'
                 ]
             ], 200);
         }
-    
+
         return response()->json([
             'status' => 'error',
             'message' => 'Order tidak ditemukan'
         ], 404);
     }
+
     
 
 
-    public function verifyTicket(Request $request) {
-        $request->validate(['order_id' => 'required|exists:carts,order_id']);
-    
-        $cart = Cart::where('order_id', $request->order_id)->first();
-    
-        if (!$cart) {
+    public function verifyTicket(Request $request)
+    {
+        // Validasi untuk memastikan order_id dan ticket_number disediakan
+        $request->validate([
+            'order_id' => 'required|exists:carts,order_id',
+            'ticket_number' => 'required|string', // Nomor tiket sebagai string untuk keunikan
+        ]);
+
+        // Ambil detail tiket berdasarkan ticket_number dan order_id
+        $ticket = TicketDetail::whereHas('cart', function ($query) use ($request) {
+            $query->where('order_id', $request->order_id);
+        })->where('ticket_number', $request->ticket_number)
+        ->first();
+
+        // Jika tiket tidak ditemukan
+        if (!$ticket) {
             return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
         }
-    
-        if ($cart->status === 'Used') {
+
+        // Cek status tiket
+        if ($ticket->status === 'Used') {
             return response()->json(['message' => 'Tiket sudah digunakan'], 400);
     
         }
-    
+
         // Update status tiket sebagai telah digunakan
-        $cart->status = 'Used';
-        $cart->save();
-    
-        return response()->json(['message' => 'Tiket valid dan berhasil diverifikasi'],200);
+        $ticket->status = 'Used';
+        $ticket->save();
+
+        return response()->json(['message' => 'Tiket valid dan berhasil diverifikasi'], 200);
     }
 
 
@@ -345,6 +384,7 @@ class CartController extends Controller
             ],
         ]);
     }
+
     
 
 }
