@@ -23,9 +23,14 @@
       <!-- Navbar Content -->
       <div class="collapse navbar-collapse" id="navbarNav">
         <!-- Center Search Bar -->
-        <form class="d-flex mx-auto search-bar" @submit.prevent="searchTickets">
+        <form
+          ref="searchForm"
+          class="d-flex mx-auto search-bar"
+          @submit.prevent="searchTickets"
+        >
           <div class="input-group">
             <input
+              ref="searchInput"
               type="text"
               class="form-control"
               placeholder="Cari di CusTix"
@@ -34,7 +39,7 @@
               aria-label="Search"
               aria-describedby="search-addon"
             />
-            <span class="input-group-text" id="search-addon">
+            <span class="input-group-text" id="search-addon" @click="searchTickets">
               <i class="ki-duotone ki-magnifier fs-2">
                 <span class="path1"></span>
                 <span class="path2"></span>
@@ -44,14 +49,20 @@
         </form>
 
         <!-- Preview Search Results -->
-        <div v-if="tickets.length > 0" class="search-results">
+        <div
+          ref="searchResults"
+          v-if="tickets.length > 0"
+          class="search-results"
+        >
           <ul>
             <li v-for="ticket in tickets" :key="ticket.id">
-              <router-link :to="{ name: 'ticket-detail', params: { name: ticket.name.replace(/\s+/g, '-') }}">
-                <img
-                  :src="ticket.image"
-                  class="ticket-image"
-                />
+              <router-link
+                :to="{
+                  name: 'ticket-detail',
+                  params: { name: ticket.name.replace(/\s+/g, '-') },
+                }"
+              >
+                <img :src="ticket.image" class="ticket-image" />
                 <div class="ticket-info">
                   <h6>{{ ticket.name }}</h6>
                   <p>{{ ticket.place }} - {{ ticket.datetime }}</p>
@@ -64,20 +75,18 @@
         <!-- Right Menu Items -->
         <ul class="navbar-nav ms-auto align-items-center">
           <li v-if="isAuthenticated" class="d-flex align-items-center">
-            <router-link to="/order" class="nav-link fw-bold fs-6 me-3"
-              >Tiket Saya</router-link
-            >
+            <router-link to="/order" class="nav-link fw-bold fs-6 me-3">
+              Tiket Saya
+            </router-link>
             <UserDropdown />
           </li>
           <li v-else class="nav-item">
-            <router-link
-              to="/sign-in"
-              class="btn btn-light-primary rounded me-2"
-              >Masuk</router-link
-            >
-            <router-link to="/sign-up" class="btn btn-active-dark rounded"
-              >Daftar</router-link
-            >
+            <router-link to="/sign-in" class="btn btn-light-primary rounded me-2">
+              Masuk
+            </router-link>
+            <router-link to="/sign-up" class="btn btn-active-dark rounded">
+              Daftar
+            </router-link>
           </li>
         </ul>
       </div>
@@ -86,7 +95,7 @@
 </template>
 
 <script>
-import { ref, computed } from "vue";
+import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
 import UserDropdown from "@/components/dropdown/UserDropdown.vue";
@@ -103,6 +112,9 @@ export default {
     const isAuthenticated = computed(() => authStore.isAuthenticated);
     const isSticky = ref(false);
 
+    const searchResults = ref(null);
+    const searchForm = ref(null);
+
     const handleScroll = () => {
       isSticky.value = window.scrollY > 0;
     };
@@ -118,7 +130,7 @@ export default {
     const searchTickets = async () => {
       try {
         const response = await axios.post(`/tickets/search`, {
-          query: searchQuery.value, // kirim searchQuery sebagai parameter query
+          query: searchQuery.value,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        //apakah betul 999
         });
         tickets.value = response.data;
       } catch (error) {
@@ -129,7 +141,29 @@ export default {
       }
     };
 
-    window.addEventListener("scroll", handleScroll);
+    // Function to hide search results when clicking outside
+    const handleClickOutside = (event) => {
+      if (
+        searchResults.value &&
+        searchForm.value &&
+        !searchResults.value.contains(event.target) &&
+        !searchForm.value.contains(event.target)
+      ) {
+        tickets.value = [];
+      }
+    };
+
+    // Add event listener on mounted
+    onMounted(() => {
+      window.addEventListener("scroll", handleScroll);
+      document.addEventListener("click", handleClickOutside);
+    });
+
+    // Remove event listener before component unmounts
+    onBeforeUnmount(() => {
+      window.removeEventListener("scroll", handleScroll);
+      document.removeEventListener("click", handleClickOutside);
+    });
 
     return {
       isAuthenticated,
@@ -138,10 +172,13 @@ export default {
       tickets,
       onInput,
       searchTickets,
+      searchResults,
+      searchForm,
     };
   },
 };
 </script>
+
 
 <style scoped>
 .navbar {

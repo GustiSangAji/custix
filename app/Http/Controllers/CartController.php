@@ -332,6 +332,7 @@ class CartController extends Controller
         // Cek status tiket
         if ($ticket->status === 'Used') {
             return response()->json(['message' => 'Tiket sudah digunakan'], 400);
+    
         }
 
         // Update status tiket sebagai telah digunakan
