@@ -64,7 +64,12 @@ const routes: Array<RouteRecordRaw> = [
         path: '/verify',
         name: 'Verify',
         component: () => import("@/pages/Verify.vue"),
-        props: (route) => ({ order_id: route.query.order_id }),
+        props: (route) => ({
+            order_id: route.query.order_id,
+            unique_id: route.query.unique_id,
+            ticket_number: route.query.ticket_number,
+            hash: route.query.hash,
+          }),
     },    
     {
         path: "/order",
@@ -76,7 +81,7 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import("@/components/tiket/TiketSaya.vue"), // Halaman Tiket Saya
             },
             {
-                path: "orders/:id",
+                path: "orders/:id/:qrIndex",
                 name: 'OrderDetail',
                 component: () => import("@/components/order/DetailOrder.vue"),
                 props: true,  

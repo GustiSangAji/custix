@@ -18,7 +18,7 @@ public function up(): void
         $table->foreignId('ticket_id')->constrained('tikets')->onDelete('cascade'); // ID tiket (pastikan nama tabel sesuai)
         $table->integer('jumlah_pemesanan'); // Jumlah tiket yang dipesan
         $table->integer('total_harga'); // Total harga tiket
-        $table->enum('status', ['Unpaid', 'Paid', 'Used', 'Gagal']);
+        $table->enum('status', ['Unpaid', 'Paid', 'Used', 'Gagal', 'Expired']);
         $table->timestamps();
     });
 }
