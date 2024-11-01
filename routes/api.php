@@ -135,7 +135,10 @@ Route::middleware('auth:api')->group(function () {
 Route::get('/user/orders', [CartController::class, 'getUserOrders']);
 Route::get('/user/orders/{id}', [CartController::class, 'getOrderById']);
 Route::post('/save-qr-code', [CartController::class, 'saveQrCode']);
-Route::post('/verify-ticket', [CartController::class, 'verifyTicket']);
+Route::middleware(['auth'])->group(function () {
+    Route::post('/verify-ticket', [CartController::class, 'verifyTicket']);
+});
+
 
 
 

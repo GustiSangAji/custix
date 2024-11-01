@@ -84,4 +84,10 @@ class User extends Authenticatable implements JWTSubject
     {
         return $this->getAllPermissions()->pluck('name');
     }
+    // Di dalam model User.php
+    public function isAdmin()
+    {
+        return $this->role && $this->role->name === 'admin'; // Sesuaikan dengan struktur peran Anda
+    }
+
 }

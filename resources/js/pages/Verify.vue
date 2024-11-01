@@ -4,10 +4,7 @@
       <div class="card-body">
         <!-- Menampilkan alert status verifikasi tiket -->
         <div v-if="verificationStatus">
-          <div
-            v-if="verificationStatus === 'valid'"
-            class="alert alert-primary d-flex align-items-center p-5"
-          >
+          <div v-if="verificationStatus === 'valid'" class="alert alert-primary d-flex align-items-center p-5">
             <i class="ki-duotone ki-shield-tick fs-2hx text-success me-4"></i>
             <div class="d-flex flex-column">
               <h4 class="mb-4">Tiket Valid</h4>
@@ -15,28 +12,25 @@
             </div>
           </div>
 
-          <div
-            v-else-if="verificationStatus === 'used'"
-            class="alert alert-danger d-flex align-items-center p-5"
-          >
+          <div v-else-if="verificationStatus === 'used'" class="alert alert-danger d-flex align-items-center p-5">
             <i class="ki-duotone ki-shield-tick fs-2hx text-danger me-4"></i>
             <div class="d-flex flex-column">
               <h4 class="mb-4">Tiket Sudah Digunakan</h4>
-              <span
-                >Tiket sudah digunakan dan tidak bisa diverifikasi lagi.</span
-              >
+              <span>Tiket sudah digunakan dan tidak bisa diverifikasi lagi.</span>
             </div>
           </div>
 
-          <div
-            v-else-if="verificationStatus === 'not_found'"
-            class="alert alert-warning d-flex align-items-center p-5"
-          >
+          <div v-else-if="verificationStatus === 'not_found'" class="alert alert-warning d-flex align-items-center p-5">
             <i class="ki-duotone ki-shield-tick fs-2hx text-warning me-4"></i>
             <div class="d-flex flex-column">
               <h4 class="mb-4">Tiket Tidak Ditemukan</h4>
               <span>Tiket tidak ditemukan dalam sistem.</span>
             </div>
+          </div>
+
+          <div v-if="verificationStatus === 'not_authorized'" class="alert alert-danger">
+            <h4 class="mb-4">Akses Ditolak</h4>
+            <span>Anda tidak memiliki izin untuk melakukan verifikasi tiket.</span>
           </div>
         </div>
 
@@ -50,6 +44,7 @@
 
 <script>
 import axios from "axios";
+import { useAuthStore } from "@/stores/auth"; // pastikan path ini sesuai
 
 export default {
   data() {
@@ -57,6 +52,7 @@ export default {
       order_id: null,
       verificationStatus: "",
       loading: false,
+      isAdmin: false,
     };
   },
 
@@ -67,7 +63,6 @@ export default {
     const ticketNumber = urlParams.get("ticket_number");
     const hash = urlParams.get("hash");
 
-    // Set selectedQrCode dengan data dari URL
     this.selectedQrCode = {
       orderId: this.order_id,
       uniqueId: uniqueId,
@@ -75,8 +70,13 @@ export default {
       hash: hash,
     };
 
-    if (this.order_id) {
+    const authStore = useAuthStore();
+    this.isAdmin = authStore.user.role?.name === 'admin'; // sesuaikan dengan cara Anda mendefinisikan peran admin
+
+    if (this.isAdmin && this.order_id) {
       this.verifyTicket();
+    } else {
+      this.verificationStatus = "not_authorized"; // Status untuk pengguna tidak terotorisasi
     }
   },
 
@@ -84,7 +84,7 @@ export default {
     verifyTicket() {
       this.loading = true;
       axios
-        .post("https://5bf2-118-99-113-13.ngrok-free.app/api/verify-ticket", {
+        .post("https://7ea1-118-99-113-13.ngrok-free.app/api/verify-ticket", {
           order_id: this.order_id,
           unique_id: this.selectedQrCode.uniqueId,
           ticket_number: this.selectedQrCode.ticketNumber,
@@ -92,9 +92,7 @@ export default {
         })
         .then((response) => {
           this.loading = false;
-          if (
-            response.data.message === "Tiket valid dan berhasil diverifikasi"
-          ) {
+          if (response.data.message === "Tiket valid dan berhasil diverifikasi") {
             this.verificationStatus = "valid";
           }
         })
