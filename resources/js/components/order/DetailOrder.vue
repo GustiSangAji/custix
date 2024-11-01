@@ -32,12 +32,8 @@
             </div>
           </div>
           <div class="card-footer text-center" style="margin-top: -30px">
-            <div
-              class="card card-body bg-white d-flex flex-column align-items-center"
-            >
-              <h4 class="fw-bold fs-6 mb-3 text-dark">
-                Scan kode QR di bawah ini
-              </h4>
+            <div class="card card-body bg-white d-flex flex-column align-items-center">
+              <h4 class="fw-bold fs-6 mb-3 text-dark">Scan kode QR di bawah ini</h4>
               <qrcode-vue
                 v-if="selectedQrCode"
                 :value="generateQRCodeValue(selectedQrCode)"
@@ -60,23 +56,26 @@
               <p class="mb-1 text-muted">Masa Berlaku</p>
               <p class="fw-bold fs-6">{{ order?.ticket?.expiry_date }}</p>
               <p class="mb-1 text-muted">Status Tiket</p>
-              <p
-                :class="
-                  order?.ticket?.status === 'used'
-                    ? 'text-danger'
-                    : 'text-success'
-                "
-              >
-                {{
-                  order?.ticket?.status === "used"
-                    ? "Sudah Digunakan"
-                    : "Belum Digunakan"
-                }}
-              </p>
+              <p :class="statusClass">{{ ticketStatus }}</p>
               <p class="mb-1 text-muted">Nama Pemesan</p>
-              <p class="fw-bold fs-6">{{ order?.ticket?.event_time }}</p>
+              <p class="fw-bold fs-6">{{ user.nama }}</p>
               <p class="mb-1 text-muted">Lokasi</p>
-              <p class="fw-bold fs-6">{{ order?.ticket?.event_location }}</p>
+              <p class="fw-bold fs-6">{{ order?.ticket?.place }}</p>
+            </div>
+          </div>
+        </div>
+        
+        <!-- Card Detail Pesanan Kedua -->
+        <div class="card card-flush text-start mt-4"> <!-- Tambahkan mb-4 untuk margin bawah -->
+          <div class="card-body">
+            <h5 class="fw-bold">Petunjuk Verifikasi Qr Code</h5> <!-- Ubah judul jika perlu -->
+            <hr />
+            <div class="card card-dashed p-6">
+              <p class="fw-bold fs-6">1. Buka Website CusTix</p>
+              <p class="fw-bold fs-6">2. Masuk ke halaman Tiket Saya</p>
+              <p class="fw-bold fs-6">3. Pilih tiket anda</p>
+              <p class="fw-bold fs-6">4. Klik Lihat Detail</p>
+              <p class="fw-bold fs-6">5. Tunjukan Qr Code ke Petugas</p>
             </div>
           </div>
         </div>
@@ -85,33 +84,54 @@
   </div>
 </template>
 
+
+
 <script>
 import axios from "axios";
+import { useAuthStore } from "@/stores/auth";
+import { computed } from "vue";
 import QrcodeVue from "qrcode.vue";
 
 export default {
   name: "OrderDetail",
-  props: ["id", "qrIndex"], // qrIndex untuk memilih QR code tertentu
+  props: ["id", "qrIndex"],
   components: {
     QrcodeVue,
+  },
+  setup() {
+    const authStore = useAuthStore();
+    const user = computed(() => authStore.user);
+    return { user };
   },
   data() {
     return {
       order: null,
-      selectedQrCode: "", // Data untuk QR code khusus tiket
+      selectedQrCode: "",
     };
   },
+  computed: {
+    ticketStatus() {
+      // Menggunakan qrIndex untuk mendapatkan status dari ticket_details
+      return this.order?.ticket_details[this.qrIndex]?.status === 'Used' ? 'Sudah Digunakan' : 'Belum Digunakan';
+    },
+    statusClass() {
+      return this.order?.ticket_details[this.qrIndex]?.status === 'Used' ? 'text-danger' : 'text-success';
+    },
+  },
+
   mounted() {
     this.getOrderDetail();
   },
   methods: {
-    getOrderDetail() {
-      axios
-        .get(`/user/orders/${this.id}`)
-        .then((response) => {
-          this.order = response.data;
+    async getOrderDetail() {
+      try {
+        const response = await axios.get(`/user/orders/${this.id}`);
+        this.order = response.data;
+        console.log("Order detail response:", response.data);
+
+        if (this.order?.qr_code) {
           const qrData = JSON.parse(this.order.qr_code);
-          const ticketData = qrData.tickets[this.qrIndex];
+          const ticketData = qrData.tickets[this.qrIndex]; 
           if (ticketData) {
             this.selectedQrCode = {
               orderId: qrData.orderId,
@@ -121,35 +141,14 @@ export default {
               date: qrData.date,
             };
           }
-        })
-        .catch((error) => {
-          console.error("Error fetching order detail:", error);
-        });
-    },
-
-    updateTicketStatus(newStatus) {
-      axios
-        .post(
-          `/orders/${this.selectedQrCode.orderId}/tickets/${this.selectedQrCode.ticketNumber}/update-status`,
-          {
-            status: newStatus,
-          }
-        )
-        .then((response) => {
-          this.order.ticket.status = newStatus;
-          console.log(response.data.message);
-        })
-        .catch((error) => {
-          console.error("Gagal memperbarui status tiket:", error);
-        });
-    },
-
-    handleVerificationSuccess() {
-      this.updateTicketStatus("used");
+        }
+      } catch (error) {
+        console.error("Error fetching order detail:", error);
+      }
     },
 
     generateQRCodeValue(qrData) {
-      const baseUrl = "https://22c9-114-10-47-147.ngrok-free.app/verify";
+      const baseUrl = "https://5bf2-118-99-113-13.ngrok-free.app/verify";
       return `${baseUrl}?order_id=${qrData.orderId}&unique_id=${qrData.uniqueId}&ticket_number=${qrData.ticketNumber}&hash=${qrData.hash}`;
     },
 
@@ -164,34 +163,14 @@ export default {
 </script>
 
 
-  <style scoped>
+<style scoped>
 .card {
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
-  overflow: hidden; /* Menyembunyikan konten yang keluar dari batas card */
-  position: relative; /* Agar child dengan position absolute tetap teratur */
 }
-
-.card-body {
-  margin-top: 20px; /* Anda bisa menyesuaikan ini sesuai kebutuhan */
-}
-
-/* Gaya untuk gambar GoPay di bagian atas */
 .go-pay-icon {
-  position: absolute; /* Mengatur posisi gambar */
-  left: 0; /* Mengatur gambar mulai dari tepi kiri */
-  right: 0; /* Mengatur gambar mencapai tepi kanan */
-  top: 0; /* Mengatur gambar berada di bagian atas card */
-  width: 100%; /* Lebar penuh */
-  height: 150px; /* Atur tinggi tetap agar terlihat baik */
-  object-fit: cover; /* Mengisi area penuh, tanpa distorsi */
-  object-position: center; /* Memastikan gambar berada di tengah */
-}
-
-/* Gaya untuk gambar QR Code */
-.qr-code {
-  width: 100%; /* Membuat gambar mengisi lebar card */
-  height: auto; /* Menjaga rasio aspek gambar */
-  max-width: 150px; /* Mengatur lebar maksimum agar tidak terlalu besar */
+  width: 100%; 
+  height: 150px; 
+  object-fit: cover; 
 }
 </style>

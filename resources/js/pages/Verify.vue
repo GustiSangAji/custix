@@ -84,7 +84,7 @@ export default {
     verifyTicket() {
       this.loading = true;
       axios
-        .post("https://22c9-114-10-47-147.ngrok-free.app/api/verify-ticket", {
+        .post("https://5bf2-118-99-113-13.ngrok-free.app/api/verify-ticket", {
           order_id: this.order_id,
           unique_id: this.selectedQrCode.uniqueId,
           ticket_number: this.selectedQrCode.ticketNumber,

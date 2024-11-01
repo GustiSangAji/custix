@@ -247,35 +247,42 @@ class CartController extends Controller
         return response()->json(['message' => 'Akses pengguna berhasil dihapus']);
     }
 
-
     public function getUserOrders()
     {
-        
         $orders = Cart::where('user_id', auth()->id())
                     ->where('status', 'Paid')
-                    ->with('ticket')
+                    ->with(['ticket', 'ticketDetails' => function ($query) {
+                        $query->select('ticket_number', 'status', 'cart_id');
+                    }])
                     ->get();
-
+    
         return response()->json($orders);
     }
+    
 
 
     public function getOrderById($id)
-    {
-        
-        $order = Cart::where('id', $id)
-                    ->where('user_id', auth()->id()) 
-                    ->where('status', 'Paid')    
-                    ->with('ticket')
-                    ->first();
+{
+    $order = Cart::where('id', $id)
+                ->where('user_id', auth()->id()) 
+                ->where('status', 'Paid')    
+                ->with(['ticket', 'ticketDetails' => function ($query) {
+                    $query->select('ticket_number', 'status', 'cart_id');
+                }])
+                ->first();
 
-        if (!$order) {
-        
-            return response()->json(['message' => 'Order not found or not paid'], 404);
-        }
-
-        return response()->json($order);
+    if (!$order) {
+        return response()->json(['message' => 'Order not found or not paid'], 404);
     }
+
+    // Tambahkan status tiket ke dalam order jika ada
+    $order->ticketDetails->map(function($ticketDetail) use ($order) {
+        $order->ticket->status = $ticketDetail->status;
+    });
+
+    return response()->json($order);
+}
+
 
     public function saveQrCode(Request $request)
     
@@ -377,28 +384,6 @@ class CartController extends Controller
             ],
         ]);
     }
-
-    public function updateTicketStatus(Request $request, $order_id, $ticket_number)
-{
-    $status = $request->input('status');
-
-    // Cari tiket detail berdasarkan order_id dan ticket_number
-    $ticketDetail = TicketDetail::whereHas('cart', function ($query) use ($order_id) {
-        $query->where('order_id', $order_id);
-    })->where('ticket_number', $ticket_number)
-      ->first();
-
-    if ($ticketDetail) {
-        // Update status tiket detail
-        $ticketDetail->status = $status;
-        $ticketDetail->save();
-
-        return response()->json(['message' => 'Status tiket berhasil diperbarui.'], 200);
-    }
-
-    return response()->json(['message' => 'Tiket tidak ditemukan.'], 404);
-}
-
 
     
 

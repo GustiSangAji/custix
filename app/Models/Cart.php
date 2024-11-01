@@ -19,13 +19,13 @@ class Cart extends Model
 
     // Relasi ke model User
     public function user()
-    {
+    {   
         return $this->belongsTo(User::class, 'user_id');
     }
 
     public function ticketDetails()
     {
-        return $this->hasMany(TicketDetail::class);
+return $this->hasMany(TicketDetail::class, 'cart_id');
     }
 
 }
