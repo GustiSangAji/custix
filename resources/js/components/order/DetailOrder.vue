@@ -1,8 +1,6 @@
 <template>
   <div class="col-md-8 col-lg-9">
     <div class="row justify-content-start">
-      <!-- Menggunakan justify-content-start untuk merapikan ke kiri -->
-
       <!-- Card Kiri -->
       <div class="col-12 col-md-5 mb-4">
         <div class="card card-flush text-start">
@@ -29,22 +27,20 @@
               <hr />
               <p class="mb-1 text-muted">Kode Pesanan</p>
               <p class="fw-bold fs-6">{{ order?.order_id }}</p>
-              <!-- Menampilkan kode pesanan dari order -->
               <p class="mb-1 text-muted">Total Pembayaran</p>
               <p class="fw-bold fs-6">{{ formatPrice(order?.total_harga) }}</p>
-              <!-- Menampilkan total pembayaran dari order -->
             </div>
           </div>
           <div class="card-footer text-center" style="margin-top: -30px">
             <div
               class="card card-body bg-white d-flex flex-column align-items-center"
             >
-              <!-- Menampilkan QR Code menggunakan qrcode-vue -->
               <h4 class="fw-bold fs-6 mb-3 text-dark">
                 Scan kode QR di bawah ini
               </h4>
               <qrcode-vue
-                :value="`https://104a-118-99-113-12.ngrok-free.app/verify?order_id=${order?.order_id}`"
+                v-if="selectedQrCode"
+                :value="generateQRCodeValue(selectedQrCode)"
                 :size="200"
               />
             </div>
@@ -61,16 +57,26 @@
             <div class="card card-dashed p-6">
               <p class="mb-1 text-muted">Nama Event</p>
               <p class="fw-bold fs-6">{{ order?.ticket?.name }}</p>
-              <!-- Nama Event -->
               <p class="mb-1 text-muted">Masa Berlaku</p>
               <p class="fw-bold fs-6">{{ order?.ticket?.expiry_date }}</p>
-              <!-- Tanggal Event -->
+              <p class="mb-1 text-muted">Status Tiket</p>
+              <p
+                :class="
+                  order?.ticket?.status === 'used'
+                    ? 'text-danger'
+                    : 'text-success'
+                "
+              >
+                {{
+                  order?.ticket?.status === "used"
+                    ? "Sudah Digunakan"
+                    : "Belum Digunakan"
+                }}
+              </p>
               <p class="mb-1 text-muted">Nama Pemesan</p>
               <p class="fw-bold fs-6">{{ order?.ticket?.event_time }}</p>
-              <!-- Waktu Event -->
               <p class="mb-1 text-muted">Lokasi</p>
               <p class="fw-bold fs-6">{{ order?.ticket?.event_location }}</p>
-              <!-- Lokasi Event -->
             </div>
           </div>
         </div>
@@ -81,17 +87,18 @@
 
 <script>
 import axios from "axios";
-import QrcodeVue from "qrcode.vue"; // Import qrcode-vue
+import QrcodeVue from "qrcode.vue";
 
 export default {
   name: "OrderDetail",
-  props: ["id"],
+  props: ["id", "qrIndex"], // qrIndex untuk memilih QR code tertentu
   components: {
-    QrcodeVue, // Tambahkan komponen QrcodeVue
+    QrcodeVue,
   },
   data() {
     return {
       order: null,
+      selectedQrCode: "", // Data untuk QR code khusus tiket
     };
   },
   mounted() {
@@ -99,17 +106,53 @@ export default {
   },
   methods: {
     getOrderDetail() {
-      const orderId = this.id; // Ambil ID dari props
       axios
-        .get(`/user/orders/${orderId}`) // Memperbaiki URL dengan backticks
+        .get(`/user/orders/${this.id}`)
         .then((response) => {
           this.order = response.data;
+          const qrData = JSON.parse(this.order.qr_code);
+          const ticketData = qrData.tickets[this.qrIndex];
+          if (ticketData) {
+            this.selectedQrCode = {
+              orderId: qrData.orderId,
+              uniqueId: qrData.uniqueId,
+              ticketNumber: ticketData.ticketNumber,
+              hash: qrData.hash,
+              date: qrData.date,
+            };
+          }
         })
         .catch((error) => {
           console.error("Error fetching order detail:", error);
         });
     },
-    // Fungsi formatPrice untuk format harga
+
+    updateTicketStatus(newStatus) {
+      axios
+        .post(
+          `/orders/${this.selectedQrCode.orderId}/tickets/${this.selectedQrCode.ticketNumber}/update-status`,
+          {
+            status: newStatus,
+          }
+        )
+        .then((response) => {
+          this.order.ticket.status = newStatus;
+          console.log(response.data.message);
+        })
+        .catch((error) => {
+          console.error("Gagal memperbarui status tiket:", error);
+        });
+    },
+
+    handleVerificationSuccess() {
+      this.updateTicketStatus("used");
+    },
+
+    generateQRCodeValue(qrData) {
+      const baseUrl = "https://22c9-114-10-47-147.ngrok-free.app/verify";
+      return `${baseUrl}?order_id=${qrData.orderId}&unique_id=${qrData.uniqueId}&ticket_number=${qrData.ticketNumber}&hash=${qrData.hash}`;
+    },
+
     formatPrice(price) {
       return new Intl.NumberFormat("id-ID", {
         style: "currency",
@@ -120,7 +163,8 @@ export default {
 };
 </script>
 
-<style scoped>
+
+  <style scoped>
 .card {
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);

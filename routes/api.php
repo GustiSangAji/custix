@@ -137,6 +137,8 @@ Route::get('/user/orders', [CartController::class, 'getUserOrders']);
 Route::get('/user/orders/{id}', [CartController::class, 'getOrderById']);
 Route::post('/save-qr-code', [CartController::class, 'saveQrCode']);
 Route::post('/verify-ticket', [CartController::class, 'verifyTicket']);
+Route::post('/orders/{order_id}/tickets/{ticket_number}/update-status', [CartController::class, 'updateTicketStatus']);
+
 
 // routes/api.php
 Route::get('/dashboard', [DashboardController::class, 'index']);

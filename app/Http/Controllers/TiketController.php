@@ -152,4 +152,16 @@ class TiketController extends Controller
             'success' => true
         ]);
     }
+
+    public function checkStatus($kodeTiket)
+{
+    $tiket = Tiket::where('kode_tiket', $kodeTiket)->first(); // Sesuaikan dengan kolom yang ada
+
+    if (!$tiket) {
+        return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
+    }
+
+    return response()->json(['status' => $tiket->status]);
+}
+
 }

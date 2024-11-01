@@ -209,6 +209,7 @@ import LayoutLanding from "@/layouts/LayoutLanding.vue";
 import { computed } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import QrcodeVue from "qrcode.vue";
+import CryptoJS from "crypto-js"; // Import crypto-js
 
 export default {
   name: "AfterPayment",
@@ -229,11 +230,11 @@ export default {
     };
   },
   mounted() {
-    this.orderId = sessionStorage.getItem('orderId'); // Ambil orderId dari sessionStorage
+    this.orderId = sessionStorage.getItem("orderId"); // Ambil orderId dari sessionStorage
     if (this.orderId) {
       this.getPaymentStatus();
       this.getOrderDetails(); // Ambil detail pesanan juga
-      sessionStorage.removeItem('orderId'); // Hapus orderId dari sessionStorage setelah digunakan
+      sessionStorage.removeItem("orderId"); // Hapus orderId dari sessionStorage setelah digunakan
     } else {
       this.$router.push("/"); // Redirect jika orderId tidak ditemukan
     }
@@ -251,65 +252,96 @@ export default {
       const queryParams = new URLSearchParams(window.location.search);
       this.paymentStatus = queryParams.get("transaction_status") || "unpaid";
 
+      console.log("Payment Status:", this.paymentStatus); // Debugging
+
       // Tampilkan toast hanya setelah data berhasil dimuat
       setTimeout(() => {
         this.showToast = true; // Tampilkan toast setelah 1 detik
       }, 1000);
     },
     getOrderDetails() {
-  axios
-    .get(`order-detail/${this.orderId}`)
-    .then((response) => {
-      this.orderDetail = response.data.order;
-      this.ticketDetail = response.data.ticket;
-      this.user = response.data.user;
+      axios
+        .get(`order-detail/${this.orderId}`)
+        .then((response) => {
+          this.orderDetail = response.data.order;
+          this.ticketDetail = response.data.ticket;
+          this.user = response.data.user;
 
-      // Hanya simpan QR code jika pembayaran berhasil
-      if (
-        this.paymentStatus === "settlement" ||
-        this.paymentStatus === "capture"
-      ) {
-        this.saveQrCodeToDatabase();
-      }
-      
-      // Akses pengguna dihapus, baik transaksi berhasil atau gagal
-      this.removeUserAccess();
-    })
-    .catch((error) => console.error("Kesalahan:", error))
-    .finally(() => {
-      this.isLoading = false; // Pastikan isLoading diatur ke false setelah data dimuat
-    });
-},
+          // Hanya simpan QR code jika pembayaran berhasil
+          if (
+            this.paymentStatus === "settlement" ||
+            this.paymentStatus === "capture"
+          ) {
+            this.saveQrCodeToDatabase();
+            this.sendPaymentDetails();
+          }
 
-saveQrCodeToDatabase() {
-    if (this.orderDetail) {
-        const orderId = this.orderDetail.order_id; // Ambil order_id yang benar
-        const jumlahPesanan = this.orderDetail.jumlah_pemesanan; // Ambil jumlah pesanan
+          // Akses pengguna dihapus, baik transaksi berhasil atau gagal
+          this.removeUserAccess();
+        })
+        .catch((error) => console.error("Kesalahan:", error))
+        .finally(() => {
+          this.isLoading = false; // Pastikan isLoading diatur ke false setelah data dimuat
+        });
+    },
+    sendPaymentDetails() {
+      const paymentData = {
+        order_id: this.orderDetail.order_id,
+        jumlah_pemesanan: this.orderDetail.jumlah_pemesanan,
+        // Tambahkan status transaksi jika perlu
+        transaction_status: this.paymentStatus,
+      };
 
-        // Array untuk menyimpan QR Code
-        const qrCodes = [];
+      axios
+        .post("afterpayment", paymentData)
+        .then((response) => {
+          console.log("Detail tiket berhasil disimpan:", response.data);
+        })
+        .catch((error) =>
+          console.error("Gagal menyimpan detail tiket:", error)
+        );
+    },
 
-        // Loop untuk menyimpan QR Code sesuai jumlah pesanan
+    saveQrCodeToDatabase() {
+      if (this.orderDetail) {
+        const orderId = this.orderDetail.order_id;
+        const jumlahPesanan = this.orderDetail.jumlah_pemesanan;
+        const currentDate = new Date().toISOString().split("T")[0];
+        const uniqueId = `ORD-${new Date().getTime()}-${orderId}`;
+
+        // Array untuk menyimpan tiket
+        const tickets = [];
         for (let i = 0; i < jumlahPesanan; i++) {
-            const qrCodeValue = `${orderId}#${i + 1}`; // Format QR Code: order_id#nomor_tiket
-            qrCodes.push(qrCodeValue); // Tambahkan QR Code ke array
+          tickets.push({
+            ticketNumber: `${uniqueId}-${i + 1}`,
+          }); // Menggabungkan uniqueId dengan nomor tiket
         }
 
+        // Format QR Code sebagai JSON objek
+        const qrCodeValue = {
+          orderId: orderId,
+          uniqueId: uniqueId,
+          date: currentDate,
+          tickets: tickets, // Menyimpan tiket dengan nomor
+          hash: this.generateHash(orderId + currentDate),
+        };
+
+        // Kirim JSON objek sebagai string
         axios
-            .post(`save-qr-code`, {
-                order_id: orderId, // Kirim order_id yang benar
-                qr_codes: qrCodes, // Kirim QR Codes sebagai array
-            })
-            .then((response) => {
-                console.log('QR code berhasil disimpan ke database:', response.data);
-            })
-            .catch((error) => {
-                console.error('Gagal menyimpan QR code ke database:', error.response ? error.response.data : error);
-            });
-    } else {
-        console.error("orderDetail tidak tersedia saat menyimpan QR code");
-    }
-},
+          .post(`save-qr-code`, {
+            order_id: orderId,
+            qr_codes: JSON.stringify(qrCodeValue),
+          })
+          .then((response) => {
+            // Tangani respon jika perlu
+          })
+          .catch((error) => console.error("Kesalahan:", error));
+      }
+    },
+
+    generateHash(data) {
+      return CryptoJS.SHA256(data).toString(CryptoJS.enc.Hex); // Menghasilkan hash SHA-256 dalam format hexadecimal
+    },
 
     removeUserAccess() {
       axios
@@ -326,6 +358,7 @@ saveQrCodeToDatabase() {
   },
 };
 </script>
+
 
 <style scoped>
 /* Sesuaikan CSS untuk memastikan tampilan rapi */

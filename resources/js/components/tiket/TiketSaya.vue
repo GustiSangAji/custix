@@ -11,35 +11,62 @@
           <div class="card-body">
             <div v-if="orders.length > 0">
               <div class="d-flex flex-column align-items-start">
+                <!-- Mengulangi pesanan berdasarkan jumlah pemesanan -->
                 <div
                   v-for="order in orders"
                   :key="order.id"
-                  class="ticket mb-6 rounded d-flex flex-column flex-md-row p-6 align-self-start w-100"
+                  class="col-12 mb-4"
                 >
-                  <div class="ticket-info flex-grow-1">
-                    <h5 class="event-name font-weight-bold mb-4 fs-4">
-                      {{ order.ticket.name }}
-                    </h5>
-                    <h3 class="text-muted mb-2 fw-normal fs-6">
-                      {{ order.ticket.datetime }} |
-                      {{ order.jumlah_pemesanan }} Tiket
-                    </h3>
-                    <router-link
-                      :to="{ name: 'OrderDetail', params: { id: order.id } }"
-                      class="btn btn-primary mt-6"
-                    >
-                      Lihat Detail
-                    </router-link>
-                  </div>
                   <div
-                    class="ticket-image d-flex justify-content-center align-items-center me-1 mb-3 mb-md-0"
+                    v-for="(n, index) in order.jumlah_pemesanan"
+                    :key="n"
+                    class="ticket mb-6 rounded d-flex flex-column flex-md-row p-6 align-self-start w-100"
                   >
-                    <img
-                      :src="'/storage/' + order.ticket.image"
-                      alt="Event Image"
-                      class="rounded"
-                      style="width: 200px; height: 100px; object-fit: cover"
-                    />
+                    <div class="ticket-info flex-grow-1">
+                      <h5 class="event-name font-weight-bold mb-4 fs-4">
+                        {{ order.ticket.name }}
+                      </h5>
+
+                      <h3 class="text-muted mb-2 fw-normal fs-6">
+                        {{ order.ticket.datetime }} | 1 Tiket
+                      </h3>
+
+                      <!-- Menampilkan status tiket -->
+                      <p
+                        :class="
+                          order.ticket.status === 'used'
+                            ? 'text-danger'
+                            : 'text-success'
+                        "
+                      >
+                        {{
+                          order.ticket.status === "used"
+                            ? "Sudah Digunakan"
+                            : "Belum Digunakan"
+                        }}
+                      </p>
+
+                      <!-- Kirim parameter qrIndex berdasarkan urutan tiket (index) -->
+                      <router-link
+                        :to="{
+                          name: 'OrderDetail',
+                          params: { id: order.id, qrIndex: index },
+                        }"
+                        class="btn btn-primary mt-6"
+                      >
+                        Lihat Detail
+                      </router-link>
+                    </div>
+                    <div
+                      class="ticket-image d-flex justify-content-center align-items-center me-1 mb-3 mb-md-0"
+                    >
+                      <img
+                        :src="'/storage/' + order.ticket.image"
+                        alt="Event Image"
+                        class="rounded"
+                        style="width: 200px; height: 100px; object-fit: cover"
+                      />
+                    </div>
                   </div>
                 </div>
               </div>
@@ -66,6 +93,7 @@
   </div>
 </template>
 
+
 <script>
 import axios from "axios";
 
@@ -82,7 +110,7 @@ export default {
   methods: {
     getOrders() {
       axios
-        .get(`/user/orders`) 
+        .get(`/user/orders`)
         .then((response) => {
           this.orders = response.data;
         })
@@ -101,5 +129,8 @@ export default {
 .ticket {
   background-color: #1b1c22;
   overflow: hidden;
+}
+.col-12.mb-4 {
+  margin-bottom: 1rem;
 }
 </style>
