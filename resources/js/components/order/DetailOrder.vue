@@ -187,7 +187,7 @@ export default {
     },
 
     generateQRCodeValue(qrData) {
-      const baseUrl = "https://7ea1-118-99-113-13.ngrok-free.app/verify";
+      const baseUrl = "http://192.168.1.8:8000/verify";
       return `${baseUrl}?order_id=${qrData.orderId}&unique_id=${qrData.uniqueId}&ticket_number=${qrData.ticketNumber}&hash=${qrData.hash}`;
     },
 

@@ -25,7 +25,7 @@
         <!-- Center Search Bar -->
         <form
           ref="searchForm"
-          class="d-flex mx-auto search-bar"
+          class="d-flex mx-10 search-bar"
           @submit.prevent="searchTickets"
         >
           <div class="input-group">
@@ -39,7 +39,11 @@
               aria-label="Search"
               aria-describedby="search-addon"
             />
-            <span class="input-group-text" id="search-addon" @click="searchTickets">
+            <span
+              class="input-group-text"
+              id="search-addon"
+              @click="searchTickets"
+            >
               <i class="ki-duotone ki-magnifier fs-2">
                 <span class="path1"></span>
                 <span class="path2"></span>
@@ -75,13 +79,16 @@
         <!-- Right Menu Items -->
         <ul class="navbar-nav ms-auto align-items-center">
           <li v-if="isAuthenticated" class="d-flex align-items-center">
-            <router-link to="/order" class="nav-link fw-bold fs-6 me-3">
+            <router-link to="/order" class="nav-link fw-bold fs-6 me-3 btn btn-active-dark">
               Tiket Saya
             </router-link>
             <UserDropdown />
           </li>
           <li v-else class="nav-item">
-            <router-link to="/sign-in" class="btn btn-light-primary rounded me-2">
+            <router-link
+              to="/sign-in"
+              class="btn btn-light-primary rounded me-2"
+            >
               Masuk
             </router-link>
             <router-link to="/sign-up" class="btn btn-active-dark rounded">
@@ -130,7 +137,7 @@ export default {
     const searchTickets = async () => {
       try {
         const response = await axios.post(`/tickets/search`, {
-          query: searchQuery.value,                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        //apakah betul 999
+          query: searchQuery.value, //apakah betul 999
         });
         tickets.value = response.data;
       } catch (error) {
@@ -319,5 +326,4 @@ export default {
     font-size: 0.9rem;
   }
 }
-
 </style>
