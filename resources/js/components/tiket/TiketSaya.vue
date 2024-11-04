@@ -7,7 +7,7 @@
         </div>
       </div>
       <div class="collapse show">
-        <div class="card">
+        <div class="card position-relative">
           <div class="card-body">
             <div v-if="orders.length > 0" class="order-list-container">
               <div class="d-flex flex-column align-items-start">
@@ -100,6 +100,7 @@ export default {
   data() {
     return {
       orders: [],
+      loading: true,
     };
   },
   mounted() {
@@ -107,6 +108,7 @@ export default {
   },
   methods: {
     getOrders() {
+      this.loading = true;
       axios
         .get(`/user/orders`)
         .then((response) => {
@@ -114,6 +116,9 @@ export default {
         })
         .catch((error) => {
           console.error("Terjadi kesalahan saat mengambil data pesanan:", error);
+        })
+        .finally(() => {
+          this.loading = false;
         });
     },
     formatDate(date) {

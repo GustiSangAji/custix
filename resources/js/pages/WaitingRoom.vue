@@ -19,7 +19,7 @@
 
             <div v-else class="card-body">
                 <p class="text-primary">
-                    Terlalu banyak pengguna mengakses halaman ini. Posisi Anda:
+                    Terlalu banyak pengguna mengakses halaman ini. antrian anda:
                     <span class="fw-bold">{{ queuePosition }}</span>
                 </p>
                 <p>Silakan tunggu hingga pengguna selesai.</p>

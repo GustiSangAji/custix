@@ -66,9 +66,9 @@
     <!-- Grafik Pendapatan Bulanan dengan Bar dan Area -->
     <div class="card mt-4 shadow-sm">
       <div class="card-header">
-        <h3 class="card-title">Pendapatan Bulanan</h3>
+        <h3 class="card-title">Pendapatan Tik</h3>
         <div class="card-toolbar">
-          <a class="btn btn-primary btn-sm">Penjualan</a>
+    
         </div>
       </div>
       <div class="card-body">
@@ -266,7 +266,7 @@ export default defineComponent({
 
 .card-body {
   padding: 1rem; // Mengurangi padding
-}
+} 
 
 .text-primary {
   color: #0d6efd; // Warna biru untuk jumlah pelanggan

@@ -46,6 +46,7 @@ const columns = [
     columnHelper.accessor("quantity", {
         header: "Jumlah",
     }),
+    
     columnHelper.accessor("price", {
         header: "Harga",
         cell: (cell) => formatRupiah(cell.getValue()),
