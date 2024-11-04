@@ -67,7 +67,7 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         });
     });
 
-    Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::middleware(['auth', 'verified', 'json'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index']);
     });
 
