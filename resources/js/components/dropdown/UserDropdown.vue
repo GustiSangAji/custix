@@ -24,7 +24,7 @@
       >
         <div class="menu-content d-flex align-items-center px-3">
           <div class="symbol symbol-50px me-5">
-            <img alt="Logo" :src="user.photo" />
+            <img alt="Foto" :src="user.photo" />
           </div>
           <div class="d-flex flex-column">
             <div class="fw-bold d-flex align-items-center fs-5">
@@ -44,16 +44,16 @@
       <li class="separator my-2"></li>
       <li class="menu-item px-5 my-1">
         <router-link
-          :to="isAdmin ? '/dashboard/profile' : '/user/profile'"
-          class="px-5 my-1 menu-item fw-semibold"
+          to="/order"
+          class="px-5 my-1 menu-item fw-semibold btn btn-active-light-primary d-flex align-items-center"
         >
-          Transaksi
+          Tiket Saya
         </router-link>
       </li>
       <li class="menu-item px-5 my-1">
         <router-link
           to="/informasi-pribadi"
-          class="px-5 my-1 menu-item fw-semibold"
+          class="px-5 my-1 menu-item fw-semibold btn btn-active-light-primary d-flex align-items-center"
         >
           Informasi Pribadi
         </router-link>
@@ -70,7 +70,7 @@
       </li>
       <!-- Menu Khusus Admin -->
       <li v-if="isAdmin" class="menu-item px-5 my-1">
-        <router-link to="/dashboard" class="px-5 my-1 menu-item fw-semibold">
+        <router-link to="/dashboard" class="px-5 my-1 mb-4 menu-item fw-semibold btn btn-active-light-primary d-flex align-items-center">
           Dashboard
         </router-link>
       </li>
@@ -116,6 +116,8 @@ export default {
   transform: translateY(-10px);
   animation: fadeIn 0.5s forwards;
 }
+
+
 
 /* Animasi untuk fade-in efek */
 @keyframes fadeIn {

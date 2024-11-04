@@ -1,80 +1,96 @@
 <template>
   <div class="col-md-4 col-lg-3 vh-100">
     <!-- Card component for sidebar -->
-    <div class="card text-white h-100">
-      <div class="card-body">
+    <div class="card mb-5 mb-xl-10">
+      <div class="card-header border-0 cursor-pointer">
         <!-- Profile Section -->
-        <h2 class="card-title mb-8 fw-bold text-white">{{ user.nama }}</h2>
-
-        <!-- List group with links -->
-        <!-- Informasi Pribadi -->
-        <router-link to="/informasi-pribadi" class="card parent-hover mb-3">
-          <div class="card-body d-flex align-items-center">
-            <!-- Ikon Keenthemes -->
-            <span class="svg-icon fs-1">
-              <i class="ki-duotone ki-user-edit fs-1">
-                <span class="path1"></span>
-                <span class="path2"></span>
-                <span class="path3"></span>
-              </i>
-            </span>
-
-            <!-- Teks Link -->
-            <span class="ms-3 text-gray-700 parent-hover-primary fs-6 fw-bold">
-              Informasi Pribadi
-            </span>
+        <div class="card-title m-0">
+          <div class="symbol symbol-40px me-4">
+            <img alt="Foto profil" :src="user.photo" />
           </div>
-        </router-link>
+          <h2 class="mb-0 fw-bold">
+            {{ user.nama }}
+            <i class="bi bi-patch-check-fill fs-3 text-primary"></i>
+          </h2>
+        </div>
+      </div>
+      <div class="collapse show">
+        <div class="card">
+          <div class="card-body mx-0 px-8">
+            <!-- List group with links -->
+            <!-- Informasi Pribadi -->
+            <router-link
+              to="/informasi-pribadi"
+               exact-active-class="active-class"
+              class="btn btn-active-light-primary mb-3 px-2 w-100"
+            >
+              <div class="d-flex align-items-center">
+                <!-- Ikon Keenthemes -->
+                <span class="svg-icon fs-1">
+                  <i class="ki-duotone ki-user-edit fs-1">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                  </i>
+                </span>
 
-        <!-- Tiket Saya -->
-        <router-link to="/order" class="card parent-hover mb-3">
-          <div class="card-body d-flex align-items-center">
-             <span class="svg-icon fs-1">
-              <i class="ki-duotone ki-wallet fs-1">
-                <span class="path1"></span>
-                <span class="path2"></span>
-                <span class="path3"></span>
-              </i>
-            </span>
+                <!-- Teks Link -->
+                <div class="ms-3 text-gray-700">Informasi Pribadi</div>
+              </div>
+            </router-link>
 
-            <span class="ms-3 text-gray-700 parent-hover-primary fs-6 fw-bold">
-              Tiket Saya
-            </span>
+            <!-- Tiket Saya -->
+            <router-link to="/order" 
+             exact-active-class="active-class"
+            class="btn btn-active-light-primary mb-3 px-2 w-100">
+              <div class="d-flex align-items-center">
+                <span class="svg-icon fs-1">
+                  <i class="ki-duotone ki-wallet fs-1">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                    <span class="path3"></span>
+                  </i>
+                </span>
+
+                <div class="ms-3 text-gray-700">Tiket Saya</div>
+              </div>
+            </router-link>
+
+            <!-- Syarat & Ketentuan -->
+            <router-link
+              to="/syarat-ketentuan"
+              class="btn btn-active-light-primary mb-3 px-2 w-100"
+            >
+              <div class="d-flex align-items-center">
+                <span class="svg-icon fs-1">
+                  <i class="ki-duotone ki-file fs-1">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                  </i>
+                </span>
+
+                <span class="ms-3 text-gray-700"> Syarat & Ketentuan </span>
+              </div>
+            </router-link>
+
+            <!-- Kebijakan Privasi -->
+            <router-link
+              to="/kebijakan-privasi"
+              class="btn btn-active-light-primary mb-3 px-2 w-100"
+            >
+              <div class="d-flex align-items-center">
+                <span class="svg-icon fs-1">
+                  <i class="ki-duotone ki-shield fs-1">
+                    <span class="path1"></span>
+                    <span class="path2"></span>
+                  </i>
+                </span>
+
+                <div class="ms-3 text-gray-700">Kebijakan Privasi</div>
+              </div>
+            </router-link>
           </div>
-        </router-link>
-
-        <!-- Syarat & Ketentuan -->
-        <router-link to="/syarat-ketentuan" class="card parent-hover mb-3">
-          <div class="card-body d-flex align-items-center">
-            <span class="svg-icon fs-1">
-              <i class="ki-duotone ki-file fs-1">
-                <span class="path1"></span>
-                <span class="path2"></span>
-              </i>
-            </span>
-
-            <span class="ms-3 text-gray-700 parent-hover-primary fs-6 fw-bold">
-              Syarat & Ketentuan
-            </span>
-          </div>
-        </router-link>
-
-        <!-- Kebijakan Privasi -->
-        <router-link to="/kebijakan-privasi" class="card parent-hover mb-3">
-          <div class="card-body d-flex align-items-center">
-            <span class="svg-icon fs-1">
-              <i class="ki-duotone ki-shield fs-1">
-                <span class="path1"></span>
-                <span class="path2"></span>
-              </i>
-            </span>
-
-            <span class="ms-3 text-gray-700 parent-hover-primary fs-6 fw-bold">
-              Kebijakan Privasi
-            </span>
-          </div>
-        </router-link>
-
+        </div>
       </div>
     </div>
   </div>
@@ -100,4 +116,7 @@ export default {
 
 <style scoped>
 /* Custom styles can be added here if necessary */
+.active-class {
+  background-color: #172331;
+}
 </style>

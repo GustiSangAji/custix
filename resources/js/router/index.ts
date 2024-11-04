@@ -38,42 +38,68 @@ const routes: Array<RouteRecordRaw> = [
         name: "ticket-detail",
         component: () => import("@/pages/FoodDetail.vue"), // Halaman detail tiket
         props: true,
+        meta: {middleware: "auth"},
+        beforeEnter: async (to, from, next) => {
+            try {
+                const response = await axios.get(`tickets/name/${to.params.name}`);
+                if (response.status === 200) {
+                    next(); // Jika tiket ditemukan, lanjutkan ke halaman detail tiket
+                }
+            } catch (error) {
+                // Jika tiket tidak ditemukan, redirect ke halaman 404
+                if (error.response && error.response.status === 404) {
+                    next({ name: 'Tiket404' });
+                } else {
+                    next(false); // Tangani kesalahan lain jika perlu
+                }
+            }
+        },
+        
     },
     {
-        path: "/payment",
-        name: "paymentDetail",
-        component: () => import("@/pages/PaymentDetail.vue"), // Halaman detail pembayaran
-        props: true,
-    },
-    {
-        path: "/waiting-room",
-        name: 'waiting-room',
-        component: () => import("@/pages/WaitingRoom.vue"),
-
-    },
-    {
-        path: "/afterpayment",
-        name: "afterpayment", 
-        component: () => import("@/pages/AfterPayment.vue"),
-    },
-    {
-        path: "/informasi-pribadi",
-        component: () => import("@/pages/setting/InformasiPribadi.vue"),
-    },
-    {
-        path: '/verify',
-        name: 'Verify',
-        component: () => import("@/pages/Verify.vue"),
-        props: (route) => ({
-            order_id: route.query.order_id,
-            unique_id: route.query.unique_id,
-            ticket_number: route.query.ticket_number,
-            hash: route.query.hash,
-          }),
-    },    
+        path: "",
+        meta: { middleware: "auth" }, // Semua child membutuhkan autentikasi
+        children: [
+            {
+                path: "/payment",
+                name: "paymentDetail",
+                component: () => import("@/pages/PaymentDetail.vue"), // Halaman detail pembayaran
+                props: true,
+            },
+            {
+                path: "/waiting-room",
+                name: 'waiting-room',
+                component: () => import("@/pages/WaitingRoom.vue"),
+        
+            },
+            {
+                path: "/afterpayment",
+                name: "afterpayment", 
+                component: () => import("@/pages/AfterPayment.vue"),
+            },
+            {
+                path: "/informasi-pribadi",
+                component: () => import("@/pages/setting/InformasiPribadi.vue"),
+            },
+            {
+                path: '/verify',
+                name: 'Verify',
+                component: () => import("@/pages/Verify.vue"),
+                props: (route) => ({
+                    order_id: route.query.order_id,
+                    unique_id: route.query.unique_id,
+                    ticket_number: route.query.ticket_number,
+                    hash: route.query.hash,
+                  }),
+            },
+        ],
+    }, 
     {
         path: "/order",
         component: () => import("@/pages/Setting.vue"), // Pastikan ini layout yang benar
+         meta: {
+            middleware: "auth", // Middleware untuk autentikasi
+        },
         children: [
             {
                 path: "",
@@ -87,13 +113,13 @@ const routes: Array<RouteRecordRaw> = [
                 props: true,  
             },
         ]
-    },
+    },   
 
     {
         path: "/dashboard",
         component: () => import("@/layouts/default-layout/DefaultLayout.vue"), // Layout untuk dashboard
         meta: {
-            middleware: "auth", // Middleware untuk autentikasi
+            middleware: "admin", 
         },
         children: [
             {
@@ -103,7 +129,6 @@ const routes: Array<RouteRecordRaw> = [
                 meta: {
                     pageTitle: "Dashboard", // Judul halaman dashboard
                     breadcrumbs: ["Dashboard"],
-                    middleware: "admin", // Middleware untuk admin
                 },
             },
             {
@@ -237,6 +262,14 @@ const routes: Array<RouteRecordRaw> = [
                 component: () => import("@/pages/errors/Error404.vue"), // Halaman error 404
                 meta: {
                     pageTitle: "Error 404",
+                },
+            },
+            {
+                path: "/404",
+                name: "Tiket404",
+                component: () => import("@/pages/errors/Tiket404.vue"), // Halaman error 404
+                meta: {
+                    pageTitle: "Tiket Error 404",
                 },
             },
             {

@@ -25,7 +25,7 @@
         <!-- Center Search Bar -->
         <form
           ref="searchForm"
-          class="d-flex mx-auto search-bar"
+          class="d-flex mx-10 search-bar"
           @submit.prevent="searchTickets"
         >
           <div class="input-group">
@@ -80,7 +80,10 @@
         <!-- Right Menu Items -->
         <ul class="navbar-nav ms-auto align-items-center">
           <li v-if="isAuthenticated" class="d-flex align-items-center">
-            <router-link to="/order" class="nav-link fw-bold fs-6 me-3">
+            <router-link
+              to="/order"
+              class="nav-link fw-bold fs-6 me-3 btn btn-active-dark"
+            >
               Tiket Saya
             </router-link>
             <UserDropdown />
@@ -138,7 +141,7 @@ export default {
     const searchTickets = async () => {
       try {
         const response = await axios.post(`/tickets/search`, {
-          query: searchQuery.value,
+          query: searchQuery.value, //apakah betul 999
         });
         tickets.value = response.data;
       } catch (error) {
