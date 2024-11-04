@@ -23,6 +23,7 @@ class UserSeeder extends Seeder
         User::create([
             'uuid' => Str::uuid(),
             'nama' => 'Admin',
+            'photo' => '/avatar/profz.png',
             'email' => 'admin@gmail.com',
             'password' => bcrypt('12345678'),
             'phone' => '08123456789',
@@ -33,6 +34,7 @@ class UserSeeder extends Seeder
         User::create([
             'uuid' => Str::uuid(),
             'nama' => 'User',
+            'photo' => '/avatar/profz.png',
             'email' => 'user@gmail.com',
             'password' => bcrypt('12345678'),
             'phone' => '081212121212',
@@ -43,6 +45,7 @@ class UserSeeder extends Seeder
         User::create([
             'uuid' => Str::uuid(),
             'nama' => 'Gilarism',
+            'photo' => '/avatar/profz.png',
             'email' => 'gilarism@gmail.com',
             'password' => bcrypt('12345678'),
             'phone' => '08121276212',
@@ -53,6 +56,7 @@ class UserSeeder extends Seeder
         User::create([
             'uuid' => Str::uuid(),
             'nama' => 'Kairos',
+            'photo' => '/avatar/profz.png',
             'email' => 'kairo@gmail.com',
             'password' => bcrypt('12345678'),
             'phone' => '08249696969',
@@ -62,12 +66,27 @@ class UserSeeder extends Seeder
 
         User::create([
             'uuid' => Str::uuid(),
-            'nama' => 'Gusti dajjal',
+            'nama' => 'Gusti Sang Aji',
+            'photo' => '/avatar/profz.png',
             'email' => 'gusti@gmail.com',
             'password' => bcrypt('12345678'),
-            'phone' => '082666666666',
+            'phone' => '666',
             'email_verified_at' => now(),
             'confirmed' => true,
-        ])->assignRole('user');
-    }
+            ])->assignRole('user');
+            
+            // Tambahkan pengguna tambahan menggunakan UserFactory
+            for ($i = 0; $i < 50; $i++) {
+                User::create([
+                    'uuid' => Str::uuid(),
+                    'nama' => $faker->name,
+                    'photo' => '/avatar/profz.png',
+                    'email' => $faker->unique()->safeEmail,
+                    'password' => bcrypt('password'), // password default
+                    'phone' => $faker->unique()->phoneNumber,
+                'email_verified_at' => now(),
+                'confirmed' => $faker->boolean,
+            ])->assignRole('user');
+        }
+}
 }

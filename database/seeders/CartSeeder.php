@@ -28,11 +28,13 @@ class CartSeeder extends Seeder
             // Buat data Cart baru dengan kolom-kolom yang diisi oleh Faker
             Cart::create([
                 'order_id' => $faker->unique()->uuid, // UUID unik untuk order_id
-                'user_id' => $faker->numberBetween(1, 50), // Asumsi ada 50 user
+                'user_id' => $faker->numberBetween(21, 70), // Asumsi ada 50 user
                 'ticket_id' => $faker->numberBetween(1, 50), // Asumsi ada 50 tiket
                 'jumlah_pemesanan' => $faker->numberBetween(1, 3), // Jumlah tiket yang dipesan
                 'total_harga' => $faker->numberBetween(100000, 1000000), // Harga tiket dalam rentang tertentu
-                'status' => $faker->randomElement(['Unpaid', 'Paid',]), // Status tiket
+                'status' => $faker->randomElement(['Unpaid', 'Paid']), // Status tiket
+                'created_at' => $randomDate, // Tanggal acak dari bulan 1-12
+                'updated_at' => $randomDate, // Sama dengan created_at agar konsisten
             ]);
         }
     }

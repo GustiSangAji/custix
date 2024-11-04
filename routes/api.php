@@ -10,6 +10,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TiketController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Api\TicketWaitingRoomController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,10 @@ Route::middleware(['json'])->prefix('auth')->group(function () {
     Route::get('me', [AuthController::class, 'me']);
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::post('/profile/update', [ProfileController::class, 'updateProfile']);
+    Route::get('/profile', [ProfileController::class, 'getProfile']);
+});
 // routes/api.php
 
 
@@ -67,15 +72,15 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
         });
     });
 
-    Route::middleware(['auth', 'verified', 'admin'])->group(function () {
+    Route::middleware(['auth', 'verified', 'json'])->group(function () {
         Route::get('/dashboard', [DashboardController::class, 'index']);
     });
 
     // Tiket Routes
     Route::middleware('can:event')->group(function () {
-    Route::get('tiket', [TiketController::class, 'get']);
-    Route::post('tiket', [TiketController::class, 'index']);
-    Route::post('tiket/store', [TiketController::class, 'store']);
+        Route::get('tiket', [TiketController::class, 'get']);
+        Route::post('tiket', [TiketController::class, 'index']);
+        Route::post('tiket/store', [TiketController::class, 'store']);
         Route::apiResource('tiket', TiketController::class)
             ->except(['index', 'store'])
             ->scoped(['tiket' => 'uuid']);

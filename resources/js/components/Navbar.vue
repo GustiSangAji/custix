@@ -6,7 +6,7 @@
     <div class="container">
       <!-- Logo -->
       <router-link class="navbar-brand" to="/home">
-        <img src="/media/hero/custiket.png" alt="Logo" class="logo img-fluid" />
+        <img :src="settings?.logo" alt="Logo" class="logo img-fluid" />
       </router-link>
       <!-- Navbar Toggler -->
       <button
@@ -55,10 +55,10 @@
         <!-- Preview Search Results -->
         <div
           ref="searchResults"
-          v-if="tickets.length > 0"
+          v-if="searchQuery.length > 0"
           class="search-results"
         >
-          <ul>
+          <ul v-if="tickets.length > 0">
             <li v-for="ticket in tickets" :key="ticket.id">
               <router-link
                 :to="{
@@ -74,6 +74,7 @@
               </router-link>
             </li>
           </ul>
+          <div v-else class="no-results">Tiket tidak ditemukan</div>
         </div>
 
         <!-- Right Menu Items -->
@@ -137,7 +138,7 @@ export default {
     const searchTickets = async () => {
       try {
         const response = await axios.post(`/tickets/search`, {
-          query: searchQuery.value, //apakah betul 999
+          query: searchQuery.value,
         });
         tickets.value = response.data;
       } catch (error) {
@@ -148,7 +149,6 @@ export default {
       }
     };
 
-    // Function to hide search results when clicking outside
     const handleClickOutside = (event) => {
       if (
         searchResults.value &&
@@ -160,10 +160,25 @@ export default {
       }
     };
 
+    const settings = ref(null);
+
+    const fetchSettings = async () => {
+      try {
+        const response = await axios.get("/setting");
+        settings.value = response.data;
+      } catch (error) {
+        console.error(
+          "Error fetching settings:",
+          error.response ? error.response.data : error.message
+        );
+      }
+    };
+
     // Add event listener on mounted
     onMounted(() => {
       window.addEventListener("scroll", handleScroll);
       document.addEventListener("click", handleClickOutside);
+      fetchSettings(); // Call the fetchSettings function on mount
     });
 
     // Remove event listener before component unmounts
@@ -181,11 +196,11 @@ export default {
       searchTickets,
       searchResults,
       searchForm,
+      settings,
     };
   },
 };
 </script>
-
 
 <style scoped>
 .navbar {
@@ -264,6 +279,13 @@ export default {
   background-color: #333;
 }
 
+.no-results {
+  color: #d1d1d1;
+  text-align: center;
+  padding: 20px;
+  font-size: 1rem;
+}
+
 .ticket-image {
   width: 70px;
   height: 70px;
@@ -290,10 +312,9 @@ export default {
   color: #d1d1d1;
 }
 
-/* Responsif untuk layar kecil */
 @media (max-width: 576px) {
   .search-results {
-    max-width: 100%; /* Lebar penuh pada layar kecil */
+    max-width: 100%;
     left: 0;
     transform: none;
   }
@@ -312,10 +333,9 @@ export default {
   }
 }
 
-/* Responsif untuk layar besar */
 @media (min-width: 992px) {
   .search-results {
-    max-width: 600px; /* Ukuran maksimal lebih besar di layar lebar */
+    max-width: 600px;
   }
 
   .ticket-info h6 {
