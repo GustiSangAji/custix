@@ -4,7 +4,6 @@ import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
 import * as Yup from "yup";
 import axios from "axios";
-import { result } from "lodash";
 
 interface ProfileDetails {
   photo: string;
@@ -48,7 +47,7 @@ export default defineComponent({
           },
         });
         profileDetails.value = {
-          photo: response.data.photo || "/media/avatars/blank.png",
+          photo: response.data.photo || "/media/avatars/profz.png",
           nama: response.data.name,
           email: response.data.email,
           phone: response.data.phone,
@@ -113,10 +112,6 @@ export default defineComponent({
       }
     };
 
-    const removeImage = () => {
-      profileDetails.value.photo = "/media/avatars/blank.png";
-    };
-
     return {
       submitButton1,
       emailFormDisplay,
@@ -124,7 +119,6 @@ export default defineComponent({
       profileDetails,
       handleFileChange,
       saveChanges1,
-      removeImage,
       profileDetailsValidator,
     };
   },
@@ -207,18 +201,6 @@ export default defineComponent({
                     <!--end::Inputs-->
                   </label>
                   <!--end::Label-->
-
-                  <!--begin::Remove-->
-                  <span
-                    class="btn btn-icon btn-circle btn-active-color-primary w-25px h-25px bg-body shadow"
-                    data-kt-image-input-action="remove"
-                    data-bs-toggle="tooltip"
-                    @click="removeImage()"
-                    title="Remove avatar"
-                  >
-                    <i class="bi bi-x fs-2"></i>
-                  </span>
-                  <!--end::Remove-->
                 </div>
                 <!--end::Image input-->
 

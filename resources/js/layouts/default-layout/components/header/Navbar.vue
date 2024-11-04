@@ -22,8 +22,9 @@
                 <img :src="user.photo" class="rounded-3" alt="user" />
             </div>
             <div v-else class="cursor-pointer symbol symbol-35px" data-kt-menu-trigger="{default: 'click', lg: 'hover'}"
-                data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
-                <img src="/media/avatars/default.png" class="rounded-3" alt="default user" />
+            data-kt-menu-attach="parent" data-kt-menu-placement="bottom-end">
+            <img :src="user.photo" class="rounded-3" alt="user" />
+           
             </div>
             <KTUserMenu />
             <!--end::Menu wrapper-->

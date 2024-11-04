@@ -80,7 +80,10 @@
         <!-- Right Menu Items -->
         <ul class="navbar-nav ms-auto align-items-center">
           <li v-if="isAuthenticated" class="d-flex align-items-center">
-            <router-link to="/order" class="nav-link fw-bold fs-6 me-3 btn btn-active-dark">
+            <router-link
+              to="/order"
+              class="nav-link fw-bold fs-6 me-3 btn btn-active-dark"
+            >
               Tiket Saya
             </router-link>
             <UserDropdown />
