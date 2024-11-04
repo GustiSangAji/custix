@@ -318,36 +318,42 @@ class CartController extends Controller
 
 
     public function verifyTicket(Request $request)
-    {
-        // Validasi untuk memastikan order_id dan ticket_number disediakan
-        $request->validate([
-            'order_id' => 'required|exists:carts,order_id',
-            'ticket_number' => 'required|string', // Nomor tiket sebagai string untuk keunikan
-        ]);
-
-        // Ambil detail tiket berdasarkan ticket_number dan order_id
-        $ticket = TicketDetail::whereHas('cart', function ($query) use ($request) {
-            $query->where('order_id', $request->order_id);
-        })->where('ticket_number', $request->ticket_number)
-        ->first();
-
-        // Jika tiket tidak ditemukan
-        if (!$ticket) {
-            return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
-        }
-
-        // Cek status tiket
-        if ($ticket->status === 'Used') {
-            return response()->json(['message' => 'Tiket sudah digunakan'], 400);
-    
-        }
-
-        // Update status tiket sebagai telah digunakan
-        $ticket->status = 'Used';
-        $ticket->save();
-
-        return response()->json(['message' => 'Tiket valid dan berhasil diverifikasi'], 200);
+{
+    // Pastikan hanya admin yang bisa mengakses endpoint ini
+    if (!$request->user()->isAdmin()) {
+        return response()->json(['message' => 'Unauthorized'], 403);
     }
+
+    // Validasi untuk memastikan order_id dan ticket_number disediakan
+    $request->validate([
+        'order_id' => 'required|exists:carts,order_id',
+        'ticket_number' => 'required|string', // Nomor tiket sebagai string untuk keunikan
+    ]);
+
+    // Ambil detail tiket berdasarkan ticket_number dan order_id
+    $ticket = TicketDetail::whereHas('cart', function ($query) use ($request) {
+        $query->where('order_id', $request->order_id);
+    })->where('ticket_number', $request->ticket_number)
+    ->first();
+
+    // Jika tiket tidak ditemukan
+    if (!$ticket) {
+        return response()->json(['message' => 'Tiket tidak ditemukan'], 404);
+    }
+
+    // Cek status tiket
+    if ($ticket->status === 'Used') {
+        return response()->json(['message' => 'Tiket sudah digunakan'], 400);
+    }
+
+    // Update status tiket sebagai telah digunakan
+    $ticket->status = 'Used';
+    $ticket->save();
+
+    return response()->json(['message' => 'Tiket valid dan berhasil diverifikasi'], 200);
+}
+
+
 
 
     public function getOrderDetail($id)

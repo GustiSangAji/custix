@@ -29,11 +29,28 @@
               <p class="fw-bold fs-6">{{ order?.order_id }}</p>
               <p class="mb-1 text-muted">Total Pembayaran</p>
               <p class="fw-bold fs-6">{{ formatPrice(order?.total_harga) }}</p>
+              <p class="mb-1 text-muted">Status Tiket</p>
+              <span
+                :class="[
+                  'badge',
+                  badgeClass,
+                  'fs-6',
+                  'fw-bold',
+                  'me-2',
+                  'd-inline-block',
+                ]"
+              >
+                {{ ticketStatus }}
+              </span>
             </div>
           </div>
           <div class="card-footer text-center" style="margin-top: -30px">
-            <div class="card card-body bg-white d-flex flex-column align-items-center">
-              <h4 class="fw-bold fs-6 mb-3 text-dark">Scan kode QR di bawah ini</h4>
+            <div
+              class="card card-body bg-white d-flex flex-column align-items-center"
+            >
+              <h4 class="fw-bold fs-6 mb-3 text-dark">
+                Scan kode QR di bawah ini
+              </h4>
               <qrcode-vue
                 v-if="selectedQrCode"
                 :value="generateQRCodeValue(selectedQrCode)"
@@ -54,21 +71,25 @@
               <p class="mb-1 text-muted">Nama Event</p>
               <p class="fw-bold fs-6">{{ order?.ticket?.name }}</p>
               <p class="mb-1 text-muted">Masa Berlaku</p>
-              <p class="fw-bold fs-6">{{ order?.ticket?.expiry_date }}</p>
-              <p class="mb-1 text-muted">Status Tiket</p>
-              <p :class="statusClass">{{ ticketStatus }}</p>
+              <p class="fw-bold fs-6">
+                {{ formatDate(order?.ticket?.expiry_date) }}
+              </p>
               <p class="mb-1 text-muted">Nama Pemesan</p>
               <p class="fw-bold fs-6">{{ user.nama }}</p>
+              <p class="mb-1 text-muted">Email</p>
+              <p class="fw-bold fs-6">{{ user.email }}</p>
               <p class="mb-1 text-muted">Lokasi</p>
               <p class="fw-bold fs-6">{{ order?.ticket?.place }}</p>
             </div>
           </div>
         </div>
-        
+
         <!-- Card Detail Pesanan Kedua -->
-        <div class="card card-flush text-start mt-4"> <!-- Tambahkan mb-4 untuk margin bawah -->
+        <div class="card card-flush text-start mt-4">
+          <!-- Tambahkan mb-4 untuk margin bawah -->
           <div class="card-body">
-            <h5 class="fw-bold">Petunjuk Verifikasi Qr Code</h5> <!-- Ubah judul jika perlu -->
+            <h5 class="fw-bold">Petunjuk Verifikasi Qr Code</h5>
+            <!-- Ubah judul jika perlu -->
             <hr />
             <div class="card card-dashed p-6">
               <p class="fw-bold fs-6">1. Buka Website CusTix</p>
@@ -112,10 +133,15 @@ export default {
   computed: {
     ticketStatus() {
       // Menggunakan qrIndex untuk mendapatkan status dari ticket_details
-      return this.order?.ticket_details[this.qrIndex]?.status === 'Used' ? 'Sudah Digunakan' : 'Belum Digunakan';
+      return this.order?.ticket_details[this.qrIndex]?.status === "Used"
+        ? "Sudah Digunakan"
+        : "Belum Digunakan";
     },
-    statusClass() {
-      return this.order?.ticket_details[this.qrIndex]?.status === 'Used' ? 'text-danger' : 'text-success';
+    badgeClass() {
+      // Mengatur class badge sesuai status
+      return this.order?.ticket_details[this.qrIndex]?.status === "Used"
+        ? "badge-light-danger"
+        : "badge-light-success";
     },
   },
 
@@ -131,7 +157,7 @@ export default {
 
         if (this.order?.qr_code) {
           const qrData = JSON.parse(this.order.qr_code);
-          const ticketData = qrData.tickets[this.qrIndex]; 
+          const ticketData = qrData.tickets[this.qrIndex];
           if (ticketData) {
             this.selectedQrCode = {
               orderId: qrData.orderId,
@@ -146,9 +172,22 @@ export default {
         console.error("Error fetching order detail:", error);
       }
     },
+    formatDate(date) {
+      const options = { year: "numeric", month: "long", day: "numeric" };
+      return new Date(date).toLocaleDateString("id-ID", options);
+    },
+    formatShortDate(dateString) {
+      const options = {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      };
+      return new Date(dateString).toLocaleDateString("id-ID", options);
+    },
 
     generateQRCodeValue(qrData) {
-      const baseUrl = "https://5bf2-118-99-113-13.ngrok-free.app/verify";
+      const baseUrl = "http://192.168.1.8:8000/verify";
       return `${baseUrl}?order_id=${qrData.orderId}&unique_id=${qrData.uniqueId}&ticket_number=${qrData.ticketNumber}&hash=${qrData.hash}`;
     },
 
@@ -164,13 +203,33 @@ export default {
 
 
 <style scoped>
-.card {
+card {
   border-radius: 10px;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  overflow: hidden; /* Menyembunyikan konten yang keluar dari batas card */
+  position: relative; /* Agar child dengan position absolute tetap teratur */
 }
+
+.card-body {
+  margin-top: 20px; /* Anda bisa menyesuaikan ini sesuai kebutuhan */
+}
+
+/* Gaya untuk gambar GoPay di bagian atas */
 .go-pay-icon {
-  width: 100%; 
-  height: 150px; 
-  object-fit: cover; 
+  position: absolute; /* Mengatur posisi gambar */
+  left: 0; /* Mengatur gambar mulai dari tepi kiri */
+  right: 0; /* Mengatur gambar mencapai tepi kanan */
+  top: 0; /* Mengatur gambar berada di bagian atas card */
+  width: 100%; /* Lebar penuh */
+  height: 150px; /* Atur tinggi tetap agar terlihat baik */
+  object-fit: cover; /* Mengisi area penuh, tanpa distorsi */
+  object-position: center; /* Memastikan gambar berada di tengah */
+}
+
+/* Gaya untuk gambar QR Code */
+.qr-code {
+  width: 100%; /* Membuat gambar mengisi lebar card */
+  height: auto; /* Menjaga rasio aspek gambar */
+  max-width: 150px; /* Mengatur lebar maksimum agar tidak terlalu besar */
 }
 </style>

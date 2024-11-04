@@ -9,47 +9,80 @@
       <div class="collapse show">
         <div class="card position-relative">
           <div class="card-body">
-            <div v-if="loading" class="loading-overlay-card">
-              <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                <span class="visually-hidden">Loading...</span>
-              </div>
-            </div>
-            <div v-else>
-              <div v-if="orders.length > 0">
-                <div class="d-flex flex-column align-items-start">
-                  <div v-for="order in orders" :key="order.id" class="col-12 mb-4">
-                    <div v-for="(ticketDetail, index) in order.ticket_details" :key="ticketDetail.ticket_number" class="ticket mb-6 rounded d-flex flex-column flex-md-row p-6 align-self-start w-100">
-                      <div class="ticket-info flex-grow-1">
-                        <h5 class="event-name font-weight-bold mb-4 fs-4">
-                          {{ order.ticket.name }}
-                        </h5>
+            <div v-if="orders.length > 0" class="order-list-container">
+              <div class="d-flex flex-column align-items-start">
+                <div
+                  v-for="order in orders"
+                  :key="order.id"
+                  class="col-12 mb-4"
+                >
+                  <div
+                    v-for="(ticketDetail, index) in order.ticket_details"
+                    :key="ticketDetail.ticket_number"
+                    class="ticket mb-6 rounded d-flex p-6 align-items-center justify-content-between w-100"
+                  >
+                    <!-- Konten sebelah kiri -->
+                    <div class="ticket-info flex-grow-1">
+                      <h5 class="event-name font-weight-bold mb-4 fs-4">
+                        {{ order.ticket.name }}
+                      </h5>
 
-                        <h3 class="text-muted mb-2 fw-normal fs-6">
-                          {{ order.ticket.datetime }} | {{ order.jumlah_pemesanan }} Tiket
-                        </h3>
+                      <h3 class="text-muted mb-2 fw-normal fs-6">
+                        {{ formatDate(order.ticket.datetime) }} | {{ order.jumlah_pemesanan }} Tiket
+                      </h3>
 
-                        <p :class="ticketDetail.status === 'Used' ? 'text-danger' : 'text-success'">
+                      <h3 class="text-muted mb-2 fw-normal fs-6">
+                        Pembelian pada {{ formatDate(order.ticket.created_at) }}
+                      </h3>
+
+                      <!-- Badge dan tombol dalam satu kolom vertikal -->
+                      <div class="d-flex flex-column align-items-start mt-3">
+                        <!-- Badge Status -->
+                        <span
+                          :class="[
+                            'badge',
+                            ticketDetail.status === 'Used' ? 'badge-light-danger' : 'badge-light-success'
+                          ]"
+                          class="mb-4"
+                        >
                           {{ ticketDetail.status === 'Used' ? 'Sudah Digunakan' : 'Belum Digunakan' }}
-                        </p>
+                        </span>
 
-                        <router-link :to="{ name: 'OrderDetail', params: { id: order.id, qrIndex: index } }" class="btn btn-primary mt-6">
+                        <!-- Tombol Lihat Detail -->
+                        <router-link
+                          :to="{ name: 'OrderDetail', params: { id: order.id, qrIndex: index } }"
+                          class="btn btn-bg-secondary btn-color-white btn-light-dark mt-4"
+                        >
                           Lihat Detail
                         </router-link>
                       </div>
-                      <div class="ticket-image d-flex justify-content-center align-items-center me-1 mb-3 mb-md-0">
-                        <img :src="'/storage/' + order.ticket.image" alt="Event Image" class="rounded" style="width: 200px; height: 100px; object-fit: cover" />
-                      </div>
+                    </div>
+                    <!-- Gambar di sebelah kanan -->
+                    <div
+                      class="ticket-image d-flex justify-content-center align-items-center ms-4"
+                    >
+                      <img
+                        :src="'/storage/' + order.ticket.image"
+                        alt="Event Image"
+                        class="rounded"
+                        style="width: 400px; height: 200px; object-fit: cover"
+                      />
                     </div>
                   </div>
                 </div>
               </div>
-              <div v-else>
-                <div class="d-flex flex-column align-items-center justify-content-center mt-4">
-                  <img src="/media/icons/ticket_tiket-saya.png" alt="Empty Ticket" class="img-fluid mb-6" style="width: 100px; height: auto" />
-                  <p class="text-muted fs-4 fw-bold">
-                    Kamu belum memiliki tiket, silakan beli tiket terlebih dahulu.
-                  </p>
-                </div>
+            </div>
+            <div v-else>
+              <div class="d-flex flex-column align-items-center justify-content-center mt-4">
+                <img
+                  src="/media/icons/ticket_tiket-saya.png"
+                  alt="Empty Ticket"
+                  class="img-fluid mb-6"
+                  style="width: 100px; height: auto"
+                />
+                <p class="text-muted fs-4 fw-bold">
+                  Kamu belum memiliki tiket, silakan beli tiket terlebih dahulu.
+                </p>
               </div>
             </div>
           </div>
@@ -88,6 +121,19 @@ export default {
           this.loading = false;
         });
     },
+    formatDate(date) {
+      const options = { year: "numeric", month: "long", day: "numeric" };
+      return new Date(date).toLocaleDateString("id-ID", options);
+    },
+    formatShortDate(dateString) {
+      const options = {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      };
+      return new Date(dateString).toLocaleDateString("id-ID", options);
+    },
   },
 };
 </script>
@@ -97,21 +143,42 @@ export default {
   background-color: #1b1c22;
   overflow: hidden;
 }
+
 .col-12.mb-4 {
   margin-bottom: 1rem;
 }
 
-/* Overlay transparan dengan warna yang menyatu dengan card */
-.loading-overlay-card {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  z-index: 10;
-  border-radius: 0.475rem;
+/* Menambahkan scroll pada daftar order */
+.order-list-container {
+  max-height: 500px; /* Atur tinggi maksimal sesuai kebutuhan */
+  overflow-y: auto;
+}
+
+/* Scrollbar custom styling */
+.order-list-container {
+  max-height: 500px; /* Atur tinggi maksimal sesuai kebutuhan */
+  overflow-y: auto;
+  scrollbar-width: thin; /* Untuk Firefox */
+  scrollbar-color: #333 #333; /* Warna scrollbar dan latar belakangnya */
+}
+
+/* Untuk browser berbasis Webkit (Chrome, Safari) */
+.order-list-container::-webkit-scrollbar {
+  width: 8px; /* Lebar scrollbar */
+}
+
+.order-list-container::-webkit-scrollbar-track {
+  background: #333; /* Warna background track */
+  border-radius: 10px;
+}
+
+.order-list-container::-webkit-scrollbar-thumb {
+  background-color: #888; /* Warna thumb (bagian yang bisa di-drag) */
+  border-radius: 10px;
+  border: 2px solid #333; /* Border agar thumb tampak lebih rapi */
+}
+
+.order-list-container::-webkit-scrollbar-thumb:hover {
+  background-color: #555; /* Warna thumb saat hover */
 }
 </style>

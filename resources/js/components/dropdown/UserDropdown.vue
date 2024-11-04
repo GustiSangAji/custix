@@ -16,15 +16,15 @@
     </router-link>
     <ul class="dropdown-menu dropdown-menu-end fade-in" aria-labelledby="navbarDropdown">
       <!-- Menu User -->
-      <li class="menu menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold py-4 fs-6 w-275px">
-        <div class="menu-content d-flex align-items-center px-3">
-          <div class="symbol symbol-50px me-5">
+      <li class="menu menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold py-4 px-5 fs-6 w-275px">
+        <div class="menu-content d-flex align-items-center px-5">
+          <div class="symbol symbol-40px me-5">
             <img alt="Logo" :src="'/media/avatars/profz.png'" />
           </div>
           <div class="d-flex flex-column">
             <div class="fw-bold d-flex align-items-center fs-5">
               {{ user.name }}
-              <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">
+              <span class="badge badge-light-success fw-bold fs-8 px-2 py-2">
                 {{ user.role ? user.role.name : 'Tidak ada' }}
               </span>
             </div>
@@ -37,27 +37,27 @@
       <li class="separator my-2"></li>
       <li class="menu-item px-5 my-1">
         <router-link
-          :to="isAdmin ? '/dashboard/profile' : '/user/profile'"
-          class="px-5 my-1 menu-item fw-semibold"
+          to="/order"
+          class="px-5 my-1 menu-item fw-semibold btn btn-active-light-primary d-flex align-items-center"
         >
-          Transaksi
+          Tiket Saya
         </router-link>
       </li>
       <li class="menu-item px-5 my-1">
         <router-link
           to="/informasi-pribadi"
-          class="px-5 my-1 menu-item fw-semibold"
+          class="px-5 my-1 menu-item fw-semibold btn btn-active-light-primary d-flex align-items-center"
         >
           Informasi Pribadi
         </router-link>
       </li>
       <li class="menu-item px-5 my-1"></li>
       <li class="menu-item px-5 my-1">
-        <router-link to="/home" @click="logout" class="px-5 my-1 menu-item fw-semibold"> Sign Out </router-link>
+        <router-link to="/home" @click="logout" class="px-5 my-1 menu-item fw-semibold btn btn-active-light-primary d-flex align-items-center"> Sign Out </router-link>
       </li>
       <!-- Menu Khusus Admin -->
       <li v-if="isAdmin" class="menu-item px-5 my-1">
-        <router-link to="/dashboard" class="px-5 my-1 menu-item fw-semibold">
+        <router-link to="/dashboard" class="px-5 my-1 mb-4 menu-item fw-semibold btn btn-active-light-primary d-flex align-items-center">
           Dashboard
         </router-link>
       </li>
@@ -101,6 +101,8 @@ export default {
   transform: translateY(-10px);
   animation: fadeIn 0.5s forwards;
 }
+
+
 
 /* Animasi untuk fade-in efek */
 @keyframes fadeIn {

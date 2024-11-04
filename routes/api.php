@@ -121,6 +121,10 @@ Route::post('/payment/{id}', [CartController::class, 'checkout']);
 Route::post('/afterpayment', [CartController::class, 'callback']);
 Route::post('/afterpay', [CartController::class, 'afterpayment']);
 
+//Verifikasi Tiket
+Route::middleware(['auth'])->group(function () {
+    Route::post('/verify-ticket', [CartController::class, 'verifyTicket']);
+});
 
 // Waiting Room Status
 Route::middleware('auth:api')->group(function () {
@@ -135,9 +139,5 @@ Route::middleware('auth:api')->group(function () {
 Route::get('/user/orders', [CartController::class, 'getUserOrders']);
 Route::get('/user/orders/{id}', [CartController::class, 'getOrderById']);
 Route::post('/save-qr-code', [CartController::class, 'saveQrCode']);
-Route::post('/verify-ticket', [CartController::class, 'verifyTicket']);
 
 
-
-// routes/api.php
-Route::get('/dashboard', [DashboardController::class, 'index']);
