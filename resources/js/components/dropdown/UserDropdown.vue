@@ -9,7 +9,7 @@
       aria-expanded="false"
     >
       <img
-        :src="user.photo"
+        :src="user.photo || '/media/avatars/profz.png'"
         alt="User Icon"
         class="rounded-circle animated-icon"
       />
@@ -24,7 +24,7 @@
       >
         <div class="menu-content d-flex align-items-center px-3">
           <div class="symbol symbol-50px me-5">
-            <img alt="Foto" :src="user.photo" />
+            <img alt="Foto" :src="user.photo || '/media/avatars/profz.png'" />
           </div>
           <div class="d-flex flex-column">
             <div class="fw-bold d-flex align-items-center fs-5">
