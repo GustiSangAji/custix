@@ -5,42 +5,46 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Storage;
-use Illuminate\Validation\ValidationException;
+use App\Models\User;
 
 class ProfileController extends Controller
 {
-    public function update(Request $request)
+    public function getProfile()
     {
-        // Validasi input
-        $validatedData = $request->validate([
+        $user = Auth::user();
+        return response()->json([
+            'name' => $user->nama,
+            'email' => $user->email,
+            'phone' => $user->phone,
+            'photo' => $user->photo,
+        ]);
+    }
+
+    public function updateProfile(Request $request)
+    {
+        $request->validate([
             'name' => 'required|string|max:255',
             'phone' => 'required|string|max:15',
-            'email' => 'required|email|max:255',
-            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048', // Maksimal 2MB
+            'email' => 'required|email|unique:users,email,' . Auth::id(),
+            'photo' => 'nullable|image|mimes:jpeg,png,jpg|max:2048',
         ]);
 
-        // Ambil pengguna yang sedang login
         $user = Auth::user();
+        $user->nama = $request->input('name');
+        $user->phone = $request->input('phone');
+        $user->email = $request->input('email');
 
-        // Jika ada gambar yang di-upload
+        // Handle file upload for profile photo
         if ($request->hasFile('photo')) {
-            // Hapus foto lama jika ada
-            if ($user->photo) {
-                Storage::delete($user->photo);
-            }
-
-            // Simpan foto baru
-            $path = $request->file('photo')->store('profiles', 'public');
-            $validatedData['photo'] = $path;
+            $photoPath = $request->file('photo')->store('fotoprofil', 'public');
+            $user->photo = Storage::url($photoPath);
         }
 
-        // Perbarui detail pengguna
-        $user->update($validatedData);
+        $user->save();
 
-        // Mengembalikan response
         return response()->json([
             'message' => 'Profile updated successfully!',
-            'photo' => $validatedData['photo'] ?? $user->photo, // Kembalikan foto baru atau foto lama
-        ]);
+            'photo' => $user->photo,
+        ], 200);
     }
 }

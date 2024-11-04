@@ -6,7 +6,7 @@
     <div class="container">
       <!-- Logo -->
       <router-link class="navbar-brand" to="/home">
-        <img :src="settings?.logo" alt="Logo" class="logo img-fluid"/>
+        <img :src="settings?.logo" alt="Logo" class="logo img-fluid" />
       </router-link>
       <!-- Navbar Toggler -->
       <button
@@ -39,7 +39,11 @@
               aria-label="Search"
               aria-describedby="search-addon"
             />
-            <span class="input-group-text" id="search-addon" @click="searchTickets">
+            <span
+              class="input-group-text"
+              id="search-addon"
+              @click="searchTickets"
+            >
               <i class="ki-duotone ki-magnifier fs-2">
                 <span class="path1"></span>
                 <span class="path2"></span>
@@ -51,10 +55,10 @@
         <!-- Preview Search Results -->
         <div
           ref="searchResults"
-          v-if="tickets.length > 0"
+          v-if="searchQuery.length > 0"
           class="search-results"
         >
-          <ul>
+          <ul v-if="tickets.length > 0">
             <li v-for="ticket in tickets" :key="ticket.id">
               <router-link
                 :to="{
@@ -70,6 +74,7 @@
               </router-link>
             </li>
           </ul>
+          <div v-else class="no-results">Tiket tidak ditemukan</div>
         </div>
 
         <!-- Right Menu Items -->
@@ -81,7 +86,10 @@
             <UserDropdown />
           </li>
           <li v-else class="nav-item">
-            <router-link to="/sign-in" class="btn btn-light-primary rounded me-2">
+            <router-link
+              to="/sign-in"
+              class="btn btn-light-primary rounded me-2"
+            >
               Masuk
             </router-link>
             <router-link to="/sign-up" class="btn btn-active-dark rounded">
@@ -271,6 +279,13 @@ export default {
   background-color: #333;
 }
 
+.no-results {
+  color: #d1d1d1;
+  text-align: center;
+  padding: 20px;
+  font-size: 1rem;
+}
+
 .ticket-image {
   width: 70px;
   height: 70px;
@@ -299,7 +314,7 @@ export default {
 
 @media (max-width: 576px) {
   .search-results {
-    max-width: 100%; 
+    max-width: 100%;
     left: 0;
     transform: none;
   }
@@ -331,5 +346,4 @@ export default {
     font-size: 0.9rem;
   }
 }
-
 </style>

@@ -15,6 +15,6 @@ class TiketSeeder extends Seeder
      */
     public function run()
     {
-        Tiket::factory()->count(10)->create();
+        Tiket::factory()->count(100)->create();
     }
 }

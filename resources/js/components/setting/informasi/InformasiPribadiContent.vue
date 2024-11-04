@@ -1,14 +1,14 @@
 <script lang="ts">
-import { defineComponent, ref } from "vue";
+import { defineComponent, ref, onMounted } from "vue";
 import { ErrorMessage, Field, Form as VForm } from "vee-validate";
 import Swal from "sweetalert2/dist/sweetalert2.js";
-import { useAuthStore } from "@/stores/auth"; // pastikan jalur ini sesuai
 import * as Yup from "yup";
-import axios from 'axios';
+import axios from "axios";
+import { result } from "lodash";
 
 interface ProfileDetails {
   photo: string;
-  name: string;
+  nama: string;
   email: string;
   phone: string;
 }
@@ -20,64 +20,59 @@ export default defineComponent({
     VForm,
   },
   setup() {
-    const authStore = useAuthStore(); // ambil store autentikasi
     const photoFile = ref<File | null>(null);
 
     const submitButton1 = ref<HTMLElement | null>(null);
-    const submitButton2 = ref<HTMLElement | null>(null);
-    const submitButton3 = ref<HTMLElement | null>(null);
-    const submitButton4 = ref<HTMLElement | null>(null);
-    const submitButton5 = ref<HTMLElement | null>(null);
-    const updateEmailButton = ref<HTMLElement | null>(null);
-    const updatePasswordButton = ref<HTMLElement | null>(null);
 
     const emailFormDisplay = ref(false);
     const passwordFormDisplay = ref(false);
 
     const profileDetailsValidator = Yup.object().shape({
-      name: Yup.string().required().label("Your name"),
+      nama: Yup.string().required().label("Your name"),
       phone: Yup.string().required().label("Phone number"),
     });
 
-    const changeEmail = Yup.object().shape({
-      emailaddress: Yup.string().required().email().label("Email"),
-      confirmemailpassword: Yup.string().required().label("Password"),
-    });
-
-    const changePassword = Yup.object().shape({
-      currentpassword: Yup.string().required().label("Current password"),
-      newpassword: Yup.string().min(4).required().label("Password"),
-      confirmpassword: Yup.string()
-        .min(4)
-        .required()
-        .oneOf([Yup.ref("newpassword")], "Passwords must match")
-        .label("Password Confirmation"),
-    });
-
     const profileDetails = ref<ProfileDetails>({
-        photo: authStore.user?.photo || "/media/avatars/blank.png", // ambil foto dari store
-        name: authStore.user?.name || "",
-        email: authStore.user?.email || "",
-        phone: authStore.user?.phone || "",
-});
+      photo: "",
+      nama: "",
+      email: "",
+      phone: "",
+    });
 
-const handleFileChange = (event: Event) => {
+    // Ambil data profil saat komponen dimuat
+    onMounted(async () => {
+      try {
+        const response = await axios.get("/profile", {
+          headers: {
+            Authorization: `Bearer ${localStorage.getItem("token")}`, // Pastikan token disimpan di localStorage atau session
+          },
+        });
+        profileDetails.value = {
+          photo: response.data.photo || "/media/avatars/blank.png",
+          nama: response.data.name,
+          email: response.data.email,
+          phone: response.data.phone,
+        };
+      } catch (error) {
+        console.error("Failed to fetch profile data", error);
+      }
+    });
+
+    const handleFileChange = (event: Event) => {
       const target = event.target as HTMLInputElement;
       if (target.files && target.files[0]) {
         photoFile.value = target.files[0];
         const reader = new FileReader();
         reader.onload = (e) => {
-          profileDetails.value.photo = e.target?.result as string; // Set preview
+          profileDetails.value.photo = e.target?.result as string;
         };
         reader.readAsDataURL(target.files[0]);
       }
     };
 
-
-
     const saveChanges1 = async () => {
       const formData = new FormData();
-      formData.append("name", profileDetails.value.name);
+      formData.append("name", profileDetails.value.nama);
       formData.append("phone", profileDetails.value.phone);
       formData.append("email", profileDetails.value.email);
       if (photoFile.value) {
@@ -85,32 +80,34 @@ const handleFileChange = (event: Event) => {
       }
 
       try {
-        const response = await axios.post('/api/profile/update', formData, {
+        const response = await axios.post("/profile/update", formData, {
           headers: {
-            'Content-Type': 'multipart/form-data',
-            'Authorization': `Bearer ${localStorage.getItem('token')}`, // Jika menggunakan token
+            Authorization: `Bearer ${localStorage.getItem("token")}`,
           },
         });
 
-        authStore.user.photo = response.data.photo; // Perbarui dengan URL foto baru
-        profileDetails.value.photo = response.data.photo; // Update untuk tampilan
+        profileDetails.value.photo = response.data.photo;
 
         Swal.fire({
           text: response.data.message,
-          icon: 'success',
-          confirmButtonText: 'Ok',
+          icon: "success",
+          confirmButtonText: "Ok",
           customClass: {
-            confirmButton: 'btn btn-light-primary',
+            confirmButton: "btn btn-light-primary",
           },
+        }).then((result) => {
+          if (result.isConfirmed) {
+            window.location.reload();
+          }
         });
       } catch (error) {
         console.error(error);
         Swal.fire({
-          text: 'Failed to update profile!',
-          icon: 'error',
-          confirmButtonText: 'Ok',
+          text: "Failed to update profile!",
+          icon: "error",
+          confirmButtonText: "Ok",
           customClass: {
-            confirmButton: 'btn btn-light-primary',
+            confirmButton: "btn btn-light-primary",
           },
         });
       }
@@ -120,119 +117,20 @@ const handleFileChange = (event: Event) => {
       profileDetails.value.photo = "/media/avatars/blank.png";
     };
 
-
-
-
-    const saveChanges2 = () => {
-      if (submitButton2.value) {
-        submitButton2.value.setAttribute("data-kt-indicator", "on");
-        setTimeout(() => {
-          submitButton2.value?.removeAttribute("data-kt-indicator");
-        }, 2000);
-      }
-    };
-
-    const saveChanges3 = () => {
-      if (submitButton3.value) {
-        submitButton3.value.setAttribute("data-kt-indicator", "on");
-        setTimeout(() => {
-          submitButton3.value?.removeAttribute("data-kt-indicator");
-        }, 2000);
-      }
-    };
-
-    const saveChanges4 = () => {
-      if (submitButton4.value) {
-        submitButton4.value.setAttribute("data-kt-indicator", "on");
-        setTimeout(() => {
-          submitButton4.value?.removeAttribute("data-kt-indicator");
-        }, 2000);
-      }
-    };
-
-    const deactivateAccount = () => {
-      if (submitButton5.value) {
-        submitButton5.value.setAttribute("data-kt-indicator", "on");
-        setTimeout(() => {
-          submitButton5.value?.removeAttribute("data-kt-indicator");
-
-          Swal.fire({
-            text: "Email is successfully changed!",
-            icon: "success",
-            confirmButtonText: "Ok",
-            buttonsStyling: false,
-            heightAuto: false,
-            customClass: {
-              confirmButton: "btn btn-light-primary",
-            },
-          }).then(() => {
-            emailFormDisplay.value = false;
-          });
-        }, 2000);
-      }
-    };
-
-    const updateEmail = () => {
-      if (updateEmailButton.value) {
-        updateEmailButton.value.setAttribute("data-kt-indicator", "on");
-        setTimeout(() => {
-          updateEmailButton.value?.removeAttribute("data-kt-indicator");
-          emailFormDisplay.value = false;
-        }, 2000);
-      }
-    };
-
-    const updatePassword = () => {
-      if (updatePasswordButton.value) {
-        updatePasswordButton.value.setAttribute("data-kt-indicator", "on");
-        setTimeout(() => {
-          updatePasswordButton.value?.removeAttribute("data-kt-indicator");
-
-          Swal.fire({
-            text: "Password is successfully changed!",
-            icon: "success",
-            confirmButtonText: "Ok",
-            buttonsStyling: false,
-            heightAuto: false,
-            customClass: {
-              confirmButton: "btn btn-light-primary",
-            },
-          }).then(() => {
-            passwordFormDisplay.value = false;
-          });
-        }, 2000);
-      }
-    };
-
-  
-
     return {
       submitButton1,
-      submitButton2,
-      submitButton3,
-      submitButton4,
-      submitButton5,
-      updateEmailButton,
-      updatePasswordButton,
       emailFormDisplay,
       passwordFormDisplay,
       profileDetails,
       handleFileChange,
       saveChanges1,
-      saveChanges2,
-      saveChanges3,
-      saveChanges4,
-      deactivateAccount,
-      updateEmail,
-      updatePassword,
       removeImage,
       profileDetailsValidator,
-      changeEmail,
-      changePassword,
     };
   },
 });
 </script>
+
 
 <template>
   <div class="col-md-8 col-lg-9">
@@ -261,8 +159,7 @@ const handleFileChange = (event: Event) => {
         <VForm
           id="kt_account_profile_details_form"
           class="form"
-          novalidate
-          @submit="saveChanges1"
+          @submit.prevent="saveChanges1"
           :validation-schema="profileDetailsValidator"
         >
           <!--begin::Card body-->
@@ -304,7 +201,7 @@ const handleFileChange = (event: Event) => {
                       type="file"
                       name="avatar"
                       accept=".png, .jpg, .jpeg"
-                        @change="handleFileChange"
+                      @change="handleFileChange"
                     />
                     <input type="hidden" name="avatar_remove" />
                     <!--end::Inputs-->
@@ -348,7 +245,8 @@ const handleFileChange = (event: Event) => {
                   name="name"
                   class="form-control form-control-lg form-control-solid"
                   placeholder="Masukkan Nama Anda"
-                  v-model="profileDetails.name"
+                  v-model="profileDetails.nama"
+                  readonly
                 />
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
@@ -382,6 +280,7 @@ const handleFileChange = (event: Event) => {
                   class="form-control form-control-lg form-control-solid"
                   placeholder="Masukkan Nomor Telepon Anda"
                   v-model="profileDetails.phone"
+                  readonly
                 />
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
@@ -414,6 +313,7 @@ const handleFileChange = (event: Event) => {
                   class="form-control form-control-lg form-control-solid"
                   placeholder="Masukkan Email Anda"
                   v-model="profileDetails.email"
+                  readonly
                 />
                 <div class="fv-plugins-message-container">
                   <div class="fv-help-block">
@@ -430,19 +330,13 @@ const handleFileChange = (event: Event) => {
           <!--begin::Actions-->
           <div class="card-footer d-flex justify-content-end py-6 px-9">
             <button
-              type="reset"
-              class="btn btn-light btn-active-light-primary me-2"
-            >
-              Discard
-            </button>
-
-            <button
-              type="submit"
+              type="button"
               id="kt_account_profile_details_submit"
               ref="submitButton1"
               class="btn btn-primary"
+              @click.prevent="saveChanges1"
             >
-              <span class="indicator-label"> Save Changes </span>
+              <span class="indicator-label">Save Changes</span>
               <span class="indicator-progress">
                 Please wait...
                 <span

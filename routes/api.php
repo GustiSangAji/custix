@@ -34,7 +34,11 @@ Route::middleware(['json'])->prefix('auth')->group(function () {
     Route::delete('logout', [AuthController::class, 'logout']);
     Route::get('me', [AuthController::class, 'me']);
 });
-Route::middleware('auth:api')->post('/profile/update', [ProfileController::class, 'update']);
+
+Route::middleware(['auth'])->group(function () {
+    Route::post('/profile/update', [ProfileController::class, 'updateProfile']);
+    Route::get('/profile', [ProfileController::class, 'getProfile']);
+});
 // routes/api.php
 
 
@@ -74,9 +78,9 @@ Route::middleware(['auth', 'verified', 'json'])->group(function () {
 
     // Tiket Routes
     Route::middleware('can:event')->group(function () {
-    Route::get('tiket', [TiketController::class, 'get']);
-    Route::post('tiket', [TiketController::class, 'index']);
-    Route::post('tiket/store', [TiketController::class, 'store']);
+        Route::get('tiket', [TiketController::class, 'get']);
+        Route::post('tiket', [TiketController::class, 'index']);
+        Route::post('tiket/store', [TiketController::class, 'store']);
         Route::apiResource('tiket', TiketController::class)
             ->except(['index', 'store'])
             ->scoped(['tiket' => 'uuid']);

@@ -2,34 +2,41 @@
   <li class="nav-item dropdown">
     <router-link
       to="/home"
-      class="nav-link dropdown-toggle d-flex align-items-center symbol symbol-35px"
+      class="nav-link dropdown-toggle d-flex align-items-center symbol symbol-45px"
       id="navbarDropdown"
       role="button"
       data-bs-toggle="dropdown"
       aria-expanded="false"
     >
       <img
-        :src="'/media/avatars/profz.png'"
+        :src="user.photo"
         alt="User Icon"
         class="rounded-circle animated-icon"
       />
     </router-link>
-    <ul class="dropdown-menu dropdown-menu-end fade-in" aria-labelledby="navbarDropdown">
+    <ul
+      class="dropdown-menu dropdown-menu-end fade-in"
+      aria-labelledby="navbarDropdown"
+    >
       <!-- Menu User -->
-      <li class="menu menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold py-4 fs-6 w-275px">
+      <li
+        class="menu menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold py-4 fs-6 w-275px"
+      >
         <div class="menu-content d-flex align-items-center px-3">
           <div class="symbol symbol-50px me-5">
-            <img alt="Logo" :src="'/media/avatars/profz.png'" />
+            <img alt="Logo" :src="user.photo" />
           </div>
           <div class="d-flex flex-column">
             <div class="fw-bold d-flex align-items-center fs-5">
               {{ user.name }}
-              <span class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2">
-                {{ user.role ? user.role.name : 'Tidak ada' }}
+              <span
+                class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2"
+              >
+                {{ user.role ? user.role.name : "Tidak ada" }}
               </span>
             </div>
             <a href="#" class="fw-semibold text-muted text-hover-primary fs-7">
-              {{ user.email || 'Tidak ada email' }}
+              {{ user.email || "Tidak ada email" }}
             </a>
           </div>
         </div>
@@ -53,7 +60,13 @@
       </li>
       <li class="menu-item px-5 my-1"></li>
       <li class="menu-item px-5 my-1">
-        <router-link to="/home" @click="logout" class="px-5 my-1 menu-item fw-semibold"> Sign Out </router-link>
+        <router-link
+          to="/home"
+          @click="logout"
+          class="px-5 my-1 menu-item fw-semibold"
+        >
+          Sign Out
+        </router-link>
       </li>
       <!-- Menu Khusus Admin -->
       <li v-if="isAdmin" class="menu-item px-5 my-1">
@@ -75,7 +88,9 @@ export default {
     const authStore = useAuthStore();
 
     const user = computed(() => authStore.user);
-    const isAdmin = computed(() => user.value && user.value.role?.name === "admin");
+    const isAdmin = computed(
+      () => user.value && user.value.role?.name === "admin"
+    );
 
     const logout = () => {
       authStore.logout();
