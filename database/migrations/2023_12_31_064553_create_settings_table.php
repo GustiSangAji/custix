@@ -17,18 +17,16 @@ return new class extends Migration
             $table->string('app');
             $table->text('description');
             $table->string('logo');
-            $table->string('banner');
-            $table->string('bg_auth');
             $table->string('carousel1')->nullable();
             $table->string('carousel2')->nullable();
             $table->string('carousel3')->nullable();
-
-            $table->string('dinas');
-            $table->string('pemerintah');
-            $table->string('alamat');
-            $table->string('telepon');
-            $table->string('email');
-
+            $table->string('carousel4')->nullable();
+            $table->string('carousel5')->nullable();
+            $table->string('carousel6')->nullable();
+            $table->string('carousel7')->nullable();
+            $table->string('carousel8')->nullable();
+            $table->string('carousel9')->nullable();
+            $table->string('carousel10')->nullable();
             $table->timestamps();
         });
     }
