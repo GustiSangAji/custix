@@ -2,7 +2,7 @@
   <li class="nav-item dropdown">
     <router-link
       to="/home"
-      class="nav-link dropdown-toggle d-flex align-items-center symbol symbol-45px"
+      class="nav-link dropdown-toggle d-flex align-items-center symbol symbol-35px"
       id="navbarDropdown"
       role="button"
       data-bs-toggle="dropdown"
@@ -20,17 +20,17 @@
     >
       <!-- Menu User -->
       <li
-        class="menu menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold py-4 fs-6 w-275px"
+        class="menu menu-column menu-rounded menu-gray-600 menu-state-bg-light-primary fw-semibold py-4 px-5 fs-6 w-275px"
       >
-        <div class="menu-content d-flex align-items-center px-3">
-          <div class="symbol symbol-50px me-5">
+        <div class="menu-content d-flex align-items-center px-5">
+          <div class="symbol symbol-40px me-5">
             <img alt="Foto" :src="user.photo || '/media/avatars/profz.png'" />
           </div>
           <div class="d-flex flex-column">
             <div class="fw-bold d-flex align-items-center fs-5">
               {{ user.name }}
               <span
-                class="badge badge-light-success fw-bold fs-8 px-2 py-1 ms-2"
+                class="badge badge-light-success fw-bold fs-8 px-2 py-2"
               >
                 {{ user.role ? user.role.name : "Tidak ada" }}
               </span>
@@ -63,7 +63,7 @@
         <router-link
           to="/home"
           @click="logout"
-          class="px-5 my-1 menu-item fw-semibold"
+          class="px-5 my-1 menu-item fw-semibold btn btn-active-light-primary d-flex align-items-center"
         >
           Sign Out
         </router-link>

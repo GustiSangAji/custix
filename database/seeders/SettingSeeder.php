@@ -32,6 +32,9 @@ class SettingSeeder extends Seeder
             'app' => 'CusTix',
             'description' => 'Beli Tiketmu Disini',
             'logo' => '/media/misc/aminkan.png',
+            'carousel1' => $carousel1,
+            'carousel2' => $carousel2,
+            'carousel3' => $carousel3,
         ]);
     }
 }
