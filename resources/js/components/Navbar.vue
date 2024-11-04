@@ -141,7 +141,7 @@ export default {
     const searchTickets = async () => {
       try {
         const response = await axios.post(`/tickets/search`, {
-          query: searchQuery.value, //apakah betul 999
+          query: searchQuery.value,
         });
         tickets.value = response.data;
       } catch (error) {

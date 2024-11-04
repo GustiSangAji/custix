@@ -30,9 +30,9 @@ class UpdateTiketRequest extends FormRequest
             'status' => ['required', Rule::in(['available', 'unavailable'])],
             'quantity' => 'required|numeric|min:1',
             'price' => 'required|numeric|min:0',
-           // 'image' => 'nullable|image|max:2048',
+            'image' => 'nullable|image|max:2048',
             'description' => 'nullable|string|max:100000000000', // Menambahkan validasi untuk deskripsi
-           // 'banner' => 'nullable|image|max:2048', // Menambahkan validasi untuk banner
+            'banner' => 'nullable|image|max:2048', // Menambahkan validasi untuk banner
         ];
     }
 

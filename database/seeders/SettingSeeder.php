@@ -20,13 +20,6 @@ class SettingSeeder extends Seeder
             'app' => 'CusTix',
             'description' => 'Beli Tiketmu Disini',
             'logo' => '/media/misc/aminkan.png',
-            'bg_auth' => '/media/misc/DmdnYIPmAIvW8d1dLHVkLjAUrS15GeY3bpAHTxxH.jpg',
-            'banner' => '/media/misc/DmdnYIPmAIvW8d1dLHVkLjAUrS15GeY3bpAHTxxH.jpg',
-            'pemerintah' => 'Pemerintah Provinsi Jawa Timur',
-            'dinas' => 'Dinas Lingkungan Hidup',
-            'alamat' => '',
-            'telepon' => '',
-            'email' => '',
         ]);
     }
 }

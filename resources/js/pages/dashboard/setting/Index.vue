@@ -8,7 +8,9 @@
         <div class="col-md-6">
           <!--begin::Input group-->
           <div class="fv-row mb-8">
-            <label class="form-label fw-bold fs-6 required">Nama Aplikasi</label>
+            <label class="form-label fw-bold fs-6 required"
+              >Nama Aplikasi</label
+            >
             <Field
               class="form-control form-control-lg form-control-solid"
               type="text"
@@ -41,24 +43,6 @@
             </div>
           </div>
           <!--end::Input group-->
-
-          <!--begin::Input group-->
-          <div class="fv-row mb-8">
-            <label class="form-label fw-bold fs-6 required">Pemerintah</label>
-            <Field
-              class="form-control form-control-lg form-control-solid"
-              type="text"
-              name="pemerintah"
-              autocomplete="off"
-              v-model="formData.pemerintah"
-            />
-            <div class="fv-plugins-message-container">
-              <div class="fv-help-block">
-                <ErrorMessage name="pemerintah" />
-              </div>
-            </div>
-          </div>
-          <!--end::Input group-->
         </div>
 
         <div class="col-12 d-md-none">
@@ -73,16 +57,6 @@
               :accepted-file-types="fileTypes"
               required
               v-on:updatefiles="(file) => (files.logo = file)"
-            ></file-upload>
-          </div>
-
-          <div class="fv-row mb-8">
-            <label class="form-label fw-bold required">Background Login</label>
-            <file-upload
-              v-bind:files="files.bgAuth"
-              :accepted-file-types="fileTypes"
-              required
-              v-on:updatefiles="(file) => (files.bgAuth = file)"
             ></file-upload>
           </div>
 
@@ -124,12 +98,18 @@ export default defineComponent({
     const fileTypes = ref(["image/jpeg", "image/png", "image/jpg"]);
     const files = ref({
       logo: setting.data?.value?.logo ? [setting.data.value.logo] : [],
-      bgAuth: setting.data?.value?.bg_auth ? [setting.data.value.bg_auth] : [],
       carousel: setting.data?.value
         ? [
             setting.data.value.carousel1,
             setting.data.value.carousel2,
             setting.data.value.carousel3,
+            setting.data.value.carousel4,
+            setting.data.value.carousel5,
+            setting.data.value.carousel6,
+            setting.data.value.carousel7,
+            setting.data.value.carousel8,
+            setting.data.value.carousel9,
+            setting.data.value.carousel10,
           ].filter(Boolean)
         : [],
     });
@@ -137,7 +117,6 @@ export default defineComponent({
     const formSchema = Yup.object().shape({
       app: Yup.string().required("Nama aplikasi wajib diisi"),
       description: Yup.string().required("Deskripsi wajib diisi"),
-      pemerintah: Yup.string().required("Nama pemerintah wajib diisi"),
     });
 
     return {
@@ -154,10 +133,8 @@ export default defineComponent({
 
       data.append("app", this.formData.app);
       data.append("description", this.formData.description);
-      data.append("pemerintah", this.formData.pemerintah);
 
       data.append("logo", this.files.logo[0]?.file || "");
-      data.append("bg_auth", this.files.bgAuth[0]?.file || "");
 
       this.files.carousel.forEach((file, index) => {
         data.append(`carousel[${index}]`, file.file);
@@ -186,13 +163,17 @@ export default defineComponent({
         this.files.logo = setting.data.value.logo
           ? [setting.data.value.logo]
           : [];
-        this.files.bgAuth = setting.data.value.bg_auth
-          ? [setting.data.value.bg_auth]
-          : [];
         this.files.carousel = [
           setting.data.value.carousel1,
           setting.data.value.carousel2,
           setting.data.value.carousel3,
+          setting.data.value.carousel4,
+          setting.data.value.carousel5,
+          setting.data.value.carousel6,
+          setting.data.value.carousel7,
+          setting.data.value.carousel8,
+          setting.data.value.carousel9,
+          setting.data.value.carousel10,
         ].filter(Boolean);
       },
       deep: true,
