@@ -331,7 +331,7 @@ export default defineComponent({
         </VForm>
         <!--end::Form-->
       </div>
-      <!--end::Content-->
+      <!--end::Content-->   
     </div>
     <!--end::Basic info-->
   </div>
