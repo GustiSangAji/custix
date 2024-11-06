@@ -42,40 +42,42 @@
 
       <!-- Navbar Content -->
       <div class="collapse navbar-collapse" id="navbarNav">
-        <form
-          ref="searchForm"
-          class="d-flex mx-auto search-bar"
-          @submit.prevent="searchTickets"
-        >
-          <div class="input-group">
-            <input
-              ref="searchInput"
-              type="text"
-              class="form-control"
-              placeholder="Cari di CusTix"
-              v-model="searchQuery"
-              @input="onInput"
-              aria-label="Search"
-              aria-describedby="search-addon"
-            />
-            <span
-              class="input-group-text"
-              id="search-addon"
-              @click="searchTickets"
-            >
-              <i class="ki-duotone ki-magnifier fs-2">
-                <span class="path1"></span>
-                <span class="path2"></span>
-              </i>
-            </span>
-          </div>
-        </form>
-
-        <!-- Preview Search Results for Navbar -->
-        <SearchResults
-          v-if="tickets.length > 0 && !isSearchSidebarOpen"
-          :tickets="tickets"
+        <div class="search-wrapper">
+    <form
+      ref="searchForm"
+      class="d-flex mx-auto search-bar"
+      @submit.prevent="searchTickets"
+    >
+      <div class="input-group">
+        <input
+          ref="searchInput"
+          type="text"
+          class="form-control"
+          placeholder="Cari di CusTix"
+          v-model="searchQuery"
+          @input="onInput"
+          aria-label="Search"
+          aria-describedby="search-addon"
         />
+        <span
+          class="input-group-text"
+          id="search-addon"
+          @click="searchTickets"
+        >
+          <i class="ki-duotone ki-magnifier fs-2">
+            <span class="path1"></span>
+            <span class="path2"></span>
+          </i>
+        </span>
+      </div>
+    </form>
+
+    <!-- Preview Search Results for Navbar -->
+    <SearchResults
+      v-if="tickets.length > 0 && !isSearchSidebarOpen"
+      :tickets="tickets"
+    />
+  </div>
 
         <!-- Right Menu Items -->
         <ul class="navbar-nav ms-auto align-items-center">
@@ -409,6 +411,7 @@ export default {
   transition: transform 0.3s ease;
 }
 
+
 /* Navbar Toggler Container */
 .navbar-toggler-container {
   display: flex;
@@ -435,35 +438,65 @@ export default {
   transform: scale(1.05);
 }
 
+.search-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 100%; /* Sesuaikan dengan lebar container */
+  margin: 0 auto;
+}
+
+/* Search Bar */
 /* Search Bar */
 .search-bar {
-  width: auto; /* Menyesuaikan lebar agar lebih rapat ke logo */
-  margin-left: 0; /* Menghilangkan margin kiri jika ada */
-  margin-right: 20px; /* Memberikan sedikit ruang di sebelah kanan */
+  width: 100%; /* Lebar penuh secara default */
+  margin-left: 0;
+  margin-right: 20px;
   transition: width 0.3s ease;
-  flex-grow: 1; /* Memberikan search bar lebih banyak ruang */
-  max-width: 700px;
+  flex-grow: 1; /* Memberikan lebih banyak ruang pada search bar */
+}
+
+/* Responsiveness for wider screens */
+@media (min-width: 900px) {
+  .search-wrapper {
+    max-width: 800px; /* Sesuaikan lebar wrapper pada layar besar */
+  }
+
+  .search-bar {
+    width: 100%; /* Membuat search bar lebih lebar pada layar besar */
+  }
 }
 
 /* Khusus untuk search bar di sidebar */
 .sidebar-search-bar .input-group {
-  width: 100%; /* Lebar khusus untuk search bar di sidebar */
+  width: 100%; /* Lebar penuh untuk search bar di sidebar */
   margin-left: 0; /* Pastikan berada di kiri */
 }
 
-@media (min-width: 992px) and (max-width: 1192px) {
+/* Untuk tampilan ukuran layar sedang */
+@media (min-width: 992px) and (max-width: 1200px) {
   .search-bar {
-    max-width: 500px; /* Atur lebar maksimum untuk rentang ukuran layar ini */
+    max-width: 600px; /* Lebar maksimum pada ukuran layar ini */
     width: 100%; /* Membuat lebar search bar fleksibel */
+  }
+  .search-wrapper {
+    max-width: 600px; /* Sesuaikan lebar wrapper pada layar besar */
+  }
+   /* Menjaga tombol 'Tiket Saya' tidak wrap */
+   .navbar-nav .nav-link {
+    white-space: nowrap; /* Mencegah teks wrap */
+    overflow: hidden; /* Sembunyikan teks yang meluber */
+    text-overflow: ellipsis; /* Menambahkan elipsis jika teks terlalu panjang */
   }
 }
 
+/* Untuk tampilan mobile */
 @media (max-width: 768px) {
   .search-bar {
-    width: 100%; /* Membuat lebar penuh untuk tampilan mobile */
+    width: 100%; /* Membuat lebar penuh pada tampilan mobile */
     margin-right: 10px; /* Mengurangi margin kanan pada tampilan kecil */
   }
 }
+
 
 /* Sidebar Overlay */
 .sidebar-overlay {

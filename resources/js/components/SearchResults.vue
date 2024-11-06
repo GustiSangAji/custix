@@ -34,39 +34,21 @@ export default {
 </script>
 
 <style scoped>
-.ticket-image {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  margin-right: 10px;
-}
-.ticket-info {
-  display: inline-block;
-  vertical-align: top;
-}
-
 .search-results {
-  position: fixed; /* Mengunci posisi pada layar */
+  position: absolute;
+  top: 100%; /* Position right below the search bar */
+  left: 0;
+  width: 100%; /* Match width of the search bar */
   background-color: #0f1014;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 100%; /* Lebar penuh agar responsif */
-  max-width: 450px; /* Batas lebar maksimal */
   max-height: 400px;
   overflow-y: auto;
   z-index: 1000;
   border-radius: 8px;
   padding: 10px;
-  top: 8%; /* Sesuaikan agar berada di bawah search bar */
-  left: 40%;
-  transform: translateX(-62%); /* Menengahkan secara horizontal */
 }
-@media (min-width: 900px) and (max-width: 1194px) {
-  .search-results {
-    left: 50%; /* Menempatkan search results di tengah-tengah */
-    transform: translateX(-50%); /* Menengahkan secara horizontal */
-    max-width: 600px; /* Menyesuaikan lebar preview */
-  }
-}
+
+
 
 .search-results ul {
   list-style: none;
@@ -84,19 +66,21 @@ export default {
 
 .search-results li:hover {
   background-color: #333;
+  border-radius: 4px;
 }
+
 /* Styling untuk gambar tiket */
 .ticket-image {
-  width: 70px;
-  height: 70px;
+  width: 50px;
+  height: 50px;
   object-fit: cover;
-  border-radius: 6px;
-  margin-right: 15px;
-  flex-shrink: 0;
+  margin-right: 10px;
 }
 
 .ticket-info {
   flex-grow: 1;
+  display: inline-block;
+  vertical-align: top;
 }
 
 .ticket-info h6 {
