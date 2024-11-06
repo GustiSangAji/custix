@@ -63,13 +63,19 @@
               id="search-addon"
               @click="searchTickets"
             >
-            <i class="ki-duotone ki-magnifier fs-2">
+              <i class="ki-duotone ki-magnifier fs-2">
                 <span class="path1"></span>
                 <span class="path2"></span>
               </i>
             </span>
           </div>
         </form>
+
+        <!-- Preview Search Results for Navbar -->
+        <SearchResults
+          v-if="tickets.length > 0 && !isSearchSidebarOpen"
+          :tickets="tickets"
+        />
 
         <!-- Right Menu Items -->
         <ul class="navbar-nav ms-auto align-items-center">
@@ -86,12 +92,11 @@
             <router-link
               to="/sign-in"
               class="btn btn-light-primary rounded me-2"
+              >Masuk</router-link
             >
-              Masuk
-            </router-link>
-            <router-link to="/sign-up" class="btn btn-active-dark rounded">
-              Daftar
-            </router-link>
+            <router-link to="/sign-up" class="btn btn-active-dark rounded"
+              >Daftar</router-link
+            >
           </li>
         </ul>
       </div>
@@ -99,88 +104,49 @@
   </nav>
 
   <!-- Sidebar Pencarian -->
-<div :class="['sidebar', { 'sidebar-open': isSearchSidebarOpen }]">
-  <div class="sidebar-header">
-    <h5 class="mb-0">Cari Tiket</h5>
-    <button
-      class="close-btn"
-      @click="toggleSearchSidebar"
-      aria-label="Close Search Sidebar"
-    >
-      &times;
-    </button>
-  </div>
-
-  <!-- Form Pencarian -->
-  <form
-    ref="searchForm"
-    class="d-flex mx-auto sidebar-search-bar"
-    @submit.prevent="searchTickets"
-  >
-    <div class="input-group">
-      <input
-        ref="searchInput"
-        type="text"
-        class="form-control"
-        placeholder="Cari di CusTix"
-        v-model="searchQuery"
-        @input="onInput"
-        aria-label="Search"
-        aria-describedby="search-addon"
-      />
-      <span
-        class="input-group-text"
-        id="search-addon"
-        @click="searchTickets"
+  <div :class="['sidebar', { 'sidebar-open': isSearchSidebarOpen }]">
+    <div class="sidebar-header">
+      <h5 class="mb-0">Cari Tiket</h5>
+      <button
+        class="close-btn"
+        @click="toggleSearchSidebar"
+        aria-label="Close Search Sidebar"
       >
-        <i class="ki-duotone ki-magnifier fs-2">
-          <span class="path1"></span>
-          <span class="path2"></span>
-        </i>
-      </span>
+        &times;
+      </button>
     </div>
-  </form>
 
-  <!-- Preview Hasil Pencarian di Sidebar -->
-  <div v-if="tickets.length > 0" class="search-results">
-    <ul>
-      <li v-for="ticket in tickets" :key="ticket.id">
-        <router-link
-          :to="{
-            name: 'ticket-detail',
-            params: { name: ticket.name.replace(/\s+/g, '-') },
-          }"
-        >
-          <img :src="ticket.image" class="ticket-image" />
-          <div class="ticket-info">
-            <h6>{{ ticket.name }}</h6>
-            <p>{{ ticket.place }} - {{ formatDate(ticket.datetime) }}</p>
-          </div>
-        </router-link>
-      </li>
-    </ul>
-  </div>
-</div>
+    <!-- Form Pencarian di Sidebar -->
+    <form
+      ref="searchForm"
+      class="d-flex mx-auto sidebar-search-bar"
+      @submit.prevent="searchTickets"
+    >
+      <div class="input-group">
+        <input
+          ref="searchInput"
+          type="text"
+          class="form-control"
+          placeholder="Cari di CusTix"
+          v-model="searchQuery"
+          @input="onInput"
+          aria-label="Search"
+          aria-describedby="search-addon"
+        />
+        <span class="input-group-text" id="search-addon" @click="searchTickets">
+          <i class="ki-duotone ki-magnifier fs-2">
+            <span class="path1"></span>
+            <span class="path2"></span>
+          </i>
+        </span>
+      </div>
+    </form>
 
-  
-  <!-- Preview Search Results -->
-  <div ref="searchResults" v-if="tickets.length > 0" class="search-results">
-    <ul>
-      <li v-for="ticket in tickets" :key="ticket.id">
-        <router-link
-          :to="{
-            name: 'ticket-detail',
-            params: { name: ticket.name.replace(/\s+/g, '-') },
-          }"
-        >
-          <img :src="ticket.image" class="ticket-image" />
-          <div class="ticket-info">
-            <h6>{{ ticket.name }}</h6>
-            <p>{{ ticket.place }} - {{ formatDate(ticket.datetime) }}</p>
-          </div>
-        </router-link>
-      </li>
-    </ul>
+    <!-- Preview Search Results for Sidebar -->
+    <SidebarSearchResults
+      v-if="tickets.length > 0 && isSearchSidebarOpen"
+      :tickets="tickets"
+    />
   </div>
 
   <!-- Sidebar Overlay -->
@@ -230,6 +196,13 @@
           class="px-2 my-1 menu-item fw-semibold btn btn-active-light-primary d-flex align-items-center"
           to="/order"
         >
+          <span class="svg-icon fs-1">
+            <i class="ki-duotone ki-wallet fs-1 me-2">
+              <span class="path1"></span>
+              <span class="path2"></span>
+              <span class="path3"></span>
+            </i>
+          </span>
           Tiket Saya
         </router-link>
       </li>
@@ -238,6 +211,13 @@
           class="px-2 my-1 menu-item fw-semibold btn btn-active-light-primary d-flex align-items-center"
           to="/informasi-pribadi"
         >
+          <span class="svg-icon fs-1">
+            <i class="ki-duotone ki-user-edit fs-1 me-2">
+              <span class="path1"></span>
+              <span class="path2"></span>
+              <span class="path3"></span>
+            </i>
+          </span>
           Informasi Pribadi
         </router-link>
       </li>
@@ -261,6 +241,12 @@
           @click="logout"
           class="px-2 my-1 menu-item fw-semibold btn btn-active-light-primary d-flex align-items-center"
         >
+          <span class="svg-icon fs-1">
+            <i class="ki-duotone ki-exit-left fs-1 me-2">
+              <span class="path1"></span>
+              <span class="path2"></span>
+            </i>
+          </span>
           Sign Out
         </router-link>
       </li>
@@ -273,12 +259,16 @@ import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
 import UserDropdown from "@/components/dropdown/UserDropdown.vue";
+import SearchResults from "@/components/SearchResults.vue";
+import SidebarSearchResults from "@/components/SidebarSearchResults.vue";
 import { useRoute } from "vue-router";
 
 export default {
   name: "Navbar",
   components: {
     UserDropdown,
+    SearchResults,
+    SidebarSearchResults,
   },
   methods: {
     formatDate(date) {
@@ -457,7 +447,7 @@ export default {
 
 /* Khusus untuk search bar di sidebar */
 .sidebar-search-bar .input-group {
-  width: 90%; /* Lebar khusus untuk search bar di sidebar */
+  width: 100%; /* Lebar khusus untuk search bar di sidebar */
   margin-left: 0; /* Pastikan berada di kiri */
 }
 
@@ -539,85 +529,5 @@ export default {
   position: absolute;
   top: 10px;
   right: 20px;
-}
-
-.ticket-image {
-  width: 50px;
-  height: 50px;
-  object-fit: cover;
-  margin-right: 10px;
-}
-.ticket-info {
-  display: inline-block;
-  vertical-align: top;
-}
-
-.search-results {
-  position: fixed; /* Mengunci posisi pada layar */
-  background-color: #0f1014;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 100%; /* Lebar penuh agar responsif */
-  max-width: 450px; /* Batas lebar maksimal */
-  max-height: 400px;
-  overflow-y: auto;
-  z-index: 1000;
-  border-radius: 8px;
-  padding: 10px;
-  top: 8%; /* Sesuaikan agar berada di bawah search bar */
-  left: 40%;
-  transform: translateX(-62%); /* Menengahkan secara horizontal */
-}
-
-@media (min-width: 900px) and (max-width: 1194px) {
-  .search-results {
-    left: 50%; /* Menempatkan search results di tengah-tengah */
-    transform: translateX(-50%); /* Menengahkan secara horizontal */
-    max-width: 600px; /* Menyesuaikan lebar preview */
-  }
-}
-
-
-.search-results ul {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.search-results li {
-  display: flex;
-  align-items: center;
-  padding: 12px;
-  border-bottom: 1px solid #26272f;
-  transition: background-color 0.2s ease;
-}
-
-.search-results li:hover {
-  background-color: #333;
-}
-/* Styling untuk gambar tiket */
-.ticket-image {
-  width: 70px;
-  height: 70px;
-  object-fit: cover;
-  border-radius: 6px;
-  margin-right: 15px;
-  flex-shrink: 0;
-}
-
-.ticket-info {
-  flex-grow: 1;
-}
-
-.ticket-info h6 {
-  margin: 0;
-  font-size: 1rem;
-  font-weight: 600;
-  color: #fff;
-}
-
-.ticket-info p {
-  margin: 0;
-  font-size: 0.85rem;
-  color: #d1d1d1;
 }
 </style>

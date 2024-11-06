@@ -163,7 +163,8 @@ export default {
   white-space: nowrap; /* Mencegah teks untuk ter-wrap */
 }
 
-@media (max-width: 768px) { /* Sesuaikan dengan lebar layar yang diinginkan */
+@media (max-width: 768px) {
+  /* Sesuaikan dengan lebar layar yang diinginkan */
   .sidebar-container {
     display: none; /* Sembunyikan sidebar hingga layar lebih dari 768px */
   }
@@ -172,12 +173,12 @@ export default {
   }
 }
 
-@media (min-width: 769px) { /* Menampilkan sidebar kembali pada layar lebih besar */
+@media (min-width: 769px) {
+  /* Menampilkan sidebar kembali pada layar lebih besar */
   .mobile-nav {
     display: none; /* Sembunyikan mobile navigation pada layar besar */
   }
 }
-
 
 /* Styles for mobile navigation */
 .mobile-nav {
@@ -186,8 +187,6 @@ export default {
   padding: 10px 0;
   background-color: #15171c; /* Ubah warna sesuai desain Anda */
 }
-
-
 
 .mobile-nav-item:hover {
   color: #007bff; /* Warna saat hover */
@@ -207,5 +206,4 @@ export default {
   margin-bottom: 4px; /* Jarak antara ikon dan teks */
   font-size: 24px; /* Sesuaikan ukuran ikon */
 }
-
 </style>
