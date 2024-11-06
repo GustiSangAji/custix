@@ -79,6 +79,7 @@ const routes: Array<RouteRecordRaw> = [
             },
             {
                 path: "/informasi-pribadi",
+                name: "informasi-pribadi",
                 component: () => import("@/pages/setting/InformasiPribadi.vue"),
             },
             {
@@ -96,9 +97,11 @@ const routes: Array<RouteRecordRaw> = [
     }, 
     {
         path: "/order",
+        name: "order",
         component: () => import("@/pages/Setting.vue"), // Pastikan ini layout yang benar
          meta: {
             middleware: "auth", // Middleware untuk autentikasi
+            layout: 'setting',
         },
         children: [
             {

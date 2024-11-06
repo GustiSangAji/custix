@@ -1,4 +1,5 @@
 <template>
+  <!-- Navbar -->
   <nav
     class="navbar navbar-expand-lg shadow-sm"
     :class="{ 'sticky-top bg-light': isSticky }"
@@ -8,24 +9,42 @@
       <router-link class="navbar-brand" to="/home">
         <img :src="settings?.logo" alt="Logo" class="logo img-fluid" />
       </router-link>
-      <!-- Navbar Toggler -->
-      <button
-        class="navbar-toggler"
-        type="button"
-        data-bs-toggle="collapse"
-        data-bs-target="#navbarNav"
-        aria-controls="navbarNav"
-        aria-expanded="false"
-        aria-label="Toggle navigation"
-      >
-        <span class="navbar-toggler-icon"></span>
-      </button>
+
+      <!-- Container untuk dua toggler -->
+      <div class="navbar-toggler-container ms-auto d-flex align-items-center">
+        <!-- Toggler Magnifier -->
+        <button
+          class="navbar-toggler"
+          type="button"
+          @click="toggleSearchSidebar"
+        >
+          <i class="ki-duotone ki-magnifier fs-3x">
+            <span class="path1"></span>
+            <span class="path2"></span>
+          </i>
+        </button>
+
+        <!-- Toggler Menu -->
+        <button
+          v-if="!isOnOrderRoute"
+          class="navbar-toggler ms-2"
+          type="button"
+          @click="toggleSidebar"
+        >
+          <i class="ki-duotone ki-menu fs-3x">
+            <span class="path1"></span>
+            <span class="path2"></span>
+            <span class="path3"></span>
+            <span class="path4"></span>
+          </i>
+        </button>
+      </div>
+
       <!-- Navbar Content -->
       <div class="collapse navbar-collapse" id="navbarNav">
-        <!-- Center Search Bar -->
         <form
           ref="searchForm"
-          class="d-flex mx-10 search-bar"
+          class="d-flex mx-auto search-bar"
           @submit.prevent="searchTickets"
         >
           <div class="input-group">
@@ -44,38 +63,13 @@
               id="search-addon"
               @click="searchTickets"
             >
-              <i class="ki-duotone ki-magnifier fs-2">
+            <i class="ki-duotone ki-magnifier fs-2">
                 <span class="path1"></span>
                 <span class="path2"></span>
               </i>
             </span>
           </div>
         </form>
-
-        <!-- Preview Search Results -->
-        <div
-          ref="searchResults"
-          v-if="searchQuery.length > 0"
-          class="search-results"
-        >
-          <ul v-if="tickets.length > 0">
-            <li v-for="ticket in tickets" :key="ticket.id">
-              <router-link
-                :to="{
-                  name: 'ticket-detail',
-                  params: { name: ticket.name.replace(/\s+/g, '-') },
-                }"
-              >
-                <img :src="ticket.image" class="ticket-image" />
-                <div class="ticket-info">
-                  <h6>{{ ticket.name }}</h6>
-                  <p>{{ ticket.place }} - {{ ticket.datetime }}</p>
-                </div>
-              </router-link>
-            </li>
-          </ul>
-          <div v-else class="no-results">Tiket tidak ditemukan</div>
-        </div>
 
         <!-- Right Menu Items -->
         <ul class="navbar-nav ms-auto align-items-center">
@@ -103,6 +97,175 @@
       </div>
     </div>
   </nav>
+
+  <!-- Sidebar Pencarian -->
+<div :class="['sidebar', { 'sidebar-open': isSearchSidebarOpen }]">
+  <div class="sidebar-header">
+    <h5 class="mb-0">Cari Tiket</h5>
+    <button
+      class="close-btn"
+      @click="toggleSearchSidebar"
+      aria-label="Close Search Sidebar"
+    >
+      &times;
+    </button>
+  </div>
+
+  <!-- Form Pencarian -->
+  <form
+    ref="searchForm"
+    class="d-flex mx-auto sidebar-search-bar"
+    @submit.prevent="searchTickets"
+  >
+    <div class="input-group">
+      <input
+        ref="searchInput"
+        type="text"
+        class="form-control"
+        placeholder="Cari di CusTix"
+        v-model="searchQuery"
+        @input="onInput"
+        aria-label="Search"
+        aria-describedby="search-addon"
+      />
+      <span
+        class="input-group-text"
+        id="search-addon"
+        @click="searchTickets"
+      >
+        <i class="ki-duotone ki-magnifier fs-2">
+          <span class="path1"></span>
+          <span class="path2"></span>
+        </i>
+      </span>
+    </div>
+  </form>
+
+  <!-- Preview Hasil Pencarian di Sidebar -->
+  <div v-if="tickets.length > 0" class="search-results">
+    <ul>
+      <li v-for="ticket in tickets" :key="ticket.id">
+        <router-link
+          :to="{
+            name: 'ticket-detail',
+            params: { name: ticket.name.replace(/\s+/g, '-') },
+          }"
+        >
+          <img :src="ticket.image" class="ticket-image" />
+          <div class="ticket-info">
+            <h6>{{ ticket.name }}</h6>
+            <p>{{ ticket.place }} - {{ formatDate(ticket.datetime) }}</p>
+          </div>
+        </router-link>
+      </li>
+    </ul>
+  </div>
+</div>
+
+  
+  <!-- Preview Search Results -->
+  <div ref="searchResults" v-if="tickets.length > 0" class="search-results">
+    <ul>
+      <li v-for="ticket in tickets" :key="ticket.id">
+        <router-link
+          :to="{
+            name: 'ticket-detail',
+            params: { name: ticket.name.replace(/\s+/g, '-') },
+          }"
+        >
+          <img :src="ticket.image" class="ticket-image" />
+          <div class="ticket-info">
+            <h6>{{ ticket.name }}</h6>
+            <p>{{ ticket.place }} - {{ formatDate(ticket.datetime) }}</p>
+          </div>
+        </router-link>
+      </li>
+    </ul>
+  </div>
+
+  <!-- Sidebar Overlay -->
+  <div
+    v-if="isSidebarOpen"
+    class="sidebar-overlay"
+    @click="toggleSidebar"
+  ></div>
+
+  <div :class="['sidebar', { 'sidebar-open': isSidebarOpen }]">
+    <div
+      class="sidebar-header d-flex justify-content-between align-items-start"
+    >
+      <img
+        :src="settings?.logo || '/media/avatars/default.png'"
+        alt="Logo"
+        class="sidebar-logo img-fluid"
+      />
+      <button
+        class="close-btn"
+        @click="toggleSidebar"
+        aria-label="Close Sidebar"
+      >
+        &times;
+      </button>
+    </div>
+
+    <!-- Menyembunyikan user-info jika belum login -->
+    <div
+      v-if="isAuthenticated"
+      class="user-info d-flex align-items-center mb-8"
+    >
+      <div class="symbol symbol-35px me-4">
+        <img
+          alt="Foto"
+          :src="user.photo || '/media/avatars/profz.png'"
+          class="user-avatar"
+        />
+      </div>
+      <h5 class="mb-0">{{ user?.nama || "Guest" }}</h5>
+      <i class="bi bi-patch-check-fill fs-3 text-primary ms-2"></i>
+    </div>
+
+    <ul class="sidebar-menu">
+      <li v-if="isAuthenticated">
+        <router-link
+          class="px-2 my-1 menu-item fw-semibold btn btn-active-light-primary d-flex align-items-center"
+          to="/order"
+        >
+          Tiket Saya
+        </router-link>
+      </li>
+      <li v-if="isAuthenticated">
+        <router-link
+          class="px-2 my-1 menu-item fw-semibold btn btn-active-light-primary d-flex align-items-center"
+          to="/informasi-pribadi"
+        >
+          Informasi Pribadi
+        </router-link>
+      </li>
+      <li v-if="!isAuthenticated">
+        <p class="fw-bold fs-4 mb-6">Masuk ke akunmu</p>
+        <div class="d-flex justify-content-between">
+          <router-link
+            to="/sign-in"
+            class="btn btn-bg-secondary btn-color-white btn-light-dark me-2 w-100 fw-bold"
+          >
+            Masuk
+          </router-link>
+          <router-link to="/sign-up" class="btn btn-danger fw-bold w-100">
+            Daftar
+          </router-link>
+        </div>
+      </li>
+      <li v-if="isAuthenticated">
+        <router-link
+          to="/home"
+          @click="logout"
+          class="px-2 my-1 menu-item fw-semibold btn btn-active-light-primary d-flex align-items-center"
+        >
+          Sign Out
+        </router-link>
+      </li>
+    </ul>
+  </div>
 </template>
 
 <script>
@@ -110,24 +273,43 @@ import { ref, computed, onMounted, onBeforeUnmount } from "vue";
 import { useAuthStore } from "@/stores/auth";
 import axios from "axios";
 import UserDropdown from "@/components/dropdown/UserDropdown.vue";
+import { useRoute } from "vue-router";
 
 export default {
   name: "Navbar",
   components: {
     UserDropdown,
   },
+  methods: {
+    formatDate(date) {
+      const options = { year: "numeric", month: "long", day: "numeric" };
+      return new Date(date).toLocaleDateString("id-ID", options);
+    },
+    formatShortDate(dateString) {
+      const options = {
+        weekday: "short",
+        year: "numeric",
+        month: "short",
+        day: "numeric",
+      };
+      return new Date(dateString).toLocaleDateString("id-ID", options);
+    },
+  },
   setup() {
     const authStore = useAuthStore();
     const searchQuery = ref("");
-    let tickets = ref([]);
-    const isAuthenticated = computed(() => authStore.isAuthenticated);
-    const isSticky = ref(false);
-
+    const tickets = ref([]);
     const searchResults = ref(null);
     const searchForm = ref(null);
+    const isAuthenticated = computed(() => authStore.isAuthenticated);
+    const user = computed(() => authStore.user);
+    const isSticky = ref(false);
+    const route = useRoute();
+    const isSidebarOpen = ref(false);
+    const isSearchSidebarOpen = ref(false);
 
-    const handleScroll = () => {
-      isSticky.value = window.scrollY > 0;
+    const logout = () => {
+      authStore.logout();
     };
 
     const onInput = async () => {
@@ -152,6 +334,11 @@ export default {
       }
     };
 
+    const handleScroll = () => {
+      isSticky.value = window.scrollY > 0;
+    };
+
+    // Function to hide search results when clicking outside
     const handleClickOutside = (event) => {
       if (
         searchResults.value &&
@@ -163,49 +350,62 @@ export default {
       }
     };
 
-    const settings = ref(null);
+    const toggleSidebar = () => {
+      isSidebarOpen.value = !isSidebarOpen.value;
+    };
 
+    const toggleSearchSidebar = () => {
+      isSearchSidebarOpen.value = !isSearchSidebarOpen.value;
+      if (isSearchSidebarOpen.value) {
+        isSidebarOpen.value = false;
+      }
+    };
+
+    const settings = ref(null);
     const fetchSettings = async () => {
       try {
         const response = await axios.get("/setting");
         settings.value = response.data;
       } catch (error) {
-        console.error(
-          "Error fetching settings:",
-          error.response ? error.response.data : error.message
-        );
+        console.error("Error fetching settings:", error);
       }
     };
 
-    // Add event listener on mounted
     onMounted(() => {
       window.addEventListener("scroll", handleScroll);
-      document.addEventListener("click", handleClickOutside);
-      fetchSettings(); // Call the fetchSettings function on mount
+      document.addEventListener("click", handleClickOutside); // Add click listener
+      fetchSettings();
     });
 
-    // Remove event listener before component unmounts
     onBeforeUnmount(() => {
       window.removeEventListener("scroll", handleScroll);
-      document.removeEventListener("click", handleClickOutside);
+      document.removeEventListener("click", handleClickOutside); // Remove click listener
     });
 
     return {
       isAuthenticated,
+      user,
       isSticky,
       searchQuery,
+      settings,
+      isSidebarOpen,
+      toggleSidebar,
+      logout,
+      isSearchSidebarOpen,
+      toggleSearchSidebar,
       tickets,
       onInput,
       searchTickets,
       searchResults,
       searchForm,
-      settings,
     };
   },
 };
 </script>
 
+
 <style scoped>
+/* Basic Navbar Styling */
 .navbar {
   transition: background-color 0.1s ease, box-shadow 0.1s ease;
 }
@@ -213,30 +413,134 @@ export default {
   box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
 }
 .logo {
-  width: 100px;
+  width: 100px; /* Navbar logo size */
   height: 40px;
   object-fit: cover;
   transition: transform 0.3s ease;
 }
+
+/* Navbar Toggler Container */
+.navbar-toggler-container {
+  display: flex;
+  align-items: center;
+}
+
+/* Navbar Toggler Styling */
+.navbar-toggler {
+  border: none;
+  background: none;
+}
+
+.navbar-toggler i {
+  font-size: 1.5rem;
+}
+
+.sidebar-logo {
+  width: 80px; /* Sidebar logo size */
+  height: auto; /* Maintain aspect ratio */
+  margin-top: -30px;
+}
+
 .logo:hover {
   transform: scale(1.05);
 }
+
+/* Search Bar */
 .search-bar {
-  width: 50%;
+  width: auto; /* Menyesuaikan lebar agar lebih rapat ke logo */
+  margin-left: 0; /* Menghilangkan margin kiri jika ada */
+  margin-right: 20px; /* Memberikan sedikit ruang di sebelah kanan */
   transition: width 0.3s ease;
+  flex-grow: 1; /* Memberikan search bar lebih banyak ruang */
+  max-width: 700px;
 }
-.search-bar:hover {
-  width: 55%;
+
+/* Khusus untuk search bar di sidebar */
+.sidebar-search-bar .input-group {
+  width: 90%; /* Lebar khusus untuk search bar di sidebar */
+  margin-left: 0; /* Pastikan berada di kiri */
 }
-.search-results {
+
+@media (min-width: 992px) and (max-width: 1192px) {
+  .search-bar {
+    max-width: 500px; /* Atur lebar maksimum untuk rentang ukuran layar ini */
+    width: 100%; /* Membuat lebar search bar fleksibel */
+  }
+}
+
+@media (max-width: 768px) {
+  .search-bar {
+    width: 100%; /* Membuat lebar penuh untuk tampilan mobile */
+    margin-right: 10px; /* Mengurangi margin kanan pada tampilan kecil */
+  }
+}
+
+/* Sidebar Overlay */
+.sidebar-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100vw; /* Menggunakan 100vw untuk memastikan lebar penuh */
+  height: 100vh; /* Menggunakan 100vh untuk memastikan tinggi penuh */
+  background: rgba(0, 0, 0, 0.5);
+  z-index: 1040;
+}
+
+/* Sidebar Styles */
+.sidebar {
+  position: fixed;
+  top: 0;
+  right: 0;
+  height: 100vh; /* Pastikan sidebar memiliki tinggi penuh */
+  width: 250px;
+  background-color: #111;
+  color: #fff;
+  z-index: 1050;
+  padding: 20px;
+  transform: translateX(100%); /* Default: hidden off-screen */
+  transition: transform 0.3s ease;
+}
+
+.sidebar-open {
+  transform: translateX(0); /* Show sidebar */
+}
+
+.sidebar-header {
+  display: flex;
+  justify-content: space-between; /* Align items at the start and end */
+  align-items: center; /* Vertically center items */
+  width: 100%; /* Make sure the header takes full width */
+  margin-bottom: 20px;
+}
+
+.user-avatar {
+  border-radius: 50%;
+}
+
+.sidebar-menu {
+  list-style: none;
+  padding: 0;
+}
+
+.sidebar-menu li {
+  margin: 15px 0;
+}
+
+.sidebar-menu li a {
+  color: #fff;
+  text-decoration: none;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 24px;
   position: absolute;
-  background-color: #0f1014;
-  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 50%;
-  max-height: 300px;
-  overflow-y: auto;
-  z-index: 1000;
+  top: 10px;
+  right: 20px;
 }
+
 .ticket-image {
   width: 50px;
   height: 50px;
@@ -249,20 +553,29 @@ export default {
 }
 
 .search-results {
-  position: absolute;
+  position: fixed; /* Mengunci posisi pada layar */
   background-color: #0f1014;
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
-  width: 100%; /* Responsif: Menyesuaikan lebar penuh */
-  max-width: 500px; /* Membatasi ukuran maksimal */
+  width: 100%; /* Lebar penuh agar responsif */
+  max-width: 450px; /* Batas lebar maksimal */
   max-height: 400px;
   overflow-y: auto;
   z-index: 1000;
   border-radius: 8px;
   padding: 10px;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
+  top: 8%; /* Sesuaikan agar berada di bawah search bar */
+  left: 40%;
+  transform: translateX(-62%); /* Menengahkan secara horizontal */
 }
+
+@media (min-width: 900px) and (max-width: 1194px) {
+  .search-results {
+    left: 50%; /* Menempatkan search results di tengah-tengah */
+    transform: translateX(-50%); /* Menengahkan secara horizontal */
+    max-width: 600px; /* Menyesuaikan lebar preview */
+  }
+}
+
 
 .search-results ul {
   list-style: none;
@@ -281,7 +594,7 @@ export default {
 .search-results li:hover {
   background-color: #333;
 }
-
+/* Styling untuk gambar tiket */
 .ticket-image {
   width: 70px;
   height: 70px;
@@ -306,42 +619,5 @@ export default {
   margin: 0;
   font-size: 0.85rem;
   color: #d1d1d1;
-}
-
-/* Responsif untuk layar kecil */
-@media (max-width: 576px) {
-  .search-results {
-    max-width: 100%; /* Lebar penuh pada layar kecil */
-    left: 0;
-    transform: none;
-  }
-
-  .ticket-image {
-    width: 60px;
-    height: 60px;
-  }
-
-  .ticket-info h6 {
-    font-size: 0.9rem;
-  }
-
-  .ticket-info p {
-    font-size: 0.8rem;
-  }
-}
-
-/* Responsif untuk layar besar */
-@media (min-width: 992px) {
-  .search-results {
-    max-width: 600px; /* Ukuran maksimal lebih besar di layar lebar */
-  }
-
-  .ticket-info h6 {
-    font-size: 1.1rem;
-  }
-
-  .ticket-info p {
-    font-size: 0.9rem;
-  }
 }
 </style>
