@@ -172,7 +172,7 @@ export default defineComponent({
                 <div
                   class="image-input image-input-outline"
                   data-kt-image-input="true"
-                  :style="{ backgroundImage: `url(${profileDetails.photo})` }"
+                  :style="{ backgroundImage: `url(${profileDetails.photo}) ||  '/media/avatars/profz.png'})` }"
                 >
                   <!--begin::Preview existing avatar-->
                   <div

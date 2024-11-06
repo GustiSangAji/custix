@@ -282,13 +282,6 @@ export default {
   background-color: #333;
 }
 
-.no-results {
-  color: #d1d1d1;
-  text-align: center;
-  padding: 20px;
-  font-size: 1rem;
-}
-
 .ticket-image {
   width: 70px;
   height: 70px;
@@ -315,9 +308,10 @@ export default {
   color: #d1d1d1;
 }
 
+/* Responsif untuk layar kecil */
 @media (max-width: 576px) {
   .search-results {
-    max-width: 100%;
+    max-width: 100%; /* Lebar penuh pada layar kecil */
     left: 0;
     transform: none;
   }
@@ -336,9 +330,10 @@ export default {
   }
 }
 
+/* Responsif untuk layar besar */
 @media (min-width: 992px) {
   .search-results {
-    max-width: 600px;
+    max-width: 600px; /* Ukuran maksimal lebih besar di layar lebar */
   }
 
   .ticket-info h6 {

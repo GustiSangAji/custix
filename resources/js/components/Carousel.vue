@@ -1,23 +1,45 @@
 <template>
-  <div id="kt_carousel_3_carousel" class="carousel carousel-custom slide" data-bs-ride="carousel" data-bs-interval="4000">
+  <div
+    id="kt_carousel_3_carousel"
+    class="carousel carousel-custom slide"
+    data-bs-ride="carousel"
+    data-bs-interval="4000"
+  >
     <div class="d-flex align-items-center justify-content-between flex-wrap">
-      <ol class="p-0 m-0 carousel-indicators carousel-indicators-bullet carousel-indicators-active-primary">
-        <li v-for="(item, index) in carouselItems" :key="item.id" :data-bs-target="'#kt_carousel_3_carousel'" :data-bs-slide-to="index" :class="{'active': index === 0}" class="ms-1"></li>
+      <ol
+        class="p-0 m-0 carousel-indicators carousel-indicators-bullet carousel-indicators-active-primary"
+      >
+        <li
+          v-for="(item, index) in carouselItems"
+          :key="item.id"
+          :data-bs-target="'#kt_carousel_3_carousel'"
+          :data-bs-slide-to="index"
+          :class="{ active: index === 0 }"
+          class="ms-1"
+        ></li>
       </ol>
     </div>
 
     <div class="carousel-inner rounded shadow-sm">
-      <div v-for="(item, index) in carouselItems" :key="item.id" :class="['carousel-item', { active: index === 0 }]">
-        <img :src="item.image" class="d-block w-100 img-fluid" :alt="item.alt">
+      <div
+        v-for="(item, index) in carouselItems"
+        :key="item.id"
+        :class="['carousel-item', { active: index === 0 }]"
+      >
+        <img
+          :src="item.image"
+          class="d-block w-100 img-fluid"
+          :alt="item.alt"
+        />
       </div>
     </div>
   </div>
 </template>
 
 <script>
-import { nextTick, onMounted, ref } from 'vue';
+import { nextTick, onMounted, ref } from "vue";
 import { initializeComponents } from "@/core/plugins/keenthemes";
-import axios from 'axios';
+import axios from "axios";
 
 export default {
   name: "Carousel",
@@ -26,15 +48,22 @@ export default {
 
     const fetchCarouselItems = async () => {
       try {
-        const response = await axios.get('/setting'); // Mengambil data dari endpoint Laravel
+        const response = await axios.get("/setting"); // Mengambil data dari endpoint Laravel
         const setting = response.data;
 
         // Menambahkan gambar carousel ke dalam array
         carouselItems.value = [
-          { id: 1, image: setting.carousel1, alt: 'Gambar Carousel 1' },
-          { id: 2, image: setting.carousel2, alt: 'Gambar Carousel 2' },
-          { id: 3, image: setting.carousel3, alt: 'Gambar Carousel 3' },
-        ].filter(item => item.image); // Filter hanya gambar yang ada
+          { id: 1, image: setting.carousel1, alt: "Gambar Carousel 1" },
+          { id: 2, image: setting.carousel2, alt: "Gambar Carousel 2" },
+          { id: 3, image: setting.carousel3, alt: "Gambar Carousel 3" },
+          { id: 4, image: setting.carousel1, alt: "Gambar Carousel 4" },
+          { id: 5, image: setting.carousel2, alt: "Gambar Carousel 5" },
+          { id: 6, image: setting.carousel3, alt: "Gambar Carousel 6" },
+          { id: 7, image: setting.carousel1, alt: "Gambar Carousel 7" },
+          { id: 8, image: setting.carousel2, alt: "Gambar Carousel 8" },
+          { id: 9, image: setting.carousel3, alt: "Gambar Carousel 9" },
+          { id: 10, image: setting.carousel1, alt: "Gambar Carousel 10" },
+        ].filter((item) => item.image); // Filter hanya gambar yang ada
       } catch (error) {
         console.error("Error fetching carousel items:", error);
       }
@@ -49,9 +78,9 @@ export default {
     });
 
     return {
-      carouselItems
+      carouselItems,
     };
-  }
+  },
 };
 </script>
 

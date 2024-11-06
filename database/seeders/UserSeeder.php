@@ -23,7 +23,7 @@ class UserSeeder extends Seeder
         User::create([
             'uuid' => Str::uuid(),
             'nama' => 'Admin',
-            'photo' => '/media/avatar/profz.png',
+            'photo' => '/media/avatars/profz.png',
             'email' => 'admin@gmail.com',
             'password' => bcrypt('12345678'),
             'phone' => '08123456789',
@@ -34,7 +34,7 @@ class UserSeeder extends Seeder
         User::create([
             'uuid' => Str::uuid(),
             'nama' => 'User',
-            'photo' => '/media/avatar/profz.png',
+            'photo' => '/media/avatars/profz.png',
             'email' => 'user@gmail.com',
             'password' => bcrypt('12345678'),
             'phone' => '081212121212',
@@ -45,7 +45,7 @@ class UserSeeder extends Seeder
         User::create([
             'uuid' => Str::uuid(),
             'nama' => 'Gilarism',
-            'photo' => '/media/avatar/profz.png',
+            'photo' => '/media/avatars/profz.png',
             'email' => 'gilarism@gmail.com',
             'password' => bcrypt('12345678'),
             'phone' => '08121276212',
@@ -56,7 +56,7 @@ class UserSeeder extends Seeder
         User::create([
             'uuid' => Str::uuid(),
             'nama' => 'Kairos',
-            'photo' => '/media/avatar/profz.png',
+            'photo' => '/media/avatars/profz.png',
             'email' => 'kairo@gmail.com',
             'password' => bcrypt('12345678'),
             'phone' => '08249696969',
@@ -67,26 +67,12 @@ class UserSeeder extends Seeder
         User::create([
             'uuid' => Str::uuid(),
             'nama' => 'Gusti Sang Aji',
-            'photo' => '/media/avatar/profz.png',
+            'photo' => '/media/avatars/profz.png',
             'email' => 'gusti@gmail.com',
             'password' => bcrypt('12345678'),
             'phone' => '666',
             'email_verified_at' => now(),
             'confirmed' => true,
-            ])->assignRole('user');
-            
-            // Tambahkan pengguna tambahan menggunakan UserFactory
-            for ($i = 0; $i < 50; $i++) {
-                User::create([
-                    'uuid' => Str::uuid(),
-                    'nama' => $faker->name,
-                    'photo' => '/avatar/profz.png',
-                    'email' => $faker->unique()->safeEmail,
-                    'password' => bcrypt('password'), // password default
-                    'phone' => $faker->unique()->phoneNumber,
-                'email_verified_at' => now(),
-                'confirmed' => $faker->boolean,
-            ])->assignRole('user');
-        }
-}
+        ])->assignRole('user');
+    }
 }

@@ -6,7 +6,7 @@
         <!-- Profile Section -->
         <div class="card-title m-0">
           <div class="symbol symbol-40px me-4">
-            <img alt="Foto profil" :src="user.photo" />
+            <img alt="Foto profil" :src="user.photo || '/media/avatars/profz.png'" />
           </div>
           <h2 class="mb-0 fw-bold">
             {{ user.nama }}

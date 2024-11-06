@@ -90,7 +90,7 @@ export default {
     verifyTicket() {
       this.loading = true;
       axios
-        .post("http://192.168.1.8:8000/api/verify-ticket", {
+        .post("http://192.168.2.140:8000/api/verify-ticket", {
           order_id: this.order_id,
           unique_id: this.selectedQrCode.uniqueId,
           ticket_number: this.selectedQrCode.ticketNumber,
