@@ -1,5 +1,5 @@
 <template>
-  <div class="search-results">
+  <div class="search-results" ref="searchResults">
     <ul>
       <li v-for="ticket in tickets" :key="ticket.id">
         <router-link

@@ -43,41 +43,46 @@
       <!-- Navbar Content -->
       <div class="collapse navbar-collapse" id="navbarNav">
         <div class="search-wrapper">
-    <form
-      ref="searchForm"
-      class="d-flex mx-auto search-bar"
-      @submit.prevent="searchTickets"
-    >
-      <div class="input-group">
-        <input
-          ref="searchInput"
-          type="text"
-          class="form-control"
-          placeholder="Cari di CusTix"
-          v-model="searchQuery"
-          @input="onInput"
-          aria-label="Search"
-          aria-describedby="search-addon"
-        />
-        <span
-          class="input-group-text"
-          id="search-addon"
-          @click="searchTickets"
-        >
-          <i class="ki-duotone ki-magnifier fs-2">
-            <span class="path1"></span>
-            <span class="path2"></span>
-          </i>
-        </span>
-      </div>
-    </form>
+          <form
+            ref="searchForm"
+            class="d-flex mx-auto search-bar"
+            @submit.prevent="searchTickets"
+          >
+            <div class="input-group">
+              <input
+                ref="searchInput"
+                type="text"
+                class="form-control"
+                placeholder="Cari di CusTix"
+                v-model="searchQuery"
+                @input="onInput"
+                aria-label="Search"
+                aria-describedby="search-addon"
+              />
+              <span
+                class="input-group-text"
+                id="search-addon"
+                @click="searchTickets"
+              >
+                <i class="ki-duotone ki-magnifier fs-2">
+                  <span class="path1"></span>
+                  <span class="path2"></span>
+                </i>
+              </span>
+            </div>
+          </form>
 
-    <!-- Preview Search Results for Navbar -->
-    <SearchResults
-      v-if="tickets.length > 0 && !isSearchSidebarOpen"
-      :tickets="tickets"
-    />
-  </div>
+          <!-- Preview Search Results for Navbar -->
+          <SearchResults
+            v-if="
+              searchQuery.length > 0 &&
+              tickets.length > 0 &&
+              !isSearchSidebarOpen
+            "
+            :tickets="tickets"
+            ref="searchResults"
+          />
+        </div>
 
         <!-- Right Menu Items -->
         <ul class="navbar-nav ms-auto align-items-center">
@@ -108,7 +113,11 @@
   <!-- Sidebar Pencarian -->
   <div :class="['sidebar', { 'sidebar-open': isSearchSidebarOpen }]">
     <div class="sidebar-header">
-      <h5 class="mb-0">Cari Tiket</h5>
+      <img
+        :src="settings?.logo || '/media/avatars/default.png'"
+        alt="Logo"
+        class="sidebar-logo img-fluid"
+      />
       <button
         class="close-btn"
         @click="toggleSearchSidebar"
@@ -146,10 +155,17 @@
 
     <!-- Preview Search Results for Sidebar -->
     <SidebarSearchResults
-      v-if="tickets.length > 0 && isSearchSidebarOpen"
+      v-if="searchQuery.length > 0 && tickets.length > 0 && isSearchSidebarOpen"
       :tickets="tickets"
     />
   </div>
+
+  <!-- Sidebar Overlay -->
+  <div
+    v-if="isSearchSidebarOpen"
+    class="sidebar-overlay"
+    @click="toggleSearchSidebar"
+  ></div>
 
   <!-- Sidebar Overlay -->
   <div
@@ -333,10 +349,10 @@ export default {
     // Function to hide search results when clicking outside
     const handleClickOutside = (event) => {
       if (
-        searchResults.value &&
         searchForm.value &&
-        !searchResults.value.contains(event.target) &&
-        !searchForm.value.contains(event.target)
+        !searchForm.value.contains(event.target) &&
+        searchResults.value?.$el && // Make sure searchResults is a Vue component and use $el to access its DOM
+        !searchResults.value.$el.contains(event.target)
       ) {
         tickets.value = [];
       }
@@ -411,7 +427,6 @@ export default {
   transition: transform 0.3s ease;
 }
 
-
 /* Navbar Toggler Container */
 .navbar-toggler-container {
   display: flex;
@@ -469,6 +484,8 @@ export default {
 /* Khusus untuk search bar di sidebar */
 .sidebar-search-bar .input-group {
   width: 100%; /* Lebar penuh untuk search bar di sidebar */
+  margin-bottom: 10px;
+
   margin-left: 0; /* Pastikan berada di kiri */
 }
 
@@ -481,8 +498,8 @@ export default {
   .search-wrapper {
     max-width: 600px; /* Sesuaikan lebar wrapper pada layar besar */
   }
-   /* Menjaga tombol 'Tiket Saya' tidak wrap */
-   .navbar-nav .nav-link {
+  /* Menjaga tombol 'Tiket Saya' tidak wrap */
+  .navbar-nav .nav-link {
     white-space: nowrap; /* Mencegah teks wrap */
     overflow: hidden; /* Sembunyikan teks yang meluber */
     text-overflow: ellipsis; /* Menambahkan elipsis jika teks terlalu panjang */
@@ -496,7 +513,6 @@ export default {
     margin-right: 10px; /* Mengurangi margin kanan pada tampilan kecil */
   }
 }
-
 
 /* Sidebar Overlay */
 .sidebar-overlay {
@@ -515,13 +531,20 @@ export default {
   top: 0;
   right: 0;
   height: 100vh; /* Pastikan sidebar memiliki tinggi penuh */
-  width: 250px;
+  width: 400px;
   background-color: #111;
   color: #fff;
   z-index: 1050;
   padding: 20px;
   transform: translateX(100%); /* Default: hidden off-screen */
   transition: transform 0.3s ease;
+}
+
+/* Atur sidebar untuk layar 400px ke bawah */
+@media (max-width: 400px) {
+  .sidebar {
+    width: 100%; /* Lebar penuh pada layar kecil */
+  }
 }
 
 .sidebar-open {
