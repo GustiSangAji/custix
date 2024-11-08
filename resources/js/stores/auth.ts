@@ -6,7 +6,7 @@ import JwtService from "@/core/services/JwtService";
 export interface User {
     id: number;
     uuid: string;
-    name: string;
+    nama: string;
     email: string;
     phone: string;
     photo?: string;

@@ -5,27 +5,23 @@
         <div class="col">
           <h2>Daftar <strong>Tiket</strong></h2>
         </div>
+        <div class="col text-end">
+          <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#kt_modal_1">
+            Pilih Tanggal
+          </button>
+        </div>
       </div>
 
+      
       <div class="row mb-4">
-        <!-- Menampilkan produk yang sudah dimuat -->
         <transition-group name="fade" tag="div" class="row mb-4">
-          <div
-            class="col-md-4 mt-4"
-            v-for="product in products"
-            :key="product.id"
-          >
+          <div class="col-md-4 mt-4" v-for="product in products" :key="product.id">
             <TicketProduct :product="product" />
           </div>
         </transition-group>
 
-        <!-- Menampilkan skeleton jika loading -->
         <div v-if="loading" class="row mb-4">
-          <div
-            v-for="n in skeletonCount"
-            :key="`skeleton-${n}`"
-            class="col-md-4 mt-4"
-          >
+          <div v-for="n in skeletonCount" :key="`skeleton-${n}`" class="col-md-4 mt-4">
             <div class="skeleton-item"></div>
           </div>
           <div class="text-center spinner-container">
@@ -39,6 +35,34 @@
       <div v-if="!loading && products.length === 0" class="text-center mt-5">
         <p>Tidak ada tiket yang tersedia saat ini.</p>
       </div>
+
+      <!-- Modal -->
+      <div class="modal fade" tabindex="-1" id="kt_modal_1" ref="ktModal">
+        <div class="modal-dialog">
+          <div class="modal-content">
+            <div class="modal-header">
+              <h3 class="modal-title">Pilih Tanggal</h3>
+              <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+              <div class="d-flex justify-content-between mb-3">
+                <button type="button" class="btn btn-success" @click="setToday">Hari Ini</button>
+                <button type="button" class="btn btn-success" @click="setTomorrow">Besok</button>
+                <button type="button" class="btn btn-secondary" @click="showCustomDate = !showCustomDate">Lainnya</button>
+              </div>
+
+              <div v-if="showCustomDate">
+                <datepicker v-model="selectedDate" format="yyyy-MM-dd"></datepicker>
+                <button type="button" class="btn btn-primary mt-2" @click="setCustomDate">Pilih Tanggal</button>
+              </div>
+            </div>
+            <div class="modal-footer">
+              <button type="button" class="btn btn-light" @click="resetDate">Reset</button>
+              <button type="button" class="btn btn-primary" @click="submitDate">Simpan perubahan</button>
+            </div>
+          </div>
+        </div>
+      </div>
     </div>
   </LayoutLanding>
 </template>
@@ -47,12 +71,14 @@
 import TicketProduct from "@/components/TicketProduct.vue";
 import axios from "axios";
 import LayoutLanding from "../layouts/LayoutLanding.vue";
+import Datepicker from 'vue3-datepicker';
 
 export default {
   name: "TicketView",
   components: {
     TicketProduct,
     LayoutLanding,
+    Datepicker
   },
   data() {
     return {
@@ -60,15 +86,19 @@ export default {
       loading: false,
       currentPage: 1,
       totalPages: 1,
-      skeletonCount: 6, // Jumlah skeleton yang ditampilkan
+      skeletonCount: 6,
+      showCustomDate: false,
+      selectedDate: null,
+      formattedDate: '',
+      scheduledTicket: null // Menyimpan tiket yang dijadwalkan
     };
   },
   mounted() {
-    this.fetchTickets(); // Ambil tiket untuk halaman pertama
-    window.addEventListener("scroll", this.handleScroll); // Tambahkan event listener untuk scroll
+    this.fetchTickets();
+    window.addEventListener("scroll", this.handleScroll);
   },
   beforeDestroy() {
-    window.removeEventListener("scroll", this.handleScroll); // Hapus event listener saat komponen dihapus
+    window.removeEventListener("scroll", this.handleScroll);
   },
   methods: {
     fetchTickets(page = this.currentPage) {
@@ -76,22 +106,19 @@ export default {
       axios
         .get(`tickets?page=${page}`)
         .then((response) => {
-          // Menunggu 1 detik sebelum menambahkan produk
           setTimeout(() => {
-            // Tambahkan produk baru ke daftar produk
             this.products = [...this.products, ...response.data.data];
             this.totalPages = response.data.last_page;
             this.currentPage = page;
-          }, 1000); // Jeda 1 detik
+          }, 1000);
         })
         .catch((error) => {
           console.error("Error fetching tickets:", error);
         })
         .finally(() => {
-          // Ubah status loading setelah 1 detik
           setTimeout(() => {
             this.loading = false;
-          }, 1000); // Jeda 1 detik
+          }, 1000);
         });
     },
     handleScroll() {
@@ -99,7 +126,6 @@ export default {
       const windowHeight = window.innerHeight;
       const documentHeight = document.documentElement.scrollHeight;
 
-      // Menentukan apakah scroll mencapai bagian bawah
       if (
         scrollTop + windowHeight >= documentHeight - 5 &&
         !this.loading &&
@@ -109,55 +135,48 @@ export default {
         this.fetchTickets(this.currentPage);
       }
     },
-  },
+    setToday() {
+      const today = new Date();
+      this.selectedDate = today;
+      console.log('Tanggal yang dipilih: Hari Ini -', today.toLocaleDateString());
+    },
+    setTomorrow() {
+      const tomorrow = new Date();
+      tomorrow.setDate(tomorrow.getDate() + 1);
+      this.selectedDate = tomorrow;
+      console.log('Tanggal yang dipilih: Besok -', tomorrow.toLocaleDateString());
+    },
+    setCustomDate() {
+      if (this.selectedDate) {
+        console.log('Tanggal yang dipilih: Khusus -', this.selectedDate.toLocaleDateString());
+        this.showCustomDate = false;
+      }
+    },
+    submitDate() {
+  if (this.selectedDate) {
+    // Mengonversi tanggal yang dipilih ke format 'YYYY-MM-DD'
+    const formattedDate = this.selectedDate.toISOString().slice(0, 10); // Format yang hanya mengambil bagian tanggal (YYYY-MM-DD)
+    console.log('Tanggal yang dikirimkan:', formattedDate);
+
+    // Kirimkan tanggal yang sudah diformat ke backend dengan prefiks `/api/`
+    axios.get('/tickets-by-date', { params: { date: formattedDate } })
+      .then(response => {
+        console.log('Data tiket:', response.data);
+        this.scheduledTicket = response.data.data[0] || null;  // Ambil tiket pertama sebagai tiket yang dijadwalkan
+        this.products = response.data.data; // Mengisi produk tiket yang sesuai
+      })
+      .catch(error => {
+        console.error('Error mengambil tiket:', error);
+      });
+  } else {
+    alert("Pilih tanggal terlebih dahulu.");
+  }
+},
+
+    resetDate() {
+      this.selectedDate = null;
+      this.showCustomDate = false;
+    }
+  }
 };
 </script>
-
-<style>
-.skeleton-item {
-  height: 200px;
-  background-color: #e0e0e0;
-  border-radius: 4px;
-  margin-bottom: 10px;
-  animation: pulse 1.5s infinite; /* Animasi skeleton */
-}
-
-.spinner-container {
-  display: flex;
-  justify-content: center;
-  margin: 20px 0; /* Sesuaikan margin untuk memisahkan spinner dari skeleton */
-}
-
-/* Animasi Pulse untuk Skeleton */
-@keyframes pulse {
-  0% {
-    opacity: 0.7;
-  }
-  50% {
-    opacity: 1;
-  }
-  100% {
-    opacity: 0.7;
-  }
-}
-
-/* Animasi Fade */
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.5s;
-}
-.fade-enter, .fade-leave-to /* .fade-leave-active di versi <2.1.8 */ {
-  opacity: 0;
-}
-
-/* Tambahkan gaya untuk transisi produk */
-.fade-enter {
-  transform: translateY(20px);
-  opacity: 0;
-}
-.fade-enter-active {
-  transform: translateY(0);
-  opacity: 1;
-  transition: transform 0.5s, opacity 0.5s; /* Transisi transform dan opacity */
-}
-</style>

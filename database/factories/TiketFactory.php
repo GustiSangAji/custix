@@ -35,15 +35,37 @@ class TiketFactory extends Factory
         $image = 'images/' . $this->faker->randomElement($images);
         $banner = 'banners/' . $this->faker->randomElement($banners);
 
-        // Menghasilkan nama event dan menghapus titik (.)
-        $name = $this->faker->sentence(3);
-        $name = str_replace('.', '', $name); // Menghapus titik
+        // Array nama festival di Indonesia
+        $festivalNames = [
+            'Synchronize Fest', 'We The Fest', 'Java Jazz Festival', 'Jakarta International BNI Java Jazz Festival',
+            'Candi Jazz Festival', 'Djakarta Warehouse Project', 'Sundown Festival', 'Prambanan Jazz Festival',
+            'Hellofest', 'Festival Musik Indonesia', 'Pahawang Music Festival', 'Indo Jam Music Festival'
+        ];
+
+        // Ambil secara acak nama festival dari array
+        $name = $this->faker->randomElement($festivalNames);
+
+        // Array nama kota dan venue
+        $cities = [
+            'Jakarta', 'Bandung', 'Bali', 'Yogyakarta', 'Surabaya', 
+            'Medan', 'Semarang', 'Makassar', 'Malang', 'Batam'
+        ];
+
+        $venues = [
+            'Gelora Bung Karno', 'Ancol Beach', 'Lapangan D Senayan', 'Trans Studio Bandung',
+            'Taman Ismail Marzuki', 'Bali International Convention Centre', 'Kota Tua Jakarta',
+            'Prambanan Temple', 'Lapangan Golf Cengkareng', 'Kebun Raya Bogor'
+        ];
+
+        // Menghasilkan lokasi secara acak
+        $location = $this->faker->randomElement($cities);
+        $venue = $this->faker->randomElement($venues);
 
         return [
             'uuid' => Str::uuid(),
             'kode_tiket' => strtoupper(Str::random(10)),
-            'name' => $name, // Nama event tanpa titik
-            'place' => $this->faker->city, // Lokasi event
+            'name' => $name, // Nama festival
+            'place' => $location . ' - ' . $venue, // Lokasi acara
             'datetime' => $this->faker->dateTimeBetween('now', '+1 year'), // Tanggal event
             'status' => $this->faker->randomElement(['available']), // Status tiket
             'quantity' => $this->faker->numberBetween(50, 500), // Stok tiket
@@ -54,5 +76,4 @@ class TiketFactory extends Factory
             'expiry_date' => $this->faker->dateTimeBetween('+1 week', '+2 years'), // Masa berlaku tiket
         ];
     }
-
 }

@@ -4,8 +4,12 @@ namespace App\Http\Controllers\Api;
 
 use App\Http\Controllers\Controller;
 use App\Models\Tiket;
+use App\Models\Tanggal;
+use Carbon\Carbon;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Validator; 
+use Illuminate\Support\Facades\Log;
 
 class TicketController extends Controller
 {
@@ -82,5 +86,26 @@ class TicketController extends Controller
 
         return response()->json($tickets);
     }
+
+    public function getTicketsByDate(Request $request)
+{
+    // Validasi parameter tanggal yang diterima
+    $validated = $request->validate([
+        'date' => 'required|date_format:Y-m-d',
+    ]);
+
+    // Mengambil tiket yang dijadwalkan pada tanggal tertentu
+    $date = Carbon::parse($request->input('date'))->format('Y-m-d'); // Format tanggal yang diterima
+    $tickets = Tiket::whereDate('datetime', $date)->get([ 
+        'id', 'kode_tiket', 'name', 'place', 'datetime', 'quantity', 'price', 'description', 'banner', 'image', 'status'
+    ]);
+
+    // Jika tidak ada tiket pada tanggal tersebut
+    if ($tickets->isEmpty()) {
+        return response()->json(['message' => 'Tidak ada tiket untuk tanggal ini'], 404);
+    }
+
+    return response()->json(['data' => $tickets]);
 }
 
+}

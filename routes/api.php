@@ -10,6 +10,7 @@ use App\Http\Controllers\RoleController;
 use App\Http\Controllers\SettingController;
 use App\Http\Controllers\TiketController;
 use App\Http\Controllers\DashboardController;
+use App\Http\Controllers\ProfileController;
 use App\Http\Controllers\Api\TicketWaitingRoomController;
 use Illuminate\Support\Facades\Route;
 
@@ -34,6 +35,10 @@ Route::middleware(['json'])->prefix('auth')->group(function () {
     Route::get('me', [AuthController::class, 'me']);
 });
 
+Route::middleware(['auth'])->group(function () {
+    Route::post('/profile/update', [ProfileController::class, 'updateProfile']);
+    Route::get('/profile', [ProfileController::class, 'getProfile']);
+});
 // routes/api.php
 
 
@@ -100,6 +105,7 @@ Route::get('/tickets/limited', [TicketController::class, 'limited']); // Untuk t
 Route::get('/tickets/{id}', [TicketController::class, 'show']); // Untuk detail tiket
 Route::post('/tickets/search', [TicketController::class, 'search']);
 Route::get('/tickets/name/{name}', [TicketController::class, 'showByName']);
+Route::get('/tickets-by-date', [TicketController::class, 'getTicketsByDate']);
 
 
 // Laporan Routes
