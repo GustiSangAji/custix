@@ -12,7 +12,10 @@
         </div>
       </div>
 
-      
+      <!-- Tampilkan Pesan Error Jika Ada -->
+      <div v-if="errorMessage" class="alert alert-danger mt-4" role="alert">
+        {{ errorMessage }}
+      </div>
       <div class="row mb-4">
         <transition-group name="fade" tag="div" class="row mb-4">
           <div class="col-md-4 mt-4" v-for="product in products" :key="product.id">
@@ -32,7 +35,7 @@
         </div>
       </div>
 
-      <div v-if="!loading && products.length === 0" class="text-center mt-5">
+      <div v-if="!loading && products.length === 0 && !errorMessage" class="text-center mt-5">
         <p>Tidak ada tiket yang tersedia saat ini.</p>
       </div>
 
@@ -90,7 +93,8 @@ export default {
       showCustomDate: false,
       selectedDate: null,
       formattedDate: '',
-      scheduledTicket: null // Menyimpan tiket yang dijadwalkan
+      scheduledTicket: null,
+      errorMessage: '' // Menyimpan pesan error jika ada
     };
   },
   mounted() {
@@ -138,44 +142,42 @@ export default {
     setToday() {
       const today = new Date();
       this.selectedDate = today;
-      console.log('Tanggal yang dipilih: Hari Ini -', today.toLocaleDateString());
     },
     setTomorrow() {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
       this.selectedDate = tomorrow;
-      console.log('Tanggal yang dipilih: Besok -', tomorrow.toLocaleDateString());
     },
     setCustomDate() {
       if (this.selectedDate) {
-        console.log('Tanggal yang dipilih: Khusus -', this.selectedDate.toLocaleDateString());
         this.showCustomDate = false;
       }
     },
     submitDate() {
-  if (this.selectedDate) {
-    // Mengonversi tanggal yang dipilih ke format 'YYYY-MM-DD'
-    const formattedDate = this.selectedDate.toISOString().slice(0, 10); // Format yang hanya mengambil bagian tanggal (YYYY-MM-DD)
-    console.log('Tanggal yang dikirimkan:', formattedDate);
+      if (this.selectedDate) {
+        const formattedDate = this.selectedDate.toISOString().slice(0, 10);
+        this.errorMessage = ''; // Reset error message
 
-    // Kirimkan tanggal yang sudah diformat ke backend dengan prefiks `/api/`
-    axios.get('/tickets-by-date', { params: { date: formattedDate } })
-      .then(response => {
-        console.log('Data tiket:', response.data);
-        this.scheduledTicket = response.data.data[0] || null;  // Ambil tiket pertama sebagai tiket yang dijadwalkan
-        this.products = response.data.data; // Mengisi produk tiket yang sesuai
-      })
-      .catch(error => {
-        console.error('Error mengambil tiket:', error);
-      });
-  } else {
-    alert("Pilih tanggal terlebih dahulu.");
-  }
-},
-
+        axios.get('/tickets-by-date', { params: { date: formattedDate } })
+          .then(response => {
+            this.scheduledTicket = response.data.data[0] || null;
+            this.products = response.data.data;
+          })
+          .catch(error => {
+            if (error.response && error.response.status === 404) {
+              this.errorMessage = 'Tidak ada tiket untuk tanggal ini.';
+            } else {
+              this.errorMessage = 'Terjadi kesalahan saat mengambil data tiket.';
+            }
+          });
+      } else {
+        alert("Pilih tanggal terlebih dahulu.");
+      }
+    },
     resetDate() {
       this.selectedDate = null;
       this.showCustomDate = false;
+      this.errorMessage = ''; // Reset error message
     }
   }
 };
