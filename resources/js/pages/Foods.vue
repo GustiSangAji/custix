@@ -23,8 +23,13 @@
           </div>
         </transition-group>
 
+        <!-- Menampilkan skeleton jika loading -->
         <div v-if="loading" class="row mb-4">
-          <div v-for="n in skeletonCount" :key="`skeleton-${n}`" class="col-md-4 mt-4">
+          <div
+            v-for="n in skeletonCount"
+            :key="`skeleton-${n}`"
+            class="col-md-4 mt-4"
+          >
             <div class="skeleton-item"></div>
           </div>
           <div class="text-center spinner-container">
@@ -75,6 +80,7 @@ import TicketProduct from "@/components/TicketProduct.vue";
 import axios from "axios";
 import LayoutLanding from "../layouts/LayoutLanding.vue";
 import Datepicker from 'vue3-datepicker';
+import dayjs from 'dayjs';
 
 export default {
   name: "TicketView",
@@ -154,26 +160,34 @@ export default {
       }
     },
     submitDate() {
-      if (this.selectedDate) {
-        const formattedDate = this.selectedDate.toISOString().slice(0, 10);
-        this.errorMessage = ''; // Reset error message
+    if (this.selectedDate) {
+      // Konversi tanggal yang dipilih ke format string 'YYYY-MM-DD' menggunakan Day.js
+      const formattedDate = dayjs(this.selectedDate).format('YYYY-MM-DD');
+      const today = dayjs().format('YYYY-MM-DD');
 
-        axios.get('/tickets-by-date', { params: { date: formattedDate } })
-          .then(response => {
-            this.scheduledTicket = response.data.data[0] || null;
-            this.products = response.data.data;
-          })
-          .catch(error => {
-            if (error.response && error.response.status === 404) {
-              this.errorMessage = 'Tidak ada tiket untuk tanggal ini.';
-            } else {
-              this.errorMessage = 'Terjadi kesalahan saat mengambil data tiket.';
-            }
-          });
-      } else {
-        alert("Pilih tanggal terlebih dahulu.");
+      if (formattedDate < today) {
+        this.errorMessage = 'Tanggal tidak boleh kurang dari hari ini.';
+        return;
       }
-    },
+
+      this.errorMessage = ''; // Reset pesan error jika valid
+
+      axios.get('/tickets-by-date', { params: { date: formattedDate } })
+        .then(response => {
+          this.scheduledTicket = response.data.data[0] || null;
+          this.products = response.data.data;
+        })
+        .catch(error => {
+          if (error.response && error.response.status === 404) {
+            this.errorMessage = 'Tidak ada tiket untuk tanggal ini.';
+          } else {
+            this.errorMessage = 'Terjadi kesalahan saat mengambil data tiket.';
+          }
+        });
+    } else {
+      alert("Pilih tanggal terlebih dahulu.");
+    }
+  },
     resetDate() {
       this.selectedDate = null;
       this.showCustomDate = false;
@@ -182,3 +196,52 @@ export default {
   }
 };
 </script>
+
+<style>
+.skeleton-item {
+  height: 200px;
+  background-color: #e0e0e0;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  animation: pulse 1.5s infinite; /* Animasi skeleton */
+}
+
+.spinner-container {
+  display: flex;
+  justify-content: center;
+  margin: 20px 0; /* Sesuaikan margin untuk memisahkan spinner dari skeleton */
+}
+
+/* Animasi Pulse untuk Skeleton */
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+  }
+  50% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.7;
+  }
+}
+
+/* Animasi Fade */
+.fade-enter-active,
+.fade-leave-active {
+  transition: opacity 0.5s;
+}
+.fade-enter, .fade-leave-to /* .fade-leave-active di versi <2.1.8 */ {
+  opacity: 0;
+}
+
+/* Tambahkan gaya untuk transisi produk */
+.fade-enter {
+  transform: translateY(20px);
+  opacity: 0;
+}
+.fade-enter-active {
+  transform: translateY(0);
+  opacity: 1;
+  transition: transform 0.5s, opacity 0.5s; /* Transisi transform dan opacity */
+}
+</style>
